@@ -1,0 +1,215 @@
+{% extends 'general/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general/barralateral.html' %}
+
+<div class="background-container" style="background-image: url({% static 'icon/CentroConciliacion.jpeg' %})">
+
+            <div class="text">
+                <h3 class="hovertown">Sistema de Gestión de Turnos del</h3>
+                <h2 class="hovertown">Centro de Conciliación Laboral</h2>
+                <p class="hovertown">del Estado de Jalisco.</p>
+                <section style="display: none;">
+                    <h2 class="sparklemaster" style="display: none;">Sistema de Turnos del Centro de Conciliacion Laboral</h2>
+                </section>
+                
+                <section style="display: none;">
+                    <h2 class="hovertown" style="display: none;">Sistema de Turnos del Centro de Conciliacion Laboral</h2>
+                </section>
+                
+                <section style="display: none;">
+                    <h2 class="foreverblur" style="display: none;">Sistema de Turnos del Centro de Conciliacion Laboral</h2>
+                </section>
+                
+                <section style="display: none;">
+                    <h2 id="jquerybuddy" style="display: none;">Sistema de Turnos del Centro de Conciliacion Laboral</h2>
+                </section>
+            </div> 
+
+                    <!-- Cargar la biblioteca jQuery desde CDN -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <!-- Cargar la biblioteca lettering.js desde CDN -->
+        <script src="https://css-tricks.com/examples/BlurredText/js/jquery.lettering.js"></script>
+
+
+
+        <style>
+        @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+        .text
+        {
+            margin-left: 6% !important;
+            padding-top: 3%;
+            padding-left: 3%;
+            
+        }
+
+        .text h2
+        {
+            text-align: left; 
+            margin: 0;
+            padding-left: 0; 
+            font-size: 5em;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1em;
+            text-transform: uppercase;
+        }
+        .text h1
+        {
+            text-align: left; 
+            margin: 0;
+            padding-left: 0; 
+            font-size: 2em;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1em;
+            text-transform: uppercase;
+        }
+        .text h3
+        {
+            text-align: left; 
+            margin: 0;
+            padding-left: 0;
+            font-size: 3em;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1em;
+
+        }
+        .text p
+        {
+            text-align: left; 
+            margin: 0;
+            padding-left: 0; 
+            font-size: 2em;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1em;
+            
+        }
+
+        *{
+            font-family: 'Poppins', sans-serif;
+        }
+        h2 {
+            color: rgb(58, 50, 50);
+            display: block;
+            font: bold 72px 'Poppins', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .hovertown span {
+            transition: all 0.9s ease;
+        }
+
+        .hovertown span:hover {
+            text-shadow: 0 0 72px rgb(33, 34, 54);
+            color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        @keyframes blackblur {
+            from { text-shadow: 0 0 72px rgb(39, 29, 29); color: transparent; }
+            to   { text-shadow: 0;              color: black;       }
+        }
+
+        .smokemonster span:nth-of-type(1)  { animation: blackblur 2s       1 alternate; }
+        .smokemonster span:nth-of-type(2)  { animation: blackblur 2s 0.1s  1 alternate; }
+        .smokemonster span:nth-of-type(3)  { animation: blackblur 2s 0.15s 1 alternate; }
+        /* Repite las animaciones según sea necesario */
+
+        @keyframes fun-1 {
+            from { text-shadow: 0 0 72px rgb(138, 68, 68); color: transparent; }
+            to   { text-shadow: 0;            color: rgb(36, 29, 29);       }
+        }
+
+            .sparklemaster span:nth-of-type(1)  { animation: fun-1 2s 0.2s  1 alternate; }
+        /* Repite las animaciones según sea necesario */
+
+        .textshadow .foreverblur {
+            text-shadow: 0 0 32px white;
+            color: transparent;
+        }
+
+        #jquerybuddy span {
+            text-shadow: 0 0 4px rgba(0,100,0,1);
+            color: transparent;
+        }
+
+        section {
+            padding: 10px 100px;
+            text-align: center;
+        }
+
+        section:nth-child(odd) {
+            background: #eee;
+        }
+
+        section:nth-child(even) {
+            background: #333;
+        }
+
+        </style>
+
+
+        <script>
+        $(document).ready(function() {
+            
+            $("h2").lettering();
+
+            
+            $("h2").click(function() { 
+                var el = $(this),  
+                newone = el.clone();
+                el.before(newone);
+                el.remove();
+            }); 
+
+            $("h3").lettering();
+
+        
+            $("h3").click(function() { 
+                var el = $(this),  
+                newone = el.clone();
+                el.before(newone);
+                el.remove();
+            });
+
+            $("h1").lettering();
+            
+            $("h1").click(function() { 
+                var el = $(this),  
+                newone = el.clone();
+                el.before(newone);
+                el.remove();
+            });
+
+            $("p").lettering();
+        
+            $("p").click(function() { 
+                var el = $(this),  
+                newone = el.clone();
+                el.before(newone);
+                el.remove();
+            });
+            
+        
+            var text = $("#jquerybuddy"),
+            numLetters = text.find("span").length;
+
+            function randomBlurize() {
+                text.find("span:nth-child(" + (Math.floor(Math.random()*numLetters)+1) + ")")
+                    .animate({
+                    'textShadowBlur': Math.floor(Math.random()*25)+4,
+                    'textShadowColor': 'rgba(0,100,0,' + (Math.floor(Math.random()*200)+55) + ')'
+                });
+                setTimeout(randomBlurize, 100);
+            }
+
+            randomBlurize();
+        });
+
+        </script>  
+</div>
+{% endblock %}

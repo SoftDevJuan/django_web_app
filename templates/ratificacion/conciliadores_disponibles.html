@@ -1,0 +1,263 @@
+{% extends 'recepcion/base.html' %}
+{% load static%}
+{% block content %}
+
+
+<link href="{% static 'CSS/pantalla_ratis.css' %}" rel="stylesheet"/>
+<script src="{% static 'js/conciliadores_disponibles.js'%}"></script>
+<script>var audioPathNotificacion = "{% static 'audios/alerta-notificacion.mp3' %}";</script>
+    <script src="{% static 'js/notificaciones.js' %}"></script>
+    <script src="{% static 'js/notificaciones_conciliador.js' %}"></script>
+    <script src="{% static 'js/notificaciones_coordinador.js' %}"></script>
+<div class="height-100 bg-light">
+<main role="main">
+  <h1 class="text-white bg-blue p-3 rounded text-center">
+    Conciliadores Disponibles
+  </h1>
+
+  {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+  <div class="row text-center my-4">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Conciliadores Disponibles</h5>
+          <h2 class="card-text" id="conteo-disponibles">
+            <i class="fa-solid fa-check blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Turnos pendientes</h5>
+          <h2 class="card-text" id="turnos-pendientes">
+            {{ turnos_pendientes }} <i class="fa-regular fa-clock blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    
+
+  <div class="group text-center mb-4">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+      <g>
+        <path
+          d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
+        ></path>
+      </g>
+    </svg>
+    <input
+      class="input"
+      type="text"
+      id="search-input"
+      placeholder="Buscar por número de expediente, por nombre, por hora, etc..."
+    />
+  </div>
+
+  <table class="table table-hover border text-center">
+    <thead class="table-light">
+      <tr>
+        <th>Conciliador</th>
+        <th>Sala/Mesa</th>
+        <th>Audiencia/Turno</th>
+        <th>Observaciones</th>
+      </tr>
+    </thead>
+    <tbody id="table-body">
+      
+    </tbody>
+  </table>
+
+
+
+
+
+  <div id="no-results" class="alert alert-danger" style="display: none">
+    No se encontraron resultados que coincidan con su busqueda. Puede comprobar
+    <a href="">turnos cancelados</a> o <a href="">turnos atendidos</a> en su
+    lugar.
+  </div>
+
+  <div class="d-flex justify-content-center my-4">
+    <div id="reloj"></div>
+  </div>
+</main>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    cargarTurnos(); 
+});// DOM
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    const tableBody = document.getElementById("table-body");
+    const noResultsDiv = document.getElementById("no-results");
+  
+    searchInput.addEventListener("input", function () {
+      const filter = searchInput.value.toLowerCase();
+      const rows = tableBody.getElementsByTagName("tr");
+      let hasResults = false;
+  
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const cells = row.getElementsByTagName("td");
+        let rowContainsFilter = false;
+  
+        for (let j = 0; j < cells.length; j++) {
+          const cell = cells[j];
+          if (cell.innerText.toLowerCase().includes(filter)) {
+            rowContainsFilter = true;
+            break;
+          }
+        }
+  
+        if (rowContainsFilter) {
+          row.style.display = "";
+          hasResults = true;
+        } else {
+          row.style.display = "none";
+        }
+      }
+  
+      noResultsDiv.style.display = hasResults ? "none" : "block";
+    });
+  
+    
+  
+    // Guardar la selección de la mesa en localStorage
+    const mesaSelects = document.querySelectorAll('select[name="mesa_id"]');
+    mesaSelects.forEach((select) => {
+      const turnoId = select.closest('tr').querySelector('input[name="turno_id"]').value;
+      const savedMesaId = localStorage.getItem(`mesa_select_${turnoId}`);
+  
+      if (savedMesaId) {
+        select.value = savedMesaId;
+      }
+  
+      select.addEventListener("change", function () {
+        localStorage.setItem(`mesa_select_${turnoId}`, select.value);
+      });
+    });
+  });
+  
+  document.addEventListener("DOMContentLoaded", function () {
+  const buttons = document.querySelectorAll(".toggle-button");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", function () {
+      const turnoId = button.getAttribute("data-turno-id");
+      const estado = button.textContent.trim() === "No revisado";
+      
+      fetch(`/actualizar_estado/${turnoId}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ estado_revisado: estado })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.nuevo_estado) {
+          button.textContent = "Revisado";
+        } else {
+          button.textContent = "No revisado";
+        }
+        location.reload();
+      });
+    });
+  });
+});
+
+  </script>
+  
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const tableBody = document.getElementById('table-body');
+    const noResultsAlert = document.getElementById('no-results');
+  
+    searchInput.addEventListener('input', function() {
+      const query = searchInput.value.toLowerCase();
+      const rows = tableBody.getElementsByTagName('tr');
+      let hasVisibleRows = false;
+  
+      for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName('td');
+        let rowText = '';
+        for (let j = 0; j < cells.length; j++) {
+          rowText += cells[j].textContent.toLowerCase() + ' ';
+        }
+  
+        if (rowText.includes(query)) {
+          rows[i].style.display = '';
+          hasVisibleRows = true;
+        } else {
+          rows[i].style.display = 'none';
+        }
+      }
+  
+      noResultsAlert.style.display = hasVisibleRows ? 'none' : 'block';
+    });
+
+    
+  });
+  </script>
+
+  <script src="{% static 'js/reloj.js'%}"></script>
+
+  
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('searchInput');
+    if(searchInput){
+      searchInput.addEventListener('keyup', function() {
+      var filter = this.value.toLowerCase();
+      var options = document.getElementById('mesaSalaSelect').options;
+
+      for (var i = 0; i < options.length; i++) {
+          var optionText = options[i].text.toLowerCase();
+          if (optionText.includes(filter)) {
+              options[i].style.display = '';
+          } else {
+              options[i].style.display = 'none';
+          }
+      }
+  });
+  }
+    
+});
+</script>
+
+
+
+<style>
+  body{
+    padding-left: 15px !important;
+    margin: 5px;
+  }
+  .header{
+    display: none;
+  }
+</style>
+<link href="{% static 'CSS/pantalla_ratis.css' %}" rel="stylesheet"/>
+    
+
+
+{% endblock %}

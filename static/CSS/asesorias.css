@@ -1,0 +1,346 @@
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff; 
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #ffffff; 
+    box-shadow: 0 4px 8px rgba(62, 59, 59, 0.2);
+    z-index: 1000;
+    display: flex;
+}
+
+.header h1 {
+    margin: 0;
+    color: gray;  
+    text-align: center;
+    font-size: 24px;
+    position: absolute;
+    left: 50%;
+    top: 25%;
+}
+
+.header a img {
+    cursor: pointer;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 70px; 
+    padding-left: 10px;
+    padding-right: 10px;
+    position: absolute;
+    left: 2%;
+    width: 95%;
+}
+
+.dashboard {
+    padding: 10px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px 0;
+    max-height: 80vh;
+    overflow: hidden;
+    
+}
+
+.turno-card.pro .turno{
+    font-weight: bold;
+    font-size: 30px;
+}
+.turno{
+    font-weight: bold;
+}
+
+.sala {
+    margin-left: auto; 
+    font-size: 14px;
+    margin-left: 10px;
+    text-align: left; 
+}
+
+.turno-board {
+    margin-top: 10px;
+    
+    max-height: calc(70vh - 20px);
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    
+}
+
+.turno-inner {
+    animation: moveLeft 60s linear infinite; 
+    position: relative;
+    flex-wrap: nowrap;
+    display: flex;
+    height: fit-content;
+    width: 100%;
+    max-height: 60vh;
+    gap: 10px;
+}
+
+
+
+
+.turno-inner-p-last{
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.turno-inner-p-last .turno-card.pro .turno{
+    height: 50%;
+    width: 100%;
+    font-size: 70px;
+}
+
+.turno-inner-p-last .turno-card.pro .sala{
+    height: 50%;
+    width: 100%;
+    font-size: 30px;
+}
+.turno-inner-p{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: relative;
+    max-height: 400px;
+}
+
+.turno-inner-p.animate {
+    animation: move 30s linear infinite;
+}
+
+.inner-scroll{
+    overflow: hidden;
+}
+
+
+@keyframes move {
+    0% {
+        transform: translateY(90%);
+    }
+    50% {
+        transform: translateY(-100%); 
+        } 
+    100% {
+        transform: translateY(50%); 
+    }
+
+}
+
+
+@keyframes moveLeft {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%); 
+    }
+
+}
+
+
+
+
+.video-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 58%;
+    padding: 20px;
+    margin: 20px 0;
+    position: fixed;
+    top: 15%;
+    right: 2%;
+    bottom: 10%;
+    max-height: 70vh;
+}
+
+video {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: auto;
+}
+
+.reloj {
+    color: #0c0000;
+    display: flex;
+    position: fixed;
+    top: 10%;
+    left: 60%;
+    justify-content: center;
+    font-size: 24px;
+    font-family: Arial, sans-serif;
+    margin-top: 20px;
+}
+
+.pasarela{
+    display: flex;
+    position: fixed;
+    bottom: 1%;
+    justify-content: center;
+    margin-top: 20px;
+    width: 95%;
+}
+
+
+
+
+
+
+/* Estilos para pantallas pequeñas */
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .dashboard {
+        width: 33%;
+        margin-right: 20px;
+        max-width: none;
+    }
+
+    .video-section {
+        flex-basis: 30%; 
+        right: 2%;
+    }
+}
+
+
+
+@media (max-height: 615px) {
+    .container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .dashboard {
+        width: 33%;
+        margin-right: 20px;
+        max-width: none;
+    }
+
+    .video-section {
+        flex-basis: 5%; 
+        right: 2%;
+        width: 45%;
+    }
+    .reloj{
+        position: fixed;
+        top: 15%;
+    }
+    .inner-scroll{
+        height: 140px;
+    }
+    .turno-inner-p-last .turno-card .pro{
+        height: 100px;
+    }
+    
+}
+
+
+
+
+/* Estilos para pantallas grandes */
+@media (min-width: 1024px) {
+    .container {
+        padding-top: 100px; 
+    }
+
+    .header h1 {
+        font-size: 32px;
+    }
+
+    .video-section {
+        flex-basis: 30%;
+        right: 2%; 
+    }
+
+    .dashboard {
+        margin-right: 20px;
+    }
+}
+
+
+
+
+
+
+.container .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.turno-card {
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    color: #2d2525;
+    height: 40%; 
+    margin-bottom: 10px; 
+    margin-top: 10px; 
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.turno-card.pro {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: calc(25% - 10px); 
+    height: 100px;
+    margin: 10px;
+    font-weight: bold;
+    border-left: 5px solid #0b23a7;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(1px);
+    background-color: rgba(197, 196, 244, 0.1);
+}
+
+.turno-inner-p-last .turno-card.pro{
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 80%; 
+    height: 200px;
+    margin: 10px;
+    font-weight: bold;
+    border-left: 5px solid #0b23a7;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(1px);
+    background-color: rgba(197, 196, 244, 0.1);
+}
+
+
+.turno, .sala {
+    margin: 5px; 
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+.turno-card.pro .turno .sala{
+    height: 100%;
+}
+

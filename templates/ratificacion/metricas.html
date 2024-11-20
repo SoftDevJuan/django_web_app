@@ -1,0 +1,235 @@
+{% extends 'recepcion/base.html' %} 
+{% load static%} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<div class="height-100 bg-light">
+<main role="main">
+  <h1 class="text-white bg-blue p-3 rounded text-center">
+    Mostrando turnos para ratificacion
+  </h1>
+
+  <div class="row text-center my-4">
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Turnos atendidos</h5>
+          <h2 class="card-text">
+            {{TurnosFin}} <i class="fa-solid fa-check blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Turnos pendientes</h5>
+          <h2 class="card-text">
+            {{turnosPen}} <i class="fa-regular fa-clock blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Turnos cancelados</h5>
+          <h2 class="card-text">
+            {{turosCan}} <i class="fa-solid fa-xmark blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="group">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+      <g>
+        <path
+          d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
+        ></path>
+      </g>
+    </svg>
+    <input
+      class="input"
+      type="text"
+      id="search-input"
+      placeholder="Buscar por número de expediente, por nombre, por hora, etc..."
+    />
+  </div>
+
+  <table class="table table-hover border text-center">
+    <thead class="table-light">
+      <tr>
+        <th>Conciliador</th>
+        <th>Turno</th>
+        <th>Estatus</th>
+        <th>Mesa</th>
+        <th>Personas</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="table-body">
+      {% comment %} iteracion de turnos {% endcomment %}
+      {% for turno in turnos %}
+      {% for users in users %}
+        <tr>
+          <td>
+            <td class="py-3 px-6 text-center">
+              <img src="{{ user.profile.image.url }}" alt="User Image 1" class="h-10 w-10 rounded-full mx-auto">
+          </td>
+          </td>
+          <td>{{ user }}</td>
+          <td>{{ turno.turno }}</td>
+          <td>{{ turno.status}}</td>
+          <td style="text-align: center;">
+            <select style="width: auto; display: inline-block;" class="form-control" name="mesas" id="mesas">
+                {% for mesa in mesas %}
+                <option value="{{ mesa.mesa }}">
+                    Mesa: {{ mesa.mesa }} 
+                    Asignada a: {{ mesa.user }}
+                </option>
+                {% endfor %}
+            </select>
+        </td>
+        
+          </td>  
+          <td>{{turno.registro}}</td>
+          <td>
+            <div class="d-flex justify-content-center">
+              <form action="{% url 'atender_pagos' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="turno" value="1100112" />
+                <input type="hidden" name="expediente" value="PA000121" />
+                <button type="submit" class="btn btn-success btn-sm fw-bold">
+                  Guardar
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <div id="no-results" class="alert alert-danger" style="display: none">
+    No se encontraron resultados que coincidan con su busqueda. Puede comprobar
+    <a href="">turnos cancelados</a> o <a href="">turnos atendidos</a> en su
+    lugar.
+  </div>
+
+  <div class="d-flex justify-content-center my-4">
+    <div id="current-time">Cargando...</div>
+  </div>
+</main>
+</div>
+
+ <!-- Modal para boton ver -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Información adicional del turno:
+          <span id="turno-id" class="blue-icon fw-bold"></span>
+        </h1>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li><span class="fw-bold">ID del ciudadano:</span> <span id="codigo-ciudadano"></span></li>
+          <li><span class="fw-bold">Nombre del solicitante: </span> <span id="nombre-ciudadano"></span></li>
+          <li><span class="fw-bold">Fecha y hora en que realizó la cita: </span> <span id="fecha-cita"></span></li>
+          <li><span class="fw-bold">Medio donde realizó la cita: </span> <span id="medio-cita"></span></li>
+          <li><span class="fw-bold">Área asignada: </span> <span id="area-asignada"></span></li>
+          <li><span class="fw-bold">Número de expediente: </span> <span id="numero-expediente"></span></li>
+          <li><span class="fw-bold">Estatus: </span> <span id="estatus-turno"></span></li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal para cancelar turno -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header justify-content-center">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">¿Cancelar turno?</h1>
+          </div>
+          <div class="modal-body text-center">
+              Una vez cancelado no podrá ser recuperado, ¿realmente quiere hacer esto?
+          </div>
+          <div class="modal-footer justify-content-center">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, mantener turno</button>
+              <form id="cancelForm" action="" method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" name="id" id="turno-id-input" />
+                  <button id="cancelButton" type="submit" class="btn btn-danger disabled" data-bs-dismiss="modal">
+                      Sí, cancelar turno (<span id="countdown">3</span>)
+                  </button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const viewModal = document.getElementById('viewModal');
+    viewModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget; // Button that triggered the modal
+      const turnoId = button.getAttribute('data-id');
+      const codigoCiudadano = button.getAttribute('data-codigo');
+      const fechaCita = button.getAttribute('data-fecha');
+      const nombreCiudadano = button.getAttribute('data-nombre');
+      const medioCita = 'Bot de WhatsApp de CCL'; // Puedes ajustar esto según corresponda
+      const areaAsignada = 'Área asignada'; // Ajusta según corresponda
+      const numeroExpediente = 'PA000121'; // Ajusta según corresponda
+      const estatusTurno = button.getAttribute('data-estatus');
+  
+      // Update the modal's content
+      document.getElementById('turno-id').textContent = turnoId;
+      document.getElementById('codigo-ciudadano').textContent = codigoCiudadano;
+      document.getElementById('nombre-ciudadano').textContent = nombreCiudadano;
+      document.getElementById('fecha-cita').textContent = fechaCita;
+      document.getElementById('medio-cita').textContent = medioCita;
+      document.getElementById('area-asignada').textContent = areaAsignada;
+      document.getElementById('numero-expediente').textContent = numeroExpediente;
+      document.getElementById('estatus-turno').textContent = estatusTurno;
+    });
+  });
+  </script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const cancelModal = document.getElementById('cancelModal');
+      const cancelButton = document.getElementById('cancelButton');
+      const countdownElement = document.getElementById('countdown');
+      const turnoIdInput = document.getElementById('turno-id-input');
+      let countdown = 3;
+    
+      cancelModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const turnoId = button.getAttribute('data-id'); // Obtén el id del turno del botón que activó el modal
+        turnoIdInput.value = turnoId; // Asigna el id del turno al campo oculto del formulario
+        document.getElementById('cancelForm').action = `/cancelar_turno/${turnoId}/`;
+      });
+    
+      cancelButton.addEventListener('click', function () {
+        const interval = setInterval(function () {
+          countdown--;
+          countdownElement.textContent = countdown;
+          if (countdown <= 0) {
+            clearInterval(interval);
+            document.getElementById('cancelForm').submit();
+          }
+        }, 1000);
+      });
+    });
+    </script>
+    
+ 
+
+{% endblock %}

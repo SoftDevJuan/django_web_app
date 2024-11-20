@@ -1,0 +1,90 @@
+{% extends 'pagos/base_pagos.html' %} {% load static%} {% block content %} 
+{% include 'general1/barralateral.html' %}
+
+<div class="bg-light">
+  <main role="main" class="pt-3 px-4 mb-2">
+    <div id="calendar" class="mb-5"></div>
+    <div id="eventoModal" class="modal fade" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-blue">Detalles del turno</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p id="eventoDetalles"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+    var turnosData = JSON.parse('{{ turnos|safe }}');
+    if (turnosData.length === 0) {
+      console.log("No hay turnos para mostrar");
+    }
+    
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      locale: "es",
+      dayMaxEvents: 3,
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+      },
+      eventClick: function(info) {
+        mostrarDetallesEvento(info.event);
+      },
+      eventContent: function(arg) {
+        var backgroundColor = arg.event.backgroundColor;
+        var textColor = arg.event.textColor;
+        var borderColor = arg.event.borderColor;
+
+        var eventEl = document.createElement('div');
+        eventEl.className = 'event-content';
+        eventEl.style.backgroundColor = backgroundColor;
+        eventEl.style.color = textColor;
+        eventEl.style.borderColor = borderColor;
+
+        var timeEl = document.createElement('span');
+        timeEl.className = 'fc-event-time';
+        timeEl.innerText = arg.timeText;
+
+        var titleEl = document.createElement('span');
+        titleEl.className = 'fc-event-title';
+        titleEl.innerText = arg.event.title;
+
+        eventEl.appendChild(timeEl);
+        eventEl.appendChild(titleEl);
+
+        return { domNodes: [eventEl] };
+      },
+      events: turnosData
+    });
+    
+    calendar.render();
+  });
+</script>
+<script>
+  function mostrarDetallesEvento(event) {
+    var detalles = `
+    <ul>
+    <li><strong>ID del Turno:</strong> ${event.extendedProps.turnoId}<br></li>
+    <li><strong>Nombre del Ciudadano:</strong> ${event.extendedProps.ciudadanoNombre}<br></li>
+    <li><strong>Área:</strong> ${event.extendedProps.area}<br></li>
+    <li><strong>Mesa:</strong> ${event.extendedProps.mesa || 'No asignada'}<br></li>
+    <li><strong>Sala:</strong> ${event.extendedProps.sala || 'No asignada'}<br></li>
+    <li><strong>N. de personas en el turno:</strong> ${event.extendedProps.cant_personas}<br></li>
+    <li><strong>Fecha:</strong> ${new Date(event.extendedProps.fecha).toLocaleString()}</li>
+    </ul>
+  `;
+  
+  document.getElementById('eventoDetalles').innerHTML = detalles;
+  $('#eventoModal').modal('show');
+  }
+</script>
+{% endblock %}

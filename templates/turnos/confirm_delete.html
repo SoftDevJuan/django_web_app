@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>¿Estás seguro de que quieres eliminar este turno?</h2>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirmar</button>
+        <a href="{% url 'turnos list' %}">Cancelar</a>
+    </form>
+{% endblock %}

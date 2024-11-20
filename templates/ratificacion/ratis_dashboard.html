@@ -1,0 +1,96 @@
+{% extends 'recepcion/base.html' %}
+{% load static%}
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<link href="{% static 'CSS/pantalla_ratis.css' %}" rel="stylesheet"/>
+<div class="height-100 bg-light">
+<main role="main">
+  <div class="row text-center my-4">
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Turnos atendidos hoy</h5>
+          <h2 class="card-text">
+            {{turnosFin}} <i class="fa-regular fa-calendar blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Convenios exitosos</h5>
+          <h2 class="card-text">
+            {{convenio}} <i class="fa-solid fa-check blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Convenios no exitosos</h5>
+          <h2 class="card-text">
+            {{noconvenio}} <i class="fa-solid fa-xmark blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart" id="chart">  
+  </div>
+  <div class="d-flex justify-content-center my-4">
+    <div id="reloj"></div>
+  </div>
+</main>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/reloj.js'%}"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  fetch("/conteo_por_conciliador/")
+    .then(response => response.json())
+    .then(data => {
+      const usernames = data.map(item => item.user__username);
+      const convenios = data.map(item => item.total_convenios);
+      const sinConvenios = data.map(item => item.total_sin_convenios);
+      const turnos = data.map(item => item.total_turnos);
+
+      var options = {
+        chart: {
+          height: '100%',
+          type: 'bar'
+        },
+        colors: ['#2200e3','#16904b', '#ea4545'],
+        series: [
+          {
+            name: 'Turnos',
+            data: turnos,
+          },
+          {
+            name: 'Convenios exitosos',
+            data: convenios,
+          },
+          {
+            name: 'Convenios no exitosos',
+            data: sinConvenios,
+          }
+        ],
+        xaxis: {
+          categories: usernames
+        }
+      }
+
+      var chart = new ApexCharts(document.querySelector('#chart'), options);
+      chart.render();
+    })
+    .catch(error => console.error('Error fetching data:', error));
+});
+</script>
+
+{% endblock %}

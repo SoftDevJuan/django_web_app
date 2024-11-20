@@ -1,0 +1,437 @@
+{% extends 'audiencia/base.html' %} 
+{% load static%} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<div class="height-100 bg-light">
+<main role="main">
+  
+  <h1 class="text-white bg-blue p-3 rounded text-center">
+    Audiencias del día
+  </h1>
+
+  <div class="row text-center my-4">
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Audiencias Pendientes</h5>
+          <h2 class="card-text">
+            {{audiencias_pendientes}} <i class="fa-regular fa-clock blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Audiencias en sala</h5>
+          <h2 class="card-text">
+            {{audiencias_en_sala}} <i class="fa-regular fa-handshake blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Audiencias concluidas</h5>
+          <h2 class="card-text">
+            {{audiencias_concluidas}} <i class="fa-solid fa-check blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="group d-flex align-middle">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+      <g>
+        <path
+          d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
+        ></path>
+      </g>
+    </svg>
+    <input
+      class="input"
+      type="text"
+      id="search-input"
+      placeholder="Buscar por número de expediente, por citados, por fecha y hora, etc..."
+    />
+  </div>
+
+  <div class="accordion mt-2 mb-3" id="accordionFiltro">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Mostrar filtros adicionales <i class="fa-solid fa-arrow-down-wide-short ms-2"></i>
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFiltro">
+        <div class="accordion-body">
+          <div class="group d-flex align-middle">
+            <select id="status-select" class="form-select me-3 w-auto">
+              <option selected value="">Cualquier estatus</option>
+              {% for status in estatus%}
+                <option value="{{ status }}">{{ status }}</option>
+              {% endfor %}
+            </select>
+            <select id="conciliador-select" class="form-select me-3">
+              <option selected value="">Todos los conciliadores</option>
+              {% for conciliador in conciliadores %}
+                <option value="{{ conciliador }}">{{ conciliador|cut:"."|title }}</option>
+              {% endfor %}
+            </select>
+        
+            <select id="fecha-select" class="form-select ms-3 w-auto">
+              <option selected value="">Cualquier fecha</option>
+              {% for fecha in fechas %}
+                <option value="{{ fecha|date:"d/m/Y" }}">{{ fecha|date:"d/m/Y" }}</option>
+              {% endfor %}
+            </select>
+            <select id="hora-select" class="form-select ms-3 w-auto">
+              <option selected value="">Cualquier hora</option>
+              {% for hora in horas %}
+                  <option value="{{ hora }}">{{ hora|time:"H:i" }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-100">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} mt-4 text-center" role="alert"> 
+      <p  {% if message.tags %} class="mb-0 mt-0 {{ message.tags }} " {% endif %}> {{ message|safe }} </p>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <table class="table table-hover border text-center align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Expediente</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Sala</th>
+        <th>Conciliador</th>
+        <th>Solicitante</th>
+        <th>Citado</th>
+        <th>Estatus</th>
+        {% if nombreGrupo == 'Conciliacion' or nombreGrupo == 'Auxiliar-Asistencias' or nombreGrupo == 'Coordinador' %}
+        <th>Acciones</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody id="table-body">
+      {% comment %} iteracion de audiencias {% endcomment %}
+      {% for audiencia in audiencias %}
+        <tr>
+          
+          <td class="expediente">{{ audiencia.expediente }}</td>
+          <td>{{ audiencia.fecha_audiencia|date:"d/m/Y" }}</td>
+          <td>{{ audiencia.hora_audiencia }}</td>
+          <td>{{ audiencia.sala_audiencia }}</td>
+          <td>{{ audiencia.conciliador_audiencia|title }}</td>
+          
+          <!-- Solicitud de asistencia con ícono -->
+          <td>
+            {% for ciudadano in audiencia.ciudadanos_solicitantes %}
+              <p>
+                {{ ciudadano.nombre|title }}
+                {% if ciudadano.asistencia %}
+                  <!-- Ícono de Bootstrap para asistencia -->
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                {% endif %}
+              </p>
+            {% endfor %}
+          </td>
+
+          <!-- Citados con ícono de asistencia -->
+          <td>
+            {% for ciudadano in audiencia.ciudadanos_citados %}
+              <p>
+                {{ ciudadano.nombre|title }}
+                {% if ciudadano.asistencia %}
+                  <!-- Ícono de Bootstrap para asistencia -->
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                {% endif %}
+              </p>
+            {% endfor %}
+          </td>
+          {% if audiencia.status_audiencia == 'Llamando' %}
+          <td><span class="badge rounded-pill text-bg-warning p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'En audiencia' %}
+          <td><span class="badge rounded-pill text-bg-success p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'Archivada' %}
+          <td><span class="badge rounded-pill text-bg-danger p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'Concluida' %}
+          <td><span class="badge rounded-pill text-bg-primary p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% else %}
+          <td><span class="badge rounded-pill text-bg-secondary p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% endif %}
+          
+         
+
+          {% if nombreGrupo == 'Conciliacion' %}
+          <td>
+              <div class="d-flex justify-content-center">
+                  <form method="POST" action="{% url 'llamar_audiencia' audiencia.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-primary btn-sm fw-bold">
+                          Llamar
+                      </button>
+                  </form>            
+              </div> 
+          </td>
+          <td>
+            <a href="{% url 'celebrar_audiencia' audiencia.id %}" class="btn btn-primary btn-sm fw-bold">
+                Celebrar Audiencia
+            </a>
+          </td>
+          {% elif nombreGrupo == 'Auxiliar-Asistencias' %}
+          <td>
+              <a href="{% url 'audiencia_asistencia' audiencia.id %}" class="btn btn-primary btn-sm fw-bold">
+                  Marcar Asistencia
+              </a>
+          </td>
+          
+          {% elif nombreGrupo == 'Coordinador' %}
+          <td>
+              <a href="{% url 'editar_audiencia' audiencia.id %}" class="btn btn-primary btn-sm fw-bold">
+                  Editar
+              </a>
+          </td>
+      </tr>
+      {% endif %}
+      
+      {% endfor %}
+      
+    </tbody>
+  </table>
+  <div id="no-results" class="alert alert-danger" style="display: none">
+    No se encontraron resultados que coincidan con su busqueda. Compruebe que los filtros sean correctos y que no haya errores de escritura.
+  </div>
+
+  <div class="d-flex justify-content-center my-4">
+    <div id="current-time">Cargando...</div>
+  </div>
+</main>
+</div>
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById("search-input");
+    const tableBody = document.getElementById("table-body");
+    const noResultsMessage = document.getElementById("no-results");
+    const statusSelect = document.getElementById("status-select");
+    const conciliadorSelect = document.getElementById("conciliador-select");
+    const fechaSelect = document.getElementById("fecha-select");
+    const horaSelect = document.getElementById("hora-select");
+
+    function saveFilters() {
+      localStorage.setItem('statusFilter', statusSelect.value);
+      localStorage.setItem('conciliadorFilter', conciliadorSelect.value);
+      localStorage.setItem('fechaFilter', fechaSelect.value);
+      localStorage.setItem('horaFilter', horaSelect.value);
+    }
+
+    function loadFilters() {
+      if (localStorage.getItem('statusFilter')) {
+          statusSelect.value = localStorage.getItem('statusFilter');
+      }
+      if (localStorage.getItem('conciliadorFilter')) {
+          conciliadorSelect.value = localStorage.getItem('conciliadorFilter');
+      }
+      if (localStorage.getItem('fechaFilter')) {
+          fechaSelect.value = localStorage.getItem('fechaFilter');
+      }
+      if (localStorage.getItem('horaFilter')) {
+          horaSelect.value = localStorage.getItem('horaFilter');
+      }
+    }
+
+    function parseTime(timeString) {
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      return date;
+    }
+
+    function actualizarHora() {
+      var now = new Date();
+      var tiempoFormateado = now.toLocaleTimeString();
+      document.getElementById('current-time').textContent = 'Última actualización el: ' + tiempoFormateado;
+    }
+
+    // Función para aplicar todos los filtros
+    function applyFilters() {
+        const searchFilter = searchInput.value.toLowerCase();
+        const statusFilter = statusSelect.value.toLowerCase();
+        const conciliadorFilter = conciliadorSelect.value.toLowerCase();
+        const fechaFilter = fechaSelect.value;
+        const horaFilter = horaSelect.value;
+
+        const rows = tableBody.getElementsByTagName("tr");
+        let hasVisibleRows = false;
+
+        Array.from(rows).forEach(function (row) {
+            const expediente = row.cells[0].textContent.toLowerCase();
+            const fecha = row.cells[1].textContent;
+            let hora = row.cells[2].textContent.trim();
+            const sala = row.cells[3].textContent.toLowerCase();
+            const conciliador = row.cells[4].textContent.toLowerCase();
+            const solicitante = row.cells[5].textContent.toLowerCase();
+            const citado = row.cells[6].textContent.toLowerCase();
+            const estatus = row.cells[7].textContent.toLowerCase();
+
+            console.log("Row values - Expediente:", expediente, "Fecha:", fecha, "Hora:", hora, "Sala:", sala, "Conciliador:", conciliador, "Estatus:", estatus);
+
+            hora = hora.substring(0, 5);
+
+            const matchesSearch = expediente.includes(searchFilter) ||
+                                  fecha.includes(searchFilter) ||
+                                  hora.includes(searchFilter) ||
+                                  sala.includes(searchFilter) ||
+                                  conciliador.includes(searchFilter) ||
+                                  solicitante.includes(searchFilter) ||
+                                  citado.includes(searchFilter) ||
+                                  estatus.includes(searchFilter);
+
+            const matchesStatus = statusFilter === '' || estatus.includes(statusFilter);
+            const matchesConciliador = conciliadorFilter === '' || conciliador.includes(conciliadorFilter);
+            const matchesFecha = fechaFilter === '' || fecha === fechaFilter;
+            const matchesHora = horaFilter === '' || parseTime(horaFilter).getTime() === parseTime(hora).getTime();
+
+            console.log("matchesSearch:", matchesSearch, "matchesStatus:", matchesStatus, "matchesConciliador:", matchesConciliador, "matchesFecha:", matchesFecha, "matchesHora:", matchesHora);
+
+            if (matchesSearch && matchesStatus && matchesConciliador && matchesFecha && matchesHora) {
+                row.style.display = "";
+                hasVisibleRows = true;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        noResultsMessage.style.display = hasVisibleRows ? "none" : "block";
+    }
+
+    loadFilters();
+    applyFilters();
+    actualizarHora();
+
+    // Agregar event listeners
+    searchInput.addEventListener("keyup", applyFilters);
+    statusSelect.addEventListener("change", function () {
+      applyFilters();
+      saveFilters();
+    });
+    conciliadorSelect.addEventListener("change", function () {
+        applyFilters();
+        saveFilters();
+    });
+    fechaSelect.addEventListener("change", function () {
+        applyFilters();
+        saveFilters();
+    });
+    horaSelect.addEventListener("change", function () {
+        applyFilters();
+        saveFilters();
+    });
+
+
+    setInterval(function() {
+      location.reload();
+    }, 180000);
+});
+</script>
+    
+    <script>
+      document.getElementById('llamar-btn').addEventListener('click', function() {
+          var audienciaId = this.getAttribute('data-audiencia-id');
+          fetch(`audiencia/<int:au/llamar_audiencia}`, {
+              method: 'POST',
+              headers: {
+                  'X-CSRFToken': '{{ csrf_token }}',
+                  'Content-Type': 'application/json'
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  alert('Estado cambiado a Llamando');
+              } else {
+                  alert('Error al cambiar el estado');
+              }
+          });
+      });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const cancelModal = document.getElementById('cancelModal');
+      const cancelButton = document.getElementById('cancelButton');
+      const countdownElement = document.getElementById('countdown');
+      const turnoIdInput = document.getElementById('turno-id-input');
+      let countdown = 3;
+    
+      cancelModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const turnoId = button.getAttribute('data-id'); // Obtén el id del turno del botón que activó el modal
+        turnoIdInput.value = turnoId; // Asigna el id del turno al campo oculto del formulario
+        document.getElementById('cancelForm').action = `/cancelar_turno/${turnoId}/`;
+      });
+    
+      cancelButton.addEventListener('click', function () {
+        const interval = setInterval(function () {
+          countdown--;
+          countdownElement.textContent = countdown;
+          if (countdown <= 0) {
+            clearInterval(interval);
+            document.getElementById('cancelForm').submit();
+          }
+        }, 1000);
+      });
+    });
+    </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("carga mi bloque de código");
+
+    function verificarLlamados() {
+      console.log("carga el fetch");
+      fetch('/ver_asistencias', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la respuesta del servidor');  // Manejo del error de respuesta
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        console.error("Error en el fetch:", error);  // Manejo de cualquier error de fetch
+      });
+    }
+
+    verificarLlamados();
+    // Ejecutar la función cada 5 segundos
+    setInterval(verificarLlamados, 5000);
+  });
+</script>
+
+
+{% endblock %},

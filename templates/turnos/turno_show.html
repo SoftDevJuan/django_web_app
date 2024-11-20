@@ -1,0 +1,50 @@
+
+{% block content %}
+<div class="container mt-3">
+    <h2>Registro de Turno y Ciudadanos</h2>
+    <form method="post" enctype="multipart/form-data" id="turnoForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div id="formset-container">
+            {{ ciudadano_formset.management_form }}
+            {% for form in ciudadano_formset %}
+            <div class="formset-form">
+                {{ form.as_p }}
+                <button type="button" class="remove-form btn btn-danger">Eliminar Ciudadano</button>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-more" class="btn btn-info">Agregar más Ciudadanos</button>
+        <button type="submit" class="btn btn-primary">Registrar Turno y Ciudadanos</button>
+    </form>
+</div>
+
+<script>
+// Cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function () {
+    let formsetContainer = document.getElementById('formset-container');
+    let totalForms = document.getElementById('id_form-TOTAL_FORMS');
+    let formNum = formsetContainer.getElementsByClassName('formset-form').length - 1;
+
+    // Función para agregar un nuevo formulario
+    document.getElementById('add-more').addEventListener('click', function () {
+        let newForm = formsetContainer.getElementsByClassName('formset-form')[0].cloneNode(true);
+        let formRegex = RegExp(`form-(\\d){1}-`, 'g');
+
+        formNum++;
+        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`);
+        formsetContainer.appendChild(newForm);
+        totalForms.setAttribute('value', `${formNum + 1}`);
+    });
+
+    // Función para eliminar un formulario
+    formsetContainer.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-form')) {
+            e.target.parentNode.remove();
+            formNum--;
+            totalForms.setAttribute('value', `${formNum + 1}`);
+        }
+    });
+});
+</script>
+{% endblock %}

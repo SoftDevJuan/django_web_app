@@ -1,0 +1,1 @@
+function cantidadSolicitantes(t){return solicitantes=parseInt(Object.keys(t.Respuesta.data.solicitados)[0])||0}

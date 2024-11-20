@@ -1,0 +1,456 @@
+{% extends 'general/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general/barralateral.html' %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escaneo de QR</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'CSS/registro_ratis.css'%}">
+</head>
+<body>
+    <div id="contenedor_busqueda" class="container mt-5" style="display: block;">
+        <div id="form-busqueda" class="d-flex flex-column align-items-center mb-4" style="padding-top: 60px">
+            <h1>Registrar por Folio de Solicitud</h1>
+            <div style="display: flex; align-items: center;">
+                <input type="number" id="folioSolicitud" placeholder="Folio Solicitud">
+                /
+                <input type="number" id="anioSolicitud" placeholder="Año Solicitud">
+                <button id="buscarBtn" class="btn btn-primary">Buscar</button>
+                <!--<div id="enlace" class="d-flex flex-column align-items-center mb-4"> -->
+                    <a href="{% url 'Registro Manual' %}" class="nav_linkin {% if active_view == 'Registro Manual' %}active{% endif %}">
+                        <i class="bx bx-user-plus nav_icon"></i>
+                        <span class="nav_name">Registro Manual</span>
+                    </a>
+                <!--</div>-->
+                
+            </div>
+        </div>
+    </div>
+    
+
+    <div id="contenedor_texto_carga" class="container mt-5" display="none">
+    </div>
+
+    <div id="contenedor_datos_procesados" class="container mt-5" style="padding-top:60px; !important" display="none">
+    </div>
+
+    <div id="botones" class="container mt-5" style="padding-top:10px; !important">
+            
+
+        <div id="contenedor_error" class="container mt-5" style="padding-top: 10px" display="none">
+            <div class="text-center mb-4" style="padding-top: 60px">
+            </div>
+        </div>
+
+    <script src="{% static 'js/solicitantes.js' %}"></script>
+    <script src="{% static 'js/citados.js' %}"></script>
+    <script src="{% static 'js/extraerDatos.js' %}"></script>
+    <script src="{% static 'js/crearTablaRati.js' %}"></script>
+    <script src="{% static 'js/ajaxGet.js' %}"></script>
+    <script src="{% static 'js/ajaxPost.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+    <script>
+        $('#anioSolicitud').val(AnioActual());
+
+        $('#buscarBtn').click(function() {
+            var folio = $('#folioSolicitud').val();
+            var anio = $('#anioSolicitud').val();
+            if (!folio || !anio) {
+                alert('Por favor, completa ambos campos.');
+                return;
+            }
+            realizarPeticion(folio, anio);
+        });
+
+        async function realizarPeticion(f, a) {
+            try {
+                mensajeBusqueda();
+                const folio = f;
+                const anio = a;
+        
+                let response = await ajaxGet("{% url 'buscar_folio_anio' %}", {
+                    folio_solicitud: folio,
+                    anio_solicitud: anio
+                });
+        
+                if (response.success) {
+                    cargarDatos(response);
+                } else {
+                    
+                    let postResponse = await ajaxPost("{% url 'Ratificacion con folio api' %}", {
+                        folio_solicitud: folio,
+                        anio_solicitud: anio
+                    });
+        
+                    let citados = obtenerCitados(postResponse);
+                    let solicitantes = obtenerSolicitantes(postResponse);
+                    let folio_solicitud = folioSolicitud(postResponse);
+        
+                    await llamarFuncion(citados, solicitantes, folio_solicitud);
+        
+                    let secondResponse = await ajaxGet("{% url 'buscar_folio_anio' %}", {
+                        folio_solicitud: folio,
+                        anio_solicitud: anio
+                    });
+        
+                    cargarDatos(secondResponse);
+                }
+            } catch (error) {
+                mensajeError();
+            }
+        }
+        
+
+        function mensajeError(){
+            $('#contenedor_texto_carga').hide();
+            $('#contenedor_error').show();
+            texto1 = "No se encontraron los datos de la Solicitud en SINACOL"
+            texto2 = "¿El folio es corrrecto? si es así, contacta a Dirección de Tecnologías para darte soporte."
+            var mensajeError = $('<h1 style="text-align:center;">').text(texto1);
+            var mensajeError2 = $('<h4 style="text-align:center;">').text(texto2);
+            $('#contenedor_error').append(mensajeError);
+            $('#contenedor_error').append(mensajeError2);
+        } 
+
+        function mensajeBusqueda(){
+            //$('#contenedor_busqueda').hide();
+            var textoCarga = "Buscando Solicitud, por favor espere..."; 
+            var mensajeCarga = $('<h1 style="padding-top:60px; text-align:center;">').text(textoCarga);
+            $('#contenedor_texto_carga').append(mensajeCarga);
+            $('#contenedor_texto_carga').show();
+        }
+
+        function cargarDatos(data){
+            $('#contenedor_texto_carga').empty();
+            $('#contenedor_texto_carga').hide();
+            $('#contenedor_datos_procesados').show();
+            crearTabla(data);
+        }
+
+
+
+        function mostrarMensaje(checkboxId) {
+            var idchb = 'checkbox-' + checkboxId;
+            var checkbox = document.getElementById(idchb);
+            console.log(checkboxId);
+            console.log('Estado del checkbox:', checkbox.checked);
+
+            if (checkbox.checked) {
+                montarOpciones(checkboxId);
+                console.log('Checkbox marcado, se monta escaneo ID:', checkboxId);
+            } else {
+
+                $('.botonId1-' + checkboxId).remove();
+                $('.botonId2-' + checkboxId).remove();
+                $('.botonId3-' + checkboxId).remove();
+                $('.botonId4-' + checkboxId).remove();
+                $('.botonId5-' + checkboxId).remove();
+                $('.botonId6-' + checkboxId).remove();
+                $('.botonId7-' + checkboxId).remove();
+                $('.botonId8-' + checkboxId).remove();
+                $('.botonId9-' + checkboxId).remove();
+                $('.botonId10-' + checkboxId).remove();
+                console.log('Checkbox desmarcado, se elimina cámara:', checkboxId);
+            }
+        }
+
+        
+
+        function montarOpciones(checkboxId) {
+            var html = `
+                <td class="botonId4-${checkboxId}" colspan="2">
+                    <button type="button" id="boton-identificacion" class="btn btn-success" onclick="montarEscaneoId('${checkboxId}')">Identificacion</button>
+                </td>
+
+                <td class="botonId5-${checkboxId}" colspan="2">
+                    <button type="button" id="boton-testigos" class="btn btn-success " onclick="montarEscaneoTestigos('${checkboxId}')">Testigos</button>
+                </td>
+            `;
+
+            var identificacionContainer = document.getElementById('identificacion-' + checkboxId);
+            if (identificacionContainer) {
+                identificacionContainer.style.display = ''; 
+                $(identificacionContainer).after(html);
+            } else {
+                console.log('Contenedor de identificación no encontrado.');
+            }
+        }
+
+
+
+
+        function montarEscaneoId(checkboxId) {
+            $('.botonId1-' + checkboxId).remove();
+            $('.botonId2-' + checkboxId).remove();
+            $('.botonId3-' + checkboxId).remove();
+            $('.botonId4-' + checkboxId).remove();
+            $('.botonId5-' + checkboxId).remove();
+            $('.botonId6-' + checkboxId).remove();
+            $('.botonId7-' + checkboxId).remove();
+            $('.botonId8-' + checkboxId).remove();
+            $('.botonId9-' + checkboxId).remove();
+            $('.botonId10-' + checkboxId).remove();
+
+            var html = `
+                    <td class="botonId1-${checkboxId}" colspan="2">
+                        <video id="video-frente-${checkboxId}" width="320" height="240" autoplay style="display:none;"></video>
+                        <canvas id="canvas-frente-${checkboxId}" style="display:none;"></canvas>
+                        <img id="photo-frente-${checkboxId}" width="300" height="200" src="#" alt="Imagen frente" style="display:none;"/>
+                        <button type="button" class="btn btn-primary open-camera" data-index="${checkboxId}" data-type="frente">Identificación Frente</button>
+                    </td>
+                    <td class="botonId2-${checkboxId}" colspan="2">
+                        <video id="video-reverso-${checkboxId}" width="320" height="240" autoplay style="display:none;"></video>
+                        <canvas id="canvas-reverso-${checkboxId}" style="display:none;"></canvas>
+                        <img id="photo-reverso-${checkboxId}" width="300" height="200" src="#" alt="Imagen reverso" style="display:none;"/>
+                        <button type="button" class="btn btn-primary open-camera" data-index="${checkboxId}" data-type="reverso">Identificación Reverso</button>
+                    </td>
+                    <td class="botonId3-${checkboxId}" colspan="2">
+                        <button id="actualizar-asistencia" class="btn btn-success update-attendance" data-index="${checkboxId}" onclick="actualizarCodigosCiudadanos()">Actualizar</button>
+                    </td>
+            `;
+        
+            var identificacionContainer = document.getElementById('identificacion-' + checkboxId);
+            if (identificacionContainer) {
+                identificacionContainer.style.display = ''; 
+                $(identificacionContainer).after(html);
+            } else {
+                console.log('Contenedor de identificación no encontrado.');
+            }
+        }
+
+
+        function montarEscaneoTestigos(checkboxId) {
+            $('.botonId1-' + checkboxId).remove();
+            $('.botonId2-' + checkboxId).remove();
+            $('.botonId3-' + checkboxId).remove();
+            $('.botonId4-' + checkboxId).remove();
+            $('.botonId5-' + checkboxId).remove();
+            $('.botonId6-' + checkboxId).remove();
+            $('.botonId7-' + checkboxId).remove();
+            $('.botonId8-' + checkboxId).remove();
+            $('.botonId9-' + checkboxId).remove();
+            $('.botonId10-' + checkboxId).remove();
+
+            var html = `
+                <td class="botonId6-${checkboxId}" colspan="2">
+                    <video id="video-testigo1-frente-${checkboxId}" width="320" height="240" autoplay style="display:none;"></video>
+                    <canvas id="canvas-testigo1-frente-${checkboxId}" style="display:none;"></canvas>
+                    <img id="photo-testigo1-frente-${checkboxId}"  width="300" height="200" src="#" alt="Imagen frente" style="display:none;"/>
+                    <button type="button" class="btn btn-primary open-camera" data-index="${checkboxId}" data-type="testigo1-frente" data-campo="campo-frente-testigo1-${checkboxId}">Testigo 1 Frente</button>
+                </td>
+                <td class="botonId7-${checkboxId}" colspan="2">
+                    <video id="video-testigo1-reverso-${checkboxId}" width="320" height="240" autoplay style="display:none;"></video>
+                    <canvas id="canvas-testigo1-reverso-${checkboxId}" style="display:none;"></canvas>
+                    <img id="photo-testigo1-reverso-${checkboxId}"  width="300" height="200" src="#" alt="Imagen reverso" style="display:none;"/>
+                    <button type="button" class="btn btn-primary open-camera" data-index="${checkboxId}" data-type="testigo1-reverso" data-campo="campo-reverso-testigo1-${checkboxId}">Testigo 1 Reverso</button>
+                </td>
+                <td class="botonId8-${checkboxId}" colspan="2">
+                    <video id="video-testigo2-frente-${checkboxId}" width="320" height="240" autoplay style="display:none;"></video>
+                    <canvas id="canvas-testigo2-frente-${checkboxId}" style="display:none;"></canvas>
+                    <img id="photo-testigo2-frente-${checkboxId}"  width="300" height="200" src="#" alt="Imagen frente" style="display:none;"/>
+                    <button type="button" class="btn btn-primary open-camera" data-index="${checkboxId}" data-type="testigo2-frente" data-campo="campo-frente-testigo2-${checkboxId}">Testigo 2 Frente</button>
+                </td>
+                <td class="botonId9-${checkboxId}" colspan="2">
+                    <video id="video-testigo2-reverso-${checkboxId}" width="320" height="240" autoplay style="display:none;"></video>
+                    <canvas id="canvas-testigo2-reverso-${checkboxId}"  width="340" height="260" style="display:none;"></canvas>
+                    <img id="photo-testigo2-reverso-${checkboxId}" width="300" height="200" src="#" alt="Imagen reverso" style="display:none;"/>
+                    <button type="button" class="btn btn-primary open-camera" data-index="${checkboxId}" data-type="testigo2-reverso" data-campo="campo-reverso-testigo2-${checkboxId}">Testigo 2 Reverso</button>
+                </td>
+                <td class="botonId10-${checkboxId}" colspan="2">
+                    <button id="actualizar-asistencia" class="btn btn-success update-attendance_testigos" data-index="${checkboxId}">Actualizar</button>
+                </td>
+            `;
+
+            var identificacionContainer = document.getElementById('identificacion-' + checkboxId);
+            if (identificacionContainer) {
+                identificacionContainer.style.display = ''; 
+                $(identificacionContainer).after(html);
+            } else {
+                console.log('Contenedor de identificación no encontrado.');
+            }
+        }
+
+
+
+
+        function AnioActual(){
+            const today = new Date();
+            return today.getFullYear();
+        }
+
+
+
+
+
+        function actualizarCampo(index){
+            var boton1 = '.botonId1-' + index;
+            var boton2 = '.botonId2-' + index;
+            var boton3 = '.botonId3-' + index;
+            var boton4 = '.botonId4-' + index;
+            var boton5 = '.botonId5-' + index;
+            var boton6 = '.botonId6-' + index;
+            var boton7 = '.botonId7-' + index;
+            var boton8 = '.botonId8-' + index;
+            var boton9 = '.botonId9-' + index;
+            var boton10 = '.botonId10-' + index;
+            
+            var campoCiudadano = '#' + index;
+            var checkbox = '#checkbox-' + index;
+            $(boton1).hide();
+            $(boton2).hide();
+            $(boton3).hide();
+            $(boton4).hide();
+            $(boton5).hide();
+            $(boton6).hide();
+            $(boton7).hide();
+            $(boton8).hide();
+            $(boton9).hide();
+            $(boton10).hide();
+            $(campoCiudadano).addClass('row-asistencia');
+            $(checkbox).prop('disabled', true);
+        }
+
+
+
+
+
+        $(document).on('click', '.open-camera', function() {
+            var index = $(this).data('index');
+            var type = $(this).data('type');
+            var campo = $(this).data('campo');
+            var videoId = 'video-' + type + '-' + index;
+            var canvasId = 'canvas-' + type + '-' + index;
+            var video = document.getElementById(videoId);
+            var canvas = document.getElementById(canvasId);
+    
+            // Mostrar el video
+            video.style.display = 'block';
+    
+            // Acceder a la cámara
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+    
+                    // Capturar la imagen al hacer clic en el video
+                    video.addEventListener('click', function() {
+                        var context = canvas.getContext('2d');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+                        // Detener el video y ocultarlo
+                        var tracks = stream.getTracks();
+                        tracks.forEach(function(track) {
+                            track.stop();
+                        });
+                        video.style.display = 'none';
+    
+                        // Mostrar la imagen capturada
+                        var dataURL = canvas.toDataURL('image/png');
+                        $('#photo-' + type + '-' + index).attr('src', dataURL).show();
+    
+                        // Asignar la imagen capturada al campo oculto correspondiente
+                        $('#' + campo).val(dataURL);
+                    });
+                })
+                .catch(function(err) {
+                    console.log("Error: " + err);
+                });
+        });
+
+
+
+
+
+        $(document).on('click', '.update-attendance', async function(event) {
+            event.preventDefault();
+            const buttonText = document.getElementById('actualizar-asistencia');
+        
+            
+                // Obtener las imágenes capturadas
+                const index = $(this).data('index');
+                const idciudadano = index.split('-')[1];
+                const frontImage = $('#photo-frente-' + index).attr('src');
+                const backImage = $('#photo-reverso-' + index).attr('src');
+        
+                if (frontImage && backImage) {
+                    try {
+                        // Enviar la solicitud al servidor
+                        const response = await ajaxPost("{% url 'Asistencia Ratificacion con folio'%}", {
+                            frontImage: frontImage,
+                            backImage: backImage,
+                            id: idciudadano
+                        });
+        
+                        if (response.success) {
+                            actualizarCampo(index);
+                        } else {
+                            alert('Error al actualizar la asistencia.');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                } else {
+                    alert('Por favor, capture ambas imágenes antes de actualizar.');
+                }
+            
+        });
+
+
+
+        $(document).on('click', '.update-attendance_testigos', async function(event) {
+            event.preventDefault();
+            const buttonText = document.getElementById('actualizar-asistencia_testigos');
+        
+            
+                // Obtener las imágenes capturadas
+                const index = $(this).data('index');
+                const idciudadano = index.split('-')[1];
+                const frontImage1 = $('#photo-testigo1-frente-' + index).attr('src');
+                const backImage1 = $('#photo-testigo1-reverso-' + index).attr('src');
+                const frontImage2 = $('#photo-testigo2-frente-' + index).attr('src');
+                const backImage2 = $('#photo-testigo2-reverso-' + index).attr('src');
+        
+                if (frontImage1 && backImage1 && frontImage2 && backImage2 ) {
+                    try {
+                        // Enviar la solicitud al servidor
+                        const response = await ajaxPost("{% url 'Asistencia Ratificacion testigos con folio'%}", {
+                            frontImage1: frontImage1,
+                            backImage1: backImage1,
+                            frontImage2: frontImage2,
+                            backImage2: backImage2,
+                            id: idciudadano
+                        });
+        
+                        if (response.success) {
+                            actualizarCampo(index);
+                        } else {
+                            alert('Error al actualizar la asistencia.');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                } else {
+                    alert('Por favor, capture ambas imágenes antes de actualizar.');
+                }
+            
+        });
+
+
+
+
+
+    </script>
+</body>
+</html>
+{% endblock %}

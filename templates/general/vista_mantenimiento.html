@@ -1,0 +1,44 @@
+{% extends 'general/base.html' %} 
+{% include 'general/header.html' %}
+{% load static %}
+
+{% block content %} 
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Pagina en Mantenimiento</title>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'CSS/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'CSS/jquery.countdown.css' %}">
+        <link rel="stylesheet" href="{% static 'CSS/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'CSS/style.css' %}">
+    </head>
+    <body>
+      <div class="wrapper">
+           <div class="opacity"></div>
+            <div class="gravity">
+               <div class="container">
+                   <div class=" row">
+                        <div class="col-md-12">
+                            <img class="logo" src="{% static 'icon/CCLLetras.png' %}" alt="Gravity">                          
+                       </div>
+                   </div>
+               </div>
+            </div>
+    
+            <div class="Mensaje_Mantenimiento">
+                <h1>Página en mantenimiento, volveremos en unos minutos</h1>
+                <br>
+                <h1>Lamentamos las molestias</h1>
+            </div>
+
+            <div id="countdown"></div>
+        </div>
+    	
+		<script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/jquery.countdown.js' %}"></script>
+        <script src="{% static 'js/active.js' %}"></script> 
+    </body>
+</html>
+{% endblock %}

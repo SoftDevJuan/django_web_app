@@ -1,0 +1,230 @@
+{% extends 'pagos/base_pagos.html' %} {% load static%} {% block content %} 
+{% include 'general1/barralateral.html' %}
+
+<div class="bg-light">
+  <main role="main" class="pt-3 px-4 mb-2">
+    <div class="container justify-content-center">
+      <div class="d-flex">
+        <div
+          class="p-2 flex-grow-1 justify-content-center align-self-center align-middle"
+        >
+          <div class="container mt-5 mb-5" style="max-width: 650px">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title text-center">Registrar nuevo pago</h5>
+                <h6 class="card-subtitle mb-2 text-muted text-center">
+                  Ingresa los detalles para completar el registro del pago,
+                  todos los campos son obligatorios.
+                </h6>
+                <div
+                  class="pt-2 ps-2 pe-2 mb-2 bg-primary-subtle bg-opacity-10 border border-info rounded"
+                >
+                  <div class="d-flex-center mb-3">
+                    <p class="card-text">Turno: <strong>{{turno}}</strong></p>
+                    <p class="card-text">Pago: <strong>1 / 12</strong></p>
+                    <p class="card-text">
+                      Expediente: <strong>{{expediente}}</strong>
+                    </p>
+                  </div>
+                </div>
+                <form action="{% url 'cancelar_pago' %}" method="POST">
+                  {% csrf_token %}
+                  <div class="mb-3 row">
+                    <div class="col">
+                      <label for="amount" class="form-label">Cantidad</label>
+                      <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="amount"
+                          placeholder="Ingresar cantidad"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div class="col">
+                      <label for="penalization" class="form-label"
+                        >Penalización</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="penalization"
+                          placeholder="Ingresar penalización"
+                          value="0.00"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="beneficiary" class="form-label"
+                      >Nombre del beneficiario</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="beneficiary"
+                      placeholder="Ingresa el nombre del beneficiario"
+                      value="Raul Hernandez Olmeda"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="payer" class="form-label"
+                      >Nombre de quien envía el pago</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="payer"
+                      placeholder="Ingrese el nombre de quien envía el pago"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3 row">
+                    <div class="col">
+                      <label for="paymentDate" class="form-label"
+                        >Fecha de pago</label
+                      >
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="paymentDate"
+                        required
+                      />
+                    </div>
+                    <div class="col">
+                      <label for="paymentMethod" class="form-label"
+                        >Método de pago</label
+                      >
+                      <select class="form-select" id="paymentMethod" required>
+                        <option selected disabled value="">
+                          Seleccione un método
+                        </option>
+                        <option value="1">
+                          Transferencia interbancaria (SPEI)
+                        </option>
+                        <option value="2">Efectivo</option>
+                        <option value="3">Otro (específica)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <div class="col d-none" id="methodOther">
+                      <label for="paymentMethodOther" class="form-label"
+                        >¿Cuál otro método de pago?</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="paymentMethodOther"
+                        placeholder="Ingrese el otro tipo de método de pago"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="purpose" class="form-label"
+                      >Comentarios o detalles adicionales del pago</label
+                    >
+                    <textarea
+                      class="form-control"
+                      id="purpose"
+                      rows="3"
+                      placeholder="Ingrese comentarios o detalles adicionales del pago"
+                      required
+                    ></textarea>
+                  </div>
+                  <div class="form-check mb-3">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="terms"
+                      required
+                    />
+                    <label class="form-check-label" for="terms">
+                      Confirmo que la información llenada anteriormente está
+                      correcta y es verídica.
+                    </label>
+                  </div>
+                  <div class="d-flex-center mt-3 mb-3">
+                    <button
+                      id="cancelar-btn"
+                      type="button"
+                      class="btn btn-secondary"
+                      data-bs-toggle="modal"
+                      data-bs-target="#cancelModal"
+                    >
+                      Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      Registrar pago
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="p-2 justify-self-center align-self-center align-middle text-center"
+        >
+          <p class="fw-bold">O tambien puede</p>
+          <button class="container-btn-file">
+            <svg
+              fill="#fff"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 50 50"
+            >
+              <path
+                d="M28.8125 .03125L.8125 5.34375C.339844 
+            5.433594 0 5.863281 0 6.34375L0 43.65625C0 
+            44.136719 .339844 44.566406 .8125 44.65625L28.8125 
+            49.96875C28.875 49.980469 28.9375 50 29 50C29.230469 
+            50 29.445313 49.929688 29.625 49.78125C29.855469 49.589844 
+            30 49.296875 30 49L30 1C30 .703125 29.855469 .410156 29.625 
+            .21875C29.394531 .0273438 29.105469 -.0234375 28.8125 .03125ZM32 
+            6L32 13L34 13L34 15L32 15L32 20L34 20L34 22L32 22L32 27L34 27L34 
+            29L32 29L32 35L34 35L34 37L32 37L32 44L47 44C48.101563 44 49 
+            43.101563 49 42L49 8C49 6.898438 48.101563 6 47 6ZM36 13L44 
+            13L44 15L36 15ZM6.6875 15.6875L11.8125 15.6875L14.5 21.28125C14.710938 
+            21.722656 14.898438 22.265625 15.0625 22.875L15.09375 22.875C15.199219 
+            22.511719 15.402344 21.941406 15.6875 21.21875L18.65625 15.6875L23.34375 
+            15.6875L17.75 24.9375L23.5 34.375L18.53125 34.375L15.28125 
+            28.28125C15.160156 28.054688 15.035156 27.636719 14.90625 
+            27.03125L14.875 27.03125C14.8125 27.316406 14.664063 27.761719 
+            14.4375 28.34375L11.1875 34.375L6.1875 34.375L12.15625 25.03125ZM36 
+            20L44 20L44 22L36 22ZM36 27L44 27L44 29L36 29ZM36 35L44 35L44 37L36 37Z"
+              ></path>
+            </svg>
+            Subir un archivo
+            <input
+              id="fileForm"
+              class="file"
+              name="file"
+              type="file"
+              accept=".xls, .xlsx, .xlsm,"
+            />
+          </button>
+          <p
+            id="sendFile"
+            class="d-none mt-3 animate__animated animate__fadeInUp"
+          >
+            <a class="text-success" href="#">Registrar pago</a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-3 mb-3 fw-light counter-text">
+      <span><i class="fa-solid fa-business-time"></i></span>
+      <span id="tiempo-transcurrido">Tiempo del turno transcurrido: 00:00:00</span>
+    </div>
+  </main>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesor</title>
+    <link rel="stylesheet" href="{% static 'CSS/asesorStyles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="{% static 'js/asesor.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script> 
+        var username = "{{ username }}"; 
+        var user_id = "{{ user.id }}";
+    </script>
+</head>
+<body>
+    <header class="bg-primary text-white text-center py-3">
+        <img src="{% static 'headers/cclimage.jpg' %}" alt="CCL Logo" class="img-fluid" style="max-height: 50px;">
+        <h1>Asesoría Jurídica</h1>
+        {% if user.is_authenticated %}
+            <p>Bienvenido, {{ user.username }}</p>
+        {% endif %}
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 bg-light sidebar py-5">
+                <div class="nav flex-column">
+                    <div class="nav-item text-center mb-3" id="verturnos">
+                        <i class="fas fa-list-alt fa-2x"></i>
+                        <p>Turnos</p>
+                    </div>
+                    <button class="btn btn-outline-primary w-100 mb-2" id="mesa"><i class="fas fa-desk"></i> Mi Mesa</button>
+                    <button class="btn btn-outline-success w-100 mb-2" id="llamar-turno"><i class="fas fa-bell"></i> Llamar turno</button>
+                    <button class="btn btn-outline-warning w-100 mb-2" id="re-llamar" style="display: none;"><i class="fas fa-redo"></i> Volver a llamar</button>
+                    {% if request.user.is_authenticated %}
+                    <form id="cerrar-sesion-form" action="{% url 'logout' %}" method="post" class="mt-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger w-100"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Panel Principal</h1>
+                </div>
+
+                <div class="turno-actual" style="display: none;">
+                    <h2 id="turno-id" class="text-center">Turno Actual: <span id="turno-numero"></span></h2>
+                    <div id="personas-lista" class="list-group">
+                        <!-- Lista de personas -->
+                    </div>
+                    <select class="form-select mt-3" id="razonSocial">
+                        <!-- Opciones de razón social -->
+                    </select>
+                </div>
+
+                <div class="observaciones mt-3" id="observacionesdiv" style="display: none;">
+                    <label for="observaciones" id="observaciones-titulo" class="form-label">Observaciones:</label>
+                    <textarea id="observaciones-text" class="form-control" rows="4"></textarea>
+                </div>
+
+                <div class="acciones mt-3">
+                    <button id="terminar-btn" class="btn btn-success w-100" style="display: none;">Terminar</button>
+                </div>
+
+                <div id="mesaModal" class="modal fade" tabindex="-1" aria-labelledby="mesaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="mesaModalLabel">Selecciona tu Mesa</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <select name="mesaselect" id="mesaSelect" class="form-select">
+                                    <option value="0">Desocupar Mesa</option>
+                                    {% for i in numeros_mesa %}
+                                    <option value="{{ i }}"> Mesa {{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="usarMesa" class="btn btn-primary">Usar Mesa</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="myModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="myModalLabel">Imagen</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img class="modal-content img-fluid" id="modalImg" alt="Modal Image">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mesaModal = new bootstrap.Modal(document.getElementById('mesaModal'));
+            const myModal = new bootstrap.Modal(document.getElementById('myModal'));
+            const mesaButton = document.getElementById('mesa');
+            const usarMesaButton = document.getElementById('usarMesa');
+            const cerrarSesionForm = document.getElementById('cerrar-sesion-form');
+            const mesaSelect = document.getElementById('mesaSelect');
+
+            mesaButton.addEventListener('click', function () {
+                mesaModal.show();
+            });
+
+            usarMesaButton.addEventListener('click', function () {
+                const selectedMesa = mesaSelect.value;
+                // Logica para usar la mesa seleccionada
+                mesaModal.hide();
+            });
+
+            // Logica adicional para manejar otros eventos y funcionalidad
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+{% extends 'recepcion/base.html' %} 
+{% load static%} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<div class="height-100 bg-light">
+<main role="main">
+  <h1 class="text-white bg-blue p-3 rounded text-center">
+    Audiencias del día
+  </h1>
+
+  <div class="row text-center my-4">
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Audiencias Pendientes</h5>
+          <h2 class="card-text">
+            {{audiencias_pendientes}} <i class="fa-solid fa-check blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Audiencias en sala</h5>
+          <h2 class="card-text">
+            {{audiencias_en_sala}} <i class="fa-regular fa-clock blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Audiencias concluidas</h5>
+          <h2 class="card-text">
+            {{audiencias_concluidas}} <i class="fa-solid fa-xmark blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="group">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+      <g>
+        <path
+          d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
+        ></path>
+      </g>
+    </svg>
+    <input
+      class="input"
+      type="text"
+      id="search-input"
+      placeholder="Buscar por número de expediente, por nombre, por hora, etc..."
+    />
+  </div>
+
+  <div class="w-100">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} mt-4 text-center" role="alert"> 
+      <p  {% if message.tags %} class="mb-0 mt-0 {{ message.tags }} " {% endif %}> {{ message|safe }} </p>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <table class="table table-hover border text-center">
+    <thead class="table-light">
+      <tr>
+        <th>Expediente</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Sala</th>
+        <th>Conciliador</th>
+        <th>Solicitante</th>
+        <th>Citado</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="table-body">
+      {% comment %} iteracion de audiencias {% endcomment %}
+      {% for audiencia in audiencias %}
+        <tr>
+          
+          <td>{{ audiencia.expediente }}</td>
+          <td>{{ audiencia.fecha_audiencia }}</td>
+          <td>{{ audiencia.hora_audiencia }}</td>
+          <td>{{ audiencia.sala_audiencia }}</td>
+          <td>{{ audiencia.conciliador_audiencia }}</td>
+          
+          <!-- Solicitud de asistencia con ícono -->
+          <td>
+            {% for ciudadano in audiencia.ciudadanos_solicitantes %}
+              <p>
+                {{ ciudadano.nombre|title }}
+                {% if ciudadano.asistencia %}
+                  <!-- Ícono de Bootstrap para asistencia -->
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                {% endif %}
+              </p>
+            {% endfor %}
+          </td>
+
+          <!-- Citados con ícono de asistencia -->
+          <td>
+            {% for ciudadano in audiencia.ciudadanos_citados %}
+              <p>
+                {{ ciudadano.nombre|title }}
+                {% if ciudadano.asistencia %}
+                  <!-- Ícono de Bootstrap para asistencia -->
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                {% endif %}
+              </p>
+            {% endfor %}
+          </td>
+          <td>{{ audiencia.status_audiencia }}</td>
+         
+         
+          
+          <td>
+            <div class="d-flex justify-content-center">
+
+              <button class="btn btn-primary btn-sm fw-bold"
+               type="button"
+               data-bs-toggle="modal" 
+               data-bs-target="#viewModal"
+               data-id="{{turno.turno}}"
+               data-codigo="{{turno.codigo_ciudadano }}"
+               data-fecha="{{turno.fecha}}"
+               data-cita="{{turno.ciudadano.cita}}"
+               data-nombre="{{ turno.nombre_ciudadano }}"
+               data-area="{{ turno.area }}"
+               data-curp-rfc="{{ turno.curp_rfc_ciudadano }}"
+               data-estatus="{{turno.status}}">
+                Ver
+              </button>
+
+              <button class="btn btn-warning btn-sm fw-bold" id="llamar-btn">
+                Llamar (<span id="llamar-count">3</span>)
+              </button>
+              <button class="btn btn-danger btn-sm fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#cancelModal" data-id="{{ turno.id }}">
+                Cancelar
+              </button>
+              <form action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="nombre_ciudadano" value="{{ turno.nombre_ciudadano }}">
+                <button type="submit" class="btn btn-success btn-sm fw-bold">
+                  Atender
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div id="no-results" class="alert alert-danger" style="display: none">
+    No se encontraron resultados que coincidan con su busqueda. Puede comprobar
+    <a href="">turnos cancelados</a> o <a href="">turnos atendidos</a> en su
+    lugar.
+  </div>
+
+  <div class="d-flex justify-content-center my-4">
+    <div id="current-time">Cargando...</div>
+  </div>
+</main>
+</div>
+
+ <!-- Modal para boton ver -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Información adicional del turno:
+          <span id="turno-id" class="blue-icon fw-bold"></span>
+        </h1>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li><span class="fw-bold">ID del ciudadano:</span> <span id="codigo-ciudadano"></span></li>
+          <li><span class="fw-bold">Nombre del solicitante: </span> <span id="nombre-ciudadano"></span></li>
+          <li><span class="fw-bold">CURP o RFC del solicitante: </span> <span id="curp-rfc"></span></li>
+          <li><span class="fw-bold">Fecha y hora en que realizó la cita: </span> <span id="fecha-cita"></span></li>
+          <li><span class="fw-bold">Área asignada: </span> <span id="area-asignada"></span></li>
+          <li><span class="fw-bold">Número de expediente: </span> <span id="numero-expediente"></span></li>
+          <li><span class="fw-bold">Estatus: </span> <span id="estatus-turno"></span></li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal para cancelar turno -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header justify-content-center">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">¿Cancelar turno?</h1>
+          </div>
+          <div class="modal-body text-center">
+              Una vez cancelado no podrá ser recuperado, ¿realmente quiere hacer esto?
+          </div>
+          <div class="modal-footer justify-content-center">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, mantener turno</button>
+              <form id="cancelForm" action="" method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" name="id" id="turno-id-input" />
+                  <button id="cancelButton" type="submit" class="btn btn-danger disabled" data-bs-dismiss="modal">
+                      Sí, cancelar turno (<span id="countdown">3</span>)
+                  </button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const viewModal = document.getElementById('viewModal');
+    viewModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+      const turnoId = button.getAttribute('data-id');
+      const codigoCiudadano = button.getAttribute('data-codigo');
+      const fechaCita = button.getAttribute('data-fecha');
+      const nombreCiudadano = button.getAttribute('data-nombre');
+      const curpRfc = button.getAttribute('data-curp-rfc');
+      const areaAsignada = button.getAttribute('data-area'); 
+      const numeroExpediente = 'PA000121';
+      const estatusTurno = button.getAttribute('data-estatus');
+  
+      document.getElementById('turno-id').textContent = turnoId;
+      document.getElementById('codigo-ciudadano').textContent = codigoCiudadano;
+      document.getElementById('nombre-ciudadano').textContent = nombreCiudadano;
+      document.getElementById('fecha-cita').textContent = fechaCita;
+      document.getElementById('curp-rfc').textContent = curpRfc;
+      document.getElementById('area-asignada').textContent = areaAsignada;
+      document.getElementById('numero-expediente').textContent = numeroExpediente;
+      document.getElementById('estatus-turno').textContent = estatusTurno;
+    });
+  });
+  </script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const cancelModal = document.getElementById('cancelModal');
+      const cancelButton = document.getElementById('cancelButton');
+      const countdownElement = document.getElementById('countdown');
+      const turnoIdInput = document.getElementById('turno-id-input');
+      let countdown = 3;
+    
+      cancelModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const turnoId = button.getAttribute('data-id'); // Obtén el id del turno del botón que activó el modal
+        turnoIdInput.value = turnoId; // Asigna el id del turno al campo oculto del formulario
+        document.getElementById('cancelForm').action = `/cancelar_turno/${turnoId}/`;
+      });
+    
+      cancelButton.addEventListener('click', function () {
+        const interval = setInterval(function () {
+          countdown--;
+          countdownElement.textContent = countdown;
+          if (countdown <= 0) {
+            clearInterval(interval);
+            document.getElementById('cancelForm').submit();
+          }
+        }, 1000);
+      });
+    });
+    </script>
+
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("carga mi bloque de código");
+
+    function verificarLlamados() {
+      console.log("carga el fetch");
+      fetch('/ver_asistencias', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la respuesta del servidor');  // Manejo del error de respuesta
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        console.error("Error en el fetch:", error);  // Manejo de cualquier error de fetch
+      });
+    }
+
+    // Ejecutar la función cada 5 segundos
+    setInterval(verificarLlamados, 5000);
+  });
+</script>
+
+ 
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{%load static%}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operación Exitosa</title>
+    <link rel="stylesheet" href="{% static 'CSS/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>¡Operación realizada con éxito!</h1>
+        <p>Tu solicitud ha sido procesada correctamente.</p>
+
+        <a href="/upload/">Subir otro archivo</a>
+
+        {% if conciliadores_no_encontrados %}
+        <h2>Conciliadores no encontrados en la base de datos:</h2>
+        <ul>
+            {% for conciliador in conciliadores_no_encontrados %}
+                <li>{{ conciliador }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Todos los conciliadores fueron encontrados correctamente.</p>
+    {% endif %}
+    </div>
+</body>
+</html>

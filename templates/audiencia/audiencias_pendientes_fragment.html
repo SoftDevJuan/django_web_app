@@ -1,0 +1,9 @@
+{% for audiencia in audiencias_pendientes %}
+    <div class="courier-info d-flex align-items-center ms-2 me-2 mb-2">
+      <i class="fa-regular fa-clock me-2"></i>
+        <div>
+        <strong>{{ audiencia.expediente }}</strong><br />
+        {{ audiencia.hora_audiencia|time:"H:i A" }} → {{ audiencia.fecha_audiencia|date:"d/m/Y" }}
+        </div>
+    </div>
+{% endfor %}

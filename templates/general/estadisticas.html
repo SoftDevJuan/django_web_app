@@ -1,0 +1,1080 @@
+{% extends 'general1/base.html' %} {% load static %} {% block content %} 
+{% include 'general1/barralateral.html' %}
+
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <div class="container-fluid">
+        <!--  Row 1 -->
+        <div class="row">
+          {% if nombreGrupo == 'Pagos' %}
+          <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+              <div class="card-body">
+                <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                  <div class="mb-3 mb-sm-0">
+                    <h5 class="card-title fw-semibold"><i class="fa-regular fa-calendar-check me-2 align-middle"></i><span class="align-middle"> Turnos y pagos del mes </span></h5>
+                  </div>
+                  <div>
+                    <select class="form-select" id="chart-change">
+                      <option value="1" {% if filtro == '1' %}selected{% endif %}>Mes actual</option>
+                      <option value="2" {% if filtro == '2' %}selected{% endif %}>Hace 1 mes</option>
+                      <option value="3" {% if filtro == '3' %}selected{% endif %}>Hace 2 meses</option>
+                      <option value="4" {% if filtro == '4' %}selected{% endif %}>Semanal</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="stacked-pagos"></div>
+              </div>
+            </div>
+          </div>
+          {% elif nombreGrupo == 'Recepción' %}
+          <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+              <div class="card-body">
+                <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                  <div class="mb-3 mb-sm-0">
+                    <h5 class="card-title fw-semibold"><i class="fa-regular fa-calendar-check me-2 align-middle"></i><span class="align-middle"> Turnos del mes </span></h5>
+                  </div>
+                  <div>
+                    <select class="form-select" id="chart-change">
+                      <option value="1" {% if filtro == '1' %}selected{% endif %}>Mes actual</option>
+                      <option value="2" {% if filtro == '2' %}selected{% endif %}>Hace 1 mes</option>
+                      <option value="3" {% if filtro == '3' %}selected{% endif %}>Hace 2 meses</option>
+                      <option value="4" {% if filtro == '4' %}selected{% endif %}>Semanal</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="stacked-recepcion"></div>
+              </div>
+            </div>
+          </div>
+          {% elif nombreGrupo == 'Asesoria-Juridica' %}
+          <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+              <div class="card-body">
+                <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                  <div class="mb-3 mb-sm-0">
+                    <h5 class="card-title fw-semibold"><i class="fa-regular fa-calendar-check me-2 align-middle"></i><span class="align-middle"> Turnos y solicitudes del mes </span></h5>
+                  </div>
+                  <div>
+                    <select class="form-select" id="chart-change">
+                      <option value="1" {% if filtro == '1' %}selected{% endif %}>Mes actual</option>
+                      <option value="2" {% if filtro == '2' %}selected{% endif %}>Hace 1 mes</option>
+                      <option value="3" {% if filtro == '3' %}selected{% endif %}>Hace 2 meses</option>
+                      <option value="4" {% if filtro == '4' %}selected{% endif %}>Semanal</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="stacked-asesoria"></div>
+              </div>
+            </div>
+          </div>
+          {% elif nombreGrupo == 'Conciliacion' %}
+          <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+              <div class="card-body">
+                <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                  <div class="mb-3 mb-sm-0">
+                    <h5 class="card-title fw-semibold"><i class="fa-regular fa-calendar-check me-2 align-middle"></i><span class="align-middle"> Turnos, audiencias y conciliaciones del mes </span></h5>
+                  </div>
+                  <div>
+                    <select class="form-select" id="chart-change">
+                      <option value="1" {% if filtro == '1' %}selected{% endif %}>Mes actual</option>
+                      <option value="2" {% if filtro == '2' %}selected{% endif %}>Hace 1 mes</option>
+                      <option value="3" {% if filtro == '3' %}selected{% endif %}>Hace 2 meses</option>
+                      <option value="4" {% if filtro == '4' %}selected{% endif %}>Semanal</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="stacked-conciliacion"></div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          {% if nombreGrupo == 'Pagos' %}
+          <div class="col-lg-4">
+            <div class="row">
+              <div class="col-lg-12">
+                <!-- Yearly Breakup -->
+                <div class="card overflow-hidden">
+                  <div class="card-body p-4">
+                    <h5 class="card-title mb-9 fw-semibold"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Pagos por día </h5>
+                    <div class="row align-items-center">
+                      <div class="col-12">
+                        <div class="d-flex justify-content-center">
+                          <div id="radial-bar"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-12">
+                <!-- Monthly Earnings -->
+                <div class="card">
+                  <div class="card-body pb-0">
+                    <div class="row alig n-items-start">
+                      <div class="col-8">
+                        <h5 class="card-title mb-9 fw-semibold"><i class="fa-solid fa-money-check-dollar me-2"></i> Promedio de pagos </h5>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="semi-circle"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% elif nombreGrupo == 'Conciliacion' %}
+          <div class="col-lg-4">
+            <div class="row">
+              <div class="col-lg-12">
+                <!-- Yearly Breakup -->
+                <div class="card overflow-hidden">
+                  <div class="card-body p-4">
+                    <h5 class="card-title mb-9 fw-semibold"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Audiencias semanales </h5>
+                    <div class="row align-items-center">
+                      <div class="col-12">
+                        <div class="d-flex justify-content-center">
+                          <div id="radial-bar"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-12">
+                <!-- Monthly Earnings -->
+                <div class="card">
+                  <div class="card-body pb-0">
+                    <div class="row alig n-items-start">
+                      <div class="col-12">
+                        <h5 class="card-title mb-9 fw-semibold"><i class="fa-solid fa-money-check-dollar me-2"></i> Promedio de audiencias por día </h5>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="semi-circle"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="row">
+          <div class="col-lg-4 d-flex align-items-stretch">
+            <div class="card w-100 pb-2">
+              <div class="card-body p-4 pb-0">
+                <div class="mb-5">
+                  <h5 class="card-title fw-semibold"><i class="fa-solid fa-chart-simple me-2"></i> Promedio de turnos</h5>
+                </div>
+              </div>
+              <div id="pie-chart"></div>
+              <div class="card-body"></div>
+            </div>
+          </div>
+          <div class="col-lg-8 d-flex align-items-stretch">
+            <div class="card w-100">
+              <div class="card-body p-4">
+                <h5 class="card-title fw-semibold mb-4"><i class="fa-regular fa-clock me-2"></i> Tiempo de atención</h5>
+              </div>
+              <div id="area-chart"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          {% if nombreGrupo == 'Pagos' %}
+          <div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+              <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Total de turnos atendidos</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-semibold fs-4 mb-0 text-primary"> {{ estadisticas_totales.turnos_atendidos }} <span class="ms-2 fw-normal text-muted fs-3"></span></h6>
+                  <div class="list-unstyled d-flex align-items-center mb-0">
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+              <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Total de turnos cancelados</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-semibold fs-4 mb-0 text-danger"> {{ estadisticas_totales.turnos_cancelados }} <span class="ms-2 fw-normal text-muted fs-3"></span></h6>
+                  <div class="list-unstyled d-flex align-items-center mb-0">
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+              <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Total de pagos realizados</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-semibold fs-4 mb-0 text-success"> {{ estadisticas_totales.pagos_realizados }} <span class="ms-2 fw-normal text-muted fs-3"></span></h6>
+                  <div class="list-unstyled d-flex align-items-center mb-0">
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+              <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Total de pagos no realizados</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-semibold fs-4 mb-0 text-secondary"> {{ estadisticas_totales.pagos_no_realizados }} <span class="ms-2 fw-normal text-muted fs-3"></span></h6>
+                  <div class="list-unstyled d-flex align-items-center mb-0">
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% elif nombreGrupo == 'Conciliacion' %}
+          <div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+              <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Total de audiencias concluidas</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-semibold fs-4 mb-0 text-primary"> {{ estadisticas_totales.audiencias_concluidas }} <span class="ms-2 fw-normal text-muted fs-3"></span></h6>
+                  <div class="list-unstyled d-flex align-items-center mb-0">
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+              <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Total de audiencias archivadas</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-semibold fs-4 mb-0 text-danger"> {{ estadisticas_totales.audiencias_archivadas }} <span class="ms-2 fw-normal text-muted fs-3"></span></h6>
+                  <div class="list-unstyled d-flex align-items-center mb-0">
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+              <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Total de conciliaciones exitosas</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-semibold fs-4 mb-0 text-success"> {{ estadisticas_totales.conciliaciones_exitosas }} <span class="ms-2 fw-normal text-muted fs-3"></span></h6>
+                  <div class="list-unstyled d-flex align-items-center mb-0">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+              <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Total de conciliaciones fallidas</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-semibold fs-4 mb-0 text-secondary"> {{ estadisticas_totales.conciliaciones_fallidas }} <span class="ms-2 fw-normal text-muted fs-3"></span></h6>
+                  <div class="list-unstyled d-flex align-items-center mb-0">
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          {% if es_admin %}
+          <div class="col-sm-12">
+            <div class="col-lg-12 d-flex align-items-stretch">
+              <div class="card w-100">
+                <div class="card-body p-4 d-sm-flex d-block align-items-center justify-content-between">
+                  <h5 class="card-title fw-semibold mb-4"><i class="fa-solid fa-person-circle-check me-2"></i> Actividad en tiempo real de usuarios</h5>
+                  <form method="get" action="{% url 'estadisticas' %}">
+                    <select class="form-select" style="width: 11rem" name="grupo">
+                      <option value="">Todas las áreas</option>
+                      {% for grupo in grupos %}
+                        <option value="{{ grupo.name }}" {% if grupo.name == grupo_seleccionado %}selected{% endif %}>{{ grupo.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </form>             
+                </div>
+                <div id="time-chart" class="pe-4"></div>
+                <div id="no-data-alert" class="alert alert-primary mx-auto mb-4" style="display: none; width: 90%;">
+                  No hay datos de usuarios disponibles para el área seleccionada. Compruebe que los usuarios tengan el rol correcto asignado.
+                </div>
+                <div id="time-chart"></div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        <div class="py-6 px-6 text-center">
+          <div id="current-time" class="mb-0 fs-4 text-secondary">Última actualización: </div>
+        </div>
+      </div>
+    </div>
+  <script src="{% static 'js/dashboard.js' %}"></script>
+  <script src="{% static 'js/simplebar.js' %}"></script>
+  <script src="{% static 'js/app.min.js' %}"></script>
+  {% if nombreGrupo == 'Pagos' %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function initializeChart() {
+            var options = {
+                series: [
+                    {
+                        name: 'Turnos atendidos',
+                        group: 'turnos',
+                        data: {{ turnos_atendidos_semanal | safe }}
+                    },
+                    {
+                        name: 'Pagos realizados',
+                        group: 'pagos',
+                        data: {{ pagos_realizados_semanal | safe }}
+                    },
+                    {
+                        name: 'Turnos cancelados',
+                        group: 'turnos',
+                        data: {{ turnos_cancelados_semanal | safe }}
+                    },
+                    {
+                        name: 'Pagos no realizados',
+                        group: 'pagos',
+                        data: {{ pagos_no_realizados_semanal | safe }}
+                    }
+                ],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: true,
+                },
+                stroke: {
+                    width: 1,
+                    colors: ['#fff']
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false
+                    }
+                },
+                xaxis: {
+                    categories: 
+                        {{ etiquetas_semana | safe }}
+                },
+                yaxis: {
+                  tickAmount: 6,
+                    labels: {
+                      formatter: function(value) {
+                        return Math.round(value);
+                      }
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                colors: ['#80c7fd', '#008FFB', '#80f1cb', '#00E396'],
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left'
+                },
+                export: {
+                  csv: {
+                    filename: 'turnos_pagos_mes',
+                    headerCategory: 'Plazo',
+                  }
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#stacked-pagos"), options);
+            chart.render();
+        }
+
+        // Llamar a la función para inicializar el gráfico
+        initializeChart();
+
+        // Manejar el cambio en el select
+        $('#chart-change').change(function() {
+            var selectedFilter = $(this).val();
+            console.log('Selected filter:', selectedFilter);
+            window.location.href = '?filtro=' + selectedFilter;
+        });
+    });
+  </script>
+  {% elif nombreGrupo == 'Recepción' %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function initializeChart() {
+            var options = {
+                series: [
+                    {
+                        name: 'Turnos atendidos',
+                        group: 'turnos',
+                        data: {{ turnos_atendidos_semanal | safe }}
+                    },
+                        name: 'Turnos cancelados',
+                        group: 'turnos',
+                        data: {{ turnos_cancelados_semanal | safe }}
+                    }
+                ],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: true,
+                },
+                stroke: {
+                    width: 1,
+                    colors: ['#fff']
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false
+                    }
+                },
+                xaxis: {
+                    categories: 
+                        {{ etiquetas_semana | safe }}
+                },
+                yaxis: {
+                  tickAmount: 6,
+                    labels: {
+                      formatter: function(value) {
+                        return Math.round(value);
+                      }
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                colors: ['#80c7fd', '#008FFB', '#80f1cb', '#00E396'],
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left'
+                },
+                export: {
+                  csv: {
+                    filename: 'turnos_mes',
+                    headerCategory: 'Plazo',
+                  }
+                }
+            };
+
+            console.log('Chart options:', options);
+
+            var chart = new ApexCharts(document.querySelector("#stacked-recepcion"), options);
+            chart.render();
+        }
+
+        // Llamar a la función para inicializar el gráfico
+        initializeChart();
+
+        // Manejar el cambio en el select
+        $('#chart-change').change(function() {
+            var selectedFilter = $(this).val();
+            console.log('Selected filter:', selectedFilter);
+            window.location.href = '?filtro=' + selectedFilter;
+        });
+    });
+  </script>
+  {% elif nombreGrupo == 'Asesoria-Juridica' %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function initializeChart() {
+            var options = {
+                series: [
+                    {
+                        name: 'Turnos atendidos',
+                        group: 'turnos',
+                        data: {{ turnos_atendidos_semanal | safe }}
+                    },
+                    {
+                        name: 'Solicitudes confirmadas',
+                        group: 'solicitudes',
+                        data: {{ solicitudes_confirmadas_semanal | safe }}
+                    },
+                    {
+                        name: 'Turnos cancelados',
+                        group: 'turnos',
+                        data: {{ turnos_cancelados_semanal | safe }}
+                    },
+                    {
+                        name: 'Solicitudes no confirmadas',
+                        group: 'solicitudes',
+                        data: {{ solicitudes_no_confirmadas_semanal | safe }}
+                    }
+                ],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: true,
+                },
+                stroke: {
+                    width: 1,
+                    colors: ['#fff']
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false
+                    }
+                },
+                xaxis: {
+                    categories: 
+                        {{ etiquetas_semana | safe }}
+                },
+                yaxis: {
+                  tickAmount: 6,
+                    labels: {
+                      formatter: function(value) {
+                        return Math.round(value);
+                      }
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                colors: ['#80c7fd', '#008FFB', '#80f1cb', '#00E396'],
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left'
+                },
+                export: {
+                  csv: {
+                    filename: 'turnos_solicitudes_mes',
+                    headerCategory: 'Plazo',
+                  }
+                }
+            };
+
+            console.log('Chart options:', options);
+
+            var chart = new ApexCharts(document.querySelector("#stacked-asesoria"), options);
+            chart.render();
+        }
+
+        // Llamar a la función para inicializar el gráfico
+        initializeChart();
+
+        // Manejar el cambio en el select
+        $('#chart-change').change(function() {
+            var selectedFilter = $(this).val();
+            console.log('Selected filter:', selectedFilter);
+            window.location.href = '?filtro=' + selectedFilter;
+        });
+    });
+  </script>
+  {% elif nombreGrupo == 'Conciliacion' %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function initializeChart() {
+            var options = {
+                series: [
+                    {
+                        name: 'Turnos atendidos',
+                        group: 'turnos',
+                        data: {{ turnos_atendidos_semanal | safe }}
+                    },
+                    {
+                        name: 'Audiencias concluidas',
+                        group: 'audiencias',
+                        data: {{ audiencias_concluidas_semanal | safe }}
+                    },
+                    {
+                      name: 'Conciliaciones exitosas',
+                      group: 'conciliaciones',
+                      data: {{ conciliaciones_exitosas_semanal | safe }}
+                    },
+                    {
+                        name: 'Turnos cancelados',
+                        group: 'turnos',
+                        data: {{ turnos_cancelados_semanal | safe }}
+                    },
+                    {
+                        name: 'Audiencias archivadas',
+                        group: 'audiencias',
+                        data: {{ audiencias_archivadas_semanal | safe }}
+                    },
+                    {
+                      name: 'Conciliaciones fallidas',
+                      group: 'conciliaciones',
+                      data: {{ conciliaciones_fallidas_semanal | safe }}
+                    }
+                ],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: true,
+                },
+                stroke: {
+                    width: 1,
+                    colors: ['#fff']
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false
+                    }
+                },
+                xaxis: {
+                    categories: 
+                        {{ etiquetas_semana | safe }}
+                },
+                yaxis: {
+                  tickAmount: 6,
+                    labels: {
+                      formatter: function(value) {
+                        return Math.round(value);
+                      }
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                colors: ['#80c7fd', '#008FFB', '#80f1cb', '#00E396', '#964B00', '#D2B48C'],
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left'
+                },
+                export: {
+                  csv: {
+                    filename: 'turnos_audiencias_conciliaciones_mes',
+                    headerCategory: 'Plazo',
+                  }
+                }
+            };
+
+            console.log('Chart options:', options);
+
+            var chart = new ApexCharts(document.querySelector("#stacked-conciliacion"), options);
+            chart.render();
+        }
+
+        // Llamar a la función para inicializar el gráfico
+        initializeChart();
+
+        // Manejar el cambio en el select
+        $('#chart-change').change(function() {
+            var selectedFilter = $(this).val();
+            console.log('Selected filter:', selectedFilter);
+            window.location.href = '?filtro=' + selectedFilter;
+        });
+    });
+  </script>
+  {% endif %}
+  {% if es_admin %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var chart;
+        var startTime = moment().startOf('day').add(8, 'hours').valueOf();
+        var endTime = moment().startOf('day').add(16, 'hours').valueOf();
+    
+        function initializeChart() {
+            var options = {
+                series: [],
+                chart: {
+                    height: '350',
+                    width: '100%',
+                    type: 'rangeBar',
+                    export: {
+                        csv: {
+                            filename: 'tiempo_atencion_conciliadores' + moment().format('YYYY-MM-DD_HH'),
+                            columnDelimiter: ',',
+                            headerCategory: 'Conciliador',
+                            headerValue: 'Tiempo'
+                        }
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 10,
+                        horizontal: true
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        var a = moment(val[0]);
+                        var b = moment(val[1]);
+                        var diff = b.diff(a, 'minutes');
+                        return diff + (diff > 1 ? ' minutos' : ' minuto');
+                    }
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        shadeIntensity: 0.25,
+                        gradientToColors: undefined,
+                        inverseColors: true,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [50, 0, 100, 100]
+                    }
+                },
+                xaxis: {
+                    type: 'datetime',
+                    labels: {
+                        formatter: function(value) {
+                            return moment(value).format('HH:mm');
+                        }
+                    },
+                    tickAmount: 16,
+                    min: startTime,
+                    max: endTime,
+                    tickPlacement: 'between'
+                },
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    custom: function({series, seriesIndex, dataPointIndex, w}) {
+                        var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+                        var start = moment(data.y[0]);
+                        var end = moment(data.y[1]);
+                        var diff = moment.duration(end.diff(start));
+                        var hours = diff.hours();
+                        var minutes = diff.minutes();
+                        var duration = (hours > 0 ? hours + 'h ' : '') + minutes + 'm';
+                        
+                        return '<div class="custom-tooltip">' +
+                               '<span><b>' + data.x + '</b></span><br>' +
+                               '<span>' + data.details + '</span><br>' +
+                               '<span>Duración: ' + duration + '</span>' +
+                               '</div>';
+                    }
+                },
+            };
+    
+            chart = new ApexCharts(document.querySelector("#time-chart"), options);
+            chart.render();
+        }
+    
+        function actualizarGrafico() {
+            var selectedGroup = document.querySelector('select[name="grupo"]').value;
+            console.log('Grupo seleccionado:', selectedGroup);
+            $.ajax({
+                url: "{% url 'consultar_estadisticas' %}",
+                method: "GET",
+                data: { grupo: selectedGroup },
+                success: function(data) {
+                  if (data.hay_datos) {
+                    var dataAtencion = [];
+                    var dataSinAtencion = [];
+                    var ahora = moment();
+    
+                    console.log('Datos recibidos:', data);
+    
+                    data.conciliador_data.forEach(function(conciliador) {
+                        conciliador.datos.forEach(function(item) {
+                            var start = moment(item.inicio);
+                            var end = moment(item.fin);
+                            
+                            if (item.tipo === 'atencion') {
+                                dataAtencion.push({
+                                    x: conciliador.conciliador,
+                                    y: [start.valueOf(), end.valueOf()],
+                                    details: `Turno: ${item.turno}<br>Inicio: ${start.format('HH:mm')} - ${item.status === 'PRO' ? 'Actual' : `Fin: ${end.format('HH:mm')}`}`
+                                });
+                            } else if (item.tipo === 'sin_atencion') {
+                                dataSinAtencion.push({
+                                    x: conciliador.conciliador,
+                                    y: [start.valueOf(), end.valueOf()],
+                                    details: `Inicio: ${start.format('HH:mm')} - ${end.isSame(ahora) ? 'Actual' : `Fin: ${end.format('HH:mm')}`}`
+                                });
+                            }
+                        });
+                    });
+    
+                    chart.updateSeries([
+                        {
+                            name: 'Tiempo en atención',
+                            data: dataAtencion
+                        },
+                        {
+                            name: 'Tiempo sin atención',
+                            data: dataSinAtencion
+                        }
+                    ]);
+    
+                    $('#current-time').text('Última actualización: ' + ahora.format('DD/MM/YYYY HH:mm:ss'));
+                    $('#time-chart').show();
+                    $('#no-data-alert').hide();
+                  } else {
+                    $('#time-chart').hide();
+                    $('#no-data-alert').show();
+                  }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('Error al actualizar el gráfico:', textStatus, errorThrown);
+                    alert('Hubo un error al actualizar el gráfico. Por favor, intenta de nuevo más tarde.');
+                }
+            });
+        }
+    
+        initializeChart();
+        actualizarGrafico();
+    
+        // Update chart when group selection changes
+        $('select[name="grupo"]').change(function() {
+            actualizarGrafico();
+        });
+    
+        // Update chart every minute
+        setInterval(actualizarGrafico, 60000);
+    });
+    </script>
+    {% endif %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      // Grafico radial de pagos por día
+      {% if nombreGrupo == 'Pagos' %}
+      var options = {
+        series: [{{pagos_hoy}}, {{pagos_ayer}}, {{pagos_hace_2_dias}}, {{pagos_hace_3_dias}}, {{pagos_hace_4_dias}}],
+        chart: {
+        height: 250,
+        type: 'radialBar',
+      },
+      {% elif nombreGrupo == 'Conciliacion' %}
+      var options = {
+        series: [{{audiencias_hoy}}, {{audiencias_ayer}}, {{audiencias_hace_2_dias}}, {{audiencias_hace_3_dias}}, {{audiencias_hace_4_dias}}],
+        chart: {
+        height: 250,
+        type: 'radialBar',
+      },
+      {% endif %}
+      plotOptions: {
+        radialBar: {
+          offsetY: 0,
+          startAngle: 0,
+          endAngle: 270,
+          hollow: {
+            margin: 5,
+            size: '30%',
+            background: 'transparent',
+            image: undefined,
+          },
+          dataLabels: {
+            name: {
+              show: false,
+            },
+            value: {
+              show: false,
+            }
+          },
+          barLabels: {
+            enabled: true,
+            useSeriesColors: true,
+            offsetX: -8,
+            fontSize: '12px',
+            formatter: function(seriesName, opts) {
+              return seriesName + ":  " + opts.w.globals.series[opts.seriesIndex]
+            },
+          },
+        }
+      },
+      colors: ['#1ab7ea', '#0084ff', '#39539E', '#0077B5'],
+      labels: ['Hoy', 'Ayer', 'Hace 2 días', 'Hace 3 días', 'Hace 4 días'],
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          legend: {
+              show: false
+          }
+        }
+      }]
+      };
+
+      var chart = new ApexCharts(document.querySelector("#radial-bar"), options);
+      chart.render();
+      // Fin grafico radial de pagos por día
+
+      // Grafico de semi circulo de promedio de pagos
+      {% if nombreGrupo == 'Pagos' %}
+      var options = {
+        series: [{{estadisticas.promedio_pagos_realizados|stringformat:".2g"}}],
+        chart: {
+        type: 'radialBar',
+        offsetY: -20,
+        height: 180,
+        sparkline: {
+          enabled: true
+        }
+      },
+      plotOptions: {
+        radialBar: {
+          startAngle: -90,
+          endAngle: 90,
+          track: {
+            background: "#e7e7e7",
+            strokeWidth: '97%',
+            margin: 5, // margin is in pixels
+            dropShadow: {
+              enabled: true,
+              top: 2,
+              left: 0,
+              color: '#999',
+              opacity: 1,
+              blur: 2
+            }
+          },
+          dataLabels: {
+            name: {
+              show: false
+            },
+            value: {
+              offsetY: -2,
+              fontSize: '22px'
+            }
+          }
+        }
+      },
+      grid: {
+        padding: {
+          top: -10
+        }
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          shadeIntensity: 0.4,
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 50, 53, 91]
+        },
+      },
+      labels: ['Promedio de pagos'],
+      };
+
+      var chart = new ApexCharts(document.querySelector("#semi-circle"), options);
+      chart.render();
+      // Fin grafico de semi circulo de promedio de pagos
+
+      // Grafico de semi circulo de promedio de audiencias por día
+      {% elif nombreGrupo == 'Conciliacion' %}
+      console.log('Promedio de audiencias por día:', {{ promedio_total_audiencias_por_dia|floatformat:"0" }});
+      var options = {
+        series: [{{ promedio_total_audiencias_por_dia|floatformat:"0" }}],
+        chart: {
+        type: 'radialBar',
+        offsetY: -20,
+        height: 180,
+        sparkline: {
+          enabled: true
+        }
+      },
+      plotOptions: {
+        radialBar: {
+          startAngle: -90,
+          endAngle: 90,
+          track: {
+            background: "#e7e7e7",
+            strokeWidth: '97%',
+            margin: 5, // margin is in pixels
+            dropShadow: {
+              enabled: true,
+              top: 2,
+              left: 0,
+              color: '#999',
+              opacity: 1,
+              blur: 2
+            }
+          },
+          dataLabels: {
+            name: {
+              show: false
+            },
+            value: {
+              offsetY: -2,
+              fontSize: '22px',
+              formatter: function(val) {
+                return val.toFixed(2);
+              }
+            }
+          }
+        }
+      },
+      grid: {
+        padding: {
+          top: -10
+        }
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          shadeIntensity: 0.4,
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 50, 53, 91]
+        },
+      },
+      labels: ['Promedio de audiencias por día'],
+      };
+
+      var chart = new ApexCharts(document.querySelector("#semi-circle"), options);
+      chart.render();
+      {% endif %}
+
+      // Grafico de barra radial de promedio de turnos
+      var options = {
+        series: [{{estadisticas.promedio_turnos_atendidos|stringformat:".2g"}}, {{estadisticas.promedio_turnos_cancelados|stringformat:".2g"}}],
+        chart: {
+        type: 'donut',
+      },
+      labels: ['Turnos atendidos', 'Turnos cancelados'],
+      legend: {
+        position: 'bottom'
+      },
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
+          },
+          legend: {
+            position: 'bottom'
+          },
+        }
+      }]
+      };
+
+      var chart = new ApexCharts(document.querySelector("#pie-chart"), options);
+      chart.render();
+      // Fin grafico de barra radial de promedio de turnos
+
+      // Grafico de area de tiempo de atención
+      var options = {
+        series: [{
+        name: 'Hoy',
+        data: [31, 40, 28, 51, 42, 109, 100, 67]
+      }, {
+        name: 'Ayer',
+        data: [11, 32, 45, 32, 34, 52, 41, 109]
+      }],
+        chart: {
+        height: 350,
+        type: 'area'
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: 'smooth'
+      },
+      xaxis: {
+        type: 'datetime',
+        categories: ["2024-08-07T09:00:00.000Z", "2024-08-07T10:00:00.000Z", "2024-08-07T11:00:00.000Z", "2024-08-07T12:00:00.000Z", "2024-08-07T13:00:00.000Z", "2024-08-07T14:00:00.000Z", "2024-08-07T15:00:00.000Z", "2024-08-07T16:00:00.000Z"],
+      },
+      tooltip: {
+        x: {
+          format: 'dd/MM/yy HH:mm'
+        },
+      },
+      };
+
+      var chart = new ApexCharts(document.querySelector("#area-chart"), options);
+      chart.render();
+      // Fin grafico de area de tiempo de atención
+    });
+  </script>
+{% endblock %}

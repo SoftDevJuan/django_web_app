@@ -1,0 +1,113 @@
+{% extends "ciudadano/base.html" %}
+
+{% block content %}
+<body>
+<div class="container">
+    <div class="card mt-5">
+        <div class="card-body">
+            <h2 class="card-title text-center">{{ titulo }}</h2>
+            <form method="post" enctype="multipart/form-data" class="mt-4">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.turno_id.label_tag }}
+                        {{ form.turno_id }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.ciudadano_id.label_tag }}
+                        {{ form.ciudadano_id }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.observaciones.label_tag }}
+                        {{ form.observaciones }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.documentacion.label_tag }}
+                        {{ form.documentacion }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.finalizacion.label_tag }}
+                        {{ form.finalizacion }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.hora_entrada.label_tag }}
+                        {{ form.hora_entrada }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.hora_salida.label_tag }}
+                        {{ form.hora_salida }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.cat_personas_final.label_tag }}
+                        {{ form.cat_personas_final }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.mesa_id.label_tag }}
+                        {{ form.mesa_id }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.cita_id.label_tag }}
+                        {{ form.cita_id }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.area_id.label_tag }}
+                        {{ form.area_id }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.folio_sinacol.label_tag }}
+                        {{ form.folio_sinacol }}
+                    </div>
+                </div>
+                {% if form.mesa %}
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.mesa.label_tag }}
+                        {{ form.mesa }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if form.empleador %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.empleador.label_tag }}
+                        {{ form.empleador }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if form.empleado %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.empleado.label_tag }}
+                        {{ form.empleado }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if form.sala %}
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.sala.label_tag }}
+                        {{ form.sala }}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+{% endblock %}

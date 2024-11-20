@@ -1,0 +1,72 @@
+{% extends 'general/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general/barralateral.html' %}
+
+<div class="containerFormulario">
+    <div class="container">
+                    <!-- Mensaje de éxito -->
+        <div class="alert alert-success mt-4" role="alert">
+        </div>
+                    <!-- Mensaje de éxito -->
+        <div class="alert alert-success mt-4" role="alert">
+            ¡Registro exitoso! Tus datos han sido registrados correctamente.
+        </div>
+                    <!-- Enlace para sacar un turno -->
+        <div class="text-center">
+            <a id='buscador_atuomatico 'href="{% url 'auto_turno'%}?registro={{ ciudadanos_registrados.0.registro }}" class="btn btn-primary mb-2">Generar turno</a>      
+        </div>
+        {% for ciudadano in ciudadanos_registrados %}
+            <div class="card">
+                <div class="card-body">        
+                    <h1 class="card-title">Datos del Ciudadano</h1>
+                    <p><strong>Nombre:</strong> {{ ciudadano.nombre }}</p>
+                    <p><strong>Sexo:</strong> {{ ciudadano.sexo }}</p>
+                    <!--<p><strong>CURP / RFC:</strong> {{ ciudadano.curp_rfc }}</p>-->
+                    <p><strong>Municipio:</strong> {{ ciudadano.municipio }}</p>
+                    <p><strong>Código Ciudadano:</strong> {{ ciudadano.codigo_ciudadano }}</p>
+                    <p><strong>Número de Registro:</strong> {{ ciudadano.registro }}</p>
+                    
+                    {% if ciudadano.documento_1 or ciudadano.documento_2 %}
+                        <div class="identificaciones-div">
+                            <img src="{{ ciudadano.documento_1.url }}" alt="Identificación Frente" class="img-id">
+                            <br><br>
+                            <img src="{{ ciudadano.documento_2.url }}" alt="Identificación Frente" class="img-id">
+                        </div>
+                        
+                    {% endif %}
+
+                    <!-- Mostrar imágenes de los testigos si existen -->
+                    
+                        {% if testigo.codigo_ciudadano == ciudadano.codigo_ciudadano %}
+                            <div class="identificaciones-div">
+                                {% if testigo.documento_3 %}
+                                    <img src="{{ testigo.documento_3.url }}" alt="Documento 3 del Testigo" class="img-id">
+                                    <br><br>
+                                {% endif %}
+                                {% if testigo.documento_4 %}
+                                    <img src="{{ testigo.documento_4.url }}" alt="Documento 4 del Testigo" class="img-id">
+                                    <br><br>
+                                {% endif %}
+                            </div>
+                            <div class="identificaciones-div">   
+                                {% if testigo.documento_5 %}
+                                    <img src="{{ testigo.documento_5.url }}" alt="Documento 5 del Testigo" class="img-id">
+                                    <br><br>
+                                {% endif %}
+                                {% if testigo.documento_6 %}
+                                    <img src="{{ testigo.documento_6.url }}" alt="Documento 6 del Testigo" class="img-id">
+                                    <br><br>
+                                {% endif %}
+                            </div>
+                        {%else%}
+                        {% endif %}
+                    
+                    <br><br>
+                    <hr>
+                </div>
+            </div>
+        {% endfor %}    
+    </div>
+</div>
+{% endblock %}

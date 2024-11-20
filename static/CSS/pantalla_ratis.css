@@ -1,0 +1,29 @@
+
+
+.td-llamando {
+    background-color: #dd7a00!important; 
+    color: #fbf0e7 !important;
+    border-radius: 5px !important;
+}
+
+.td-en-proceso {
+    background-color: #160f9a !important;
+    color: #f0f1ff !important;
+    border-radius: 5px !important;
+}
+
+
+
+.table tbody tr {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    margin-bottom: 20px !important;
+    border-radius: 5px !important;
+}
+
+.table tbody td {
+    padding: 10px !important;
+}
+
+#no-disponible td {
+    background-color: #ecfcf2 !important;
+}

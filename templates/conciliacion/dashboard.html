@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Estadísticas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .header {
+            background-color: #003366;
+            width: 100%;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-buttons button {
+            background-color: #00509e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .nav-buttons button:hover {
+            background-color: #003f7f;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #004080;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .stats .stat-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            margin: 0 10px;
+            text-align: center;
+        }
+        .stat-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #00509e;
+        }
+        .stat-card h3 {
+            margin: 10px 0 5px;
+            font-size: 1.25rem;
+            color: #333;
+        }
+        .stat-card p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00509e;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dashboard de Estadísticas</h1>
+        <div class="nav-buttons">
+            <button>Inicio</button>
+            <button>Reportes</button>
+            <button>Configuración</button>
+        </div>
+    </div>
+    <div class="stats">
+        <div class="stat-card">
+            <i class="fas fa-users"></i>
+            <h3>Usuarios Activos</h3>
+            <p>1,200</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-chart-line"></i>
+            <h3>Visitas</h3>
+            <p>15,300</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-dollar-sign"></i>
+            <h3>Ingresos</h3>
+            <p>$12,400</p>
+        </div>
+    </div>
+    <div class="dashboard">
+        <div class="card">
+            <h2><i class="fas fa-chart-bar"></i> Gráfico de Barras</h2>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <h2><i class="fas fa-chart-line"></i> Gráfico de Líneas</h2>
+            <div class="chart-container">
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <h2><i class="fas fa-chart-pie"></i> Gráfico de Pastel</h2>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Datos para los gráficos
+        const barData = {
+            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+            datasets: [{
+                label: 'Ventas',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        const lineData = {
+            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+            datasets: [{
+                label: 'Visitas',
+                data: [50, 60, 70, 180, 190, 200],
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.1
+            }]
+        };
+
+        const pieData = {
+            labels: ['Red', 'Blue', 'Yellow'],
+            datasets: [{
+                label: 'My First Dataset',
+                data: [300, 50, 100],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        // Configuración para los gráficos
+        const barConfig = {
+            type: 'bar',
+            data: barData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        const lineConfig = {
+            type: 'line',
+            data: lineData,
+            options: {}
+        };
+
+        const pieConfig = {
+            type: 'pie',
+            data: pieData,
+            options: {}
+        };
+
+        // Renderizando los gráficos
+        const barChart = new Chart(
+            document.getElementById('barChart'),
+            barConfig
+        );
+
+        const lineChart = new Chart(
+            document.getElementById('lineChart'),
+            lineConfig
+        );
+
+        const pieChart = new Chart(
+            document.getElementById('pieChart'),
+            pieConfig
+        );
+    </script>
+</body>
+</html>

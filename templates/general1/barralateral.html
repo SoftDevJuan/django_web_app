@@ -1,0 +1,71 @@
+{% load static %}
+<div class="l-navbar" id="nav-bar">
+  <nav class="nav">
+    <div> 
+      <a href="{% url 'Inicio' %}" class="nav_logo">
+        <img src="{% static 'icon/ccl-logo.svg' %}" class="nav_logo-icon"  alt="...">
+        <span class="nav_logo-name">CCL Jalisco</span>
+      </a>
+      <div class="nav_list">
+        {% if usuario.is_authenticated and nombreGrupo == 'Ratificacion' or nombreGrupo == 'Administrador' %}
+        <a href="{% url 'auxiliares_ratificacion' %}" class="nav_link {% if active_view == 'Ratificacion' %}active{% endif %}">
+          <i class="bx bx-user-voice nav_icon"></i>
+          <span class="nav_name">Auxiliar Ratificacion</span>
+        </a>
+        {% elif usuario.is_authenticated and nombreGrupo == 'Auxiliar-Asistencias' or nombreGrupo == 'Administrador' or nombreGrupo == 'Conciliacion' or nombreGrupo == 'Auxiliar-Coordinador' or nombreGrupo == 'Ratificacion' or nombreGrupo == 'Recepcion' %}
+          <a href="{% url 'audiencias_auxiliares_api'%}" class="nav_link">
+            <i class="bx bx-briefcase-alt-2 nav_icon"></i>
+            <span class="nav_name">Audiencias</span>
+          </a>
+          <a href="{% url 'conciliador' %}" class="nav_link {% if active_view == 'Auxiliares Ratificacion' %}active{% endif %}">
+            <i class="bx bx-user-circle nav_icon"></i>
+            <span class="nav_name">Ratificaciones</span>
+          </a>
+        {% endif %}
+
+        {% if usuario.is_authenticated and nombreGrupo == 'Coordinador' or nombreGrupo == 'Administrador' %}
+        <a href="{% url 'asignar_sala' %}" class="nav_link {% if active_view == 'Coordinador' %}active{% endif %}">
+          <i class="bx bx-edit nav_icon"></i>
+          <span class="nav_name">Asignar salas</span>
+        </a>
+        {% endif %}
+
+        {% if usuario.is_authenticated and nombreGrupo == 'Asesoria-Juridica' or nombreGrupo == 'Administrador' %}
+        <a href="{% url 'asesor' %}" class="nav_link active">
+          <i class="bx bx-user-voice nav_icon"></i>
+          <span class="nav_name">Turnero Asesorias</span>
+        </a>
+        {%else%}
+
+        <a href="{% url 'Inicio' %}" class="nav_link active">
+          <i class="bx bx-grid-alt nav_icon"></i>
+          <span class="nav_name">Panel principal</span>
+        </a>
+        <a href="{% url 'perfil' %}" class="nav_link {% if active_view == 'Inicio' %}active{% endif %}">
+          <i class="bx bx-user nav_icon"></i>
+          <span class="nav_name">{{ usuario.username|capfirst }}</span>
+        </a>
+        {% endif %}
+
+        {% if nombreGrupo == 'Pantalla' %}
+        <a href="{% url 'pantalla_asesoria' %}" class="nav_link {% if active_view == 'Pantalla AJ' %}active{% endif %}">
+          <i class="bx bx-tv nav_icon"></i>
+          <span class="nav_name">Pantalla asesoría</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% if request.user.is_authenticated %}
+      <form id="logout-form" action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <a class="nav_link" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+          <i class="bx bx-log-out nav_icon"></i>
+          <span class="nav_name">Salir</span>
+        </a>
+      </form>
+    {% else %}
+      <a class="btn btn-primary btn-primary" href="{% url 'login' %}">Iniciar Sesion</a>
+    {% endif %}
+    
+  </nav>
+</div>

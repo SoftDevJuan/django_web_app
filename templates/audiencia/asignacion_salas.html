@@ -1,0 +1,309 @@
+{% extends 'audiencia/base.html' %} 
+{% load static%} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+<style>
+.clear {
+  clear: both;
+}
+
+.checkBox {
+  display: block;
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+  border: 3px solid rgba(255, 255, 255, 0);
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0px 0px 0px 2px black;
+}
+
+.checkBox div {
+  width: 30px;
+  height: 30px;
+  background-color: black;
+  top: -52px;
+  left: -52px;
+  position: absolute;
+  transform: rotateZ(45deg);
+  z-index: 100;
+}
+
+.checkBox input[type=checkbox]:checked + div {
+  left: -10px;
+  top: -10px;
+}
+
+.checkBox input[type=checkbox] {
+  position: absolute;
+  left: 50px;
+  visibility: hidden;
+}
+
+.transition {
+  transition: 300ms ease;
+}
+
+.input {
+  width: 100%;
+  max-width: 500px;
+  height: 45px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px solid lightgrey;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0px 0px 20px -18px;
+}
+
+.input:hover {
+  border: 2px solid lightgrey;
+  box-shadow: 0px 0px 20px -17px;
+}
+
+.input:focus {
+  border: 2px solid grey;
+}
+
+.salas-select {
+  width: 100%;
+  max-width: 400px;
+  --bs-form-select-bg-img: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e);
+  display: block;
+  padding: .375rem 2.25rem .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  background-image: var(--bs-form-select-bg-img), var(--bs-form-select-bg-icon, none);
+  background-repeat: no-repeat;
+  background-position: right .75rem center;
+  background-size: 16px 12px;
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+</style>
+<div class="content w-75 content-center mx-auto">
+  <h1 class="text-center" style="margin-top: 5rem;">Asignación de salas</h1>
+  <div class="d-flex align-middle justify-content-center" style="margin-top: 1rem;">
+    <input class="input" id="search-input" name="text" type="text" placeholder="Buscar por conciliador o sala...">
+  </div>
+    {% if messages %}
+      <div class="container d-flex justify-content-center" style="margin-top: 2rem;">
+      {% for message in messages %}
+        <div class="d-flex ps-5 pe-5 alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+        {{ message }}
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+  <table class="table table-striped rounded-4">
+    <thead class="table-primary">
+      <tr class="align-middle">
+        <th class="text-center align-middle h-50" scope="row">
+          <div class="content">
+            <label class="checkBox">
+              <input type="checkbox" id="selectAll">
+              <div class="transition"></div>
+            </label>
+          </div>
+        </th>
+        <th scope="col">Conciliador</th>
+        <th scope="col">Sala</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for audiencia in audiencias %}
+    <tr class="audiencia-row">
+      <th class="text-center align-middle" scope="row">
+        <div class="content">
+          <label class="checkBox">
+            <input type="checkbox" class="rowCheckbox">
+            <div class="transition"></div>
+          </label>
+        </div>
+      </th>
+      <td class="align-middle conciliador" style="font-size: medium;">
+        {{ audiencia.conciliador_audiencia }}
+      </td>
+      <td class="sala">
+        <select name="salas" class="form-select salas-select" id="salas-select-{{ forloop.counter }}" aria-label="Salas">
+          <option value="Sin sala asignada" {% if audiencia.sala_audiencia == 'Sin sala asignada' %}selected{% endif %}>Sin sala asignada</option>
+          {% for sala in salas_list %}
+              <option value="{{ sala.nombre }}" {% if audiencia.sala_audiencia == sala.nombre %}selected{% endif %}>{{ sala.nombre }}</option>
+          {% endfor %}
+          <option value="ALTA" {% if audiencia.sala_audiencia == 'ALTA' %}selected{% endif %}>ALTA</option>
+          <option value="SALA DE JUNTAS 1" {% if audiencia.sala_audiencia == 'SALA DE JUNTAS 1' %}selected{% endif %}>SALA DE JUNTAS 1</option>
+          <option value="SALA DE JUNTAS 2" {% if audiencia.sala_audiencia == 'SALA DE JUNTAS 2' %}selected{% endif %}>SALA DE JUNTAS 2</option>
+        </select>
+      </td>
+      <td class="acciones">
+        <div class="container d-flex">
+          <form method="POST" action="{% url 'desocupar_sala' %}" id="desocuparForm-{{ forloop.counter }}">
+            {% csrf_token %}
+            <input type="hidden" name="conciliador" value="{{ audiencia.conciliador_audiencia }}">
+            <button type="submit" class="btn btn-danger ps-2 pe-2 pb-1 me-1 text-center" data-bs-toggle="tooltip" data-bs-title="Desocupar sala" data-bs-placement="top">
+                <i class='bx bx-log-out-circle'></i>
+            </button>
+          </form>
+          <form method="POST" action="{% url 'asignar_sala' %}" id="salaForm-{{ forloop.counter }}">
+            {% csrf_token %}
+            <input type="hidden" name="conciliador" value="{{ audiencia.conciliador_audiencia }}">
+            <input type="hidden" name="salas" id="salaHidden-{{ forloop.counter }}">
+            <button type="submit" class="btn btn-primary ps-2 pe-2 pb-1 text-center" data-bs-toggle="tooltip" data-bs-title="Asignar sala" data-bs-placement="top">
+                <i class='bx bx-map-pin'></i>
+            </button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-between" style="margin-bottom: 3rem;">
+    <button type="button" class="btn btn-danger" id="desocuparSeleccionadas">Desocupar seleccionadas</button>
+    <button type="button" class="btn btn-primary" id="asignarSeleccionadas">Asignar seleccionadas</button>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    $('select[id^="salas-select"]').select2({
+      theme: 'bootstrap-5',
+      placeholder: 'Selecciona una sala',
+      allowClear: true
+    });
+
+    const buttons = document.querySelectorAll('.desocupar-sala-btn');
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const rowCheckboxes = document.getElementsByClassName('rowCheckbox');
+
+    selectAllCheckbox.addEventListener('change', function() {
+      Array.from(rowCheckboxes).forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+    });
+
+    document.querySelectorAll('[id^="salaForm-"]').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formId = this.id;
+        const rowNumber = formId.split('-')[1];
+        const salaSelect = document.getElementById(`salas-select-${rowNumber}`);
+        const salaHidden = document.getElementById(`salaHidden-${rowNumber}`);
+        salaHidden.value = salaSelect.value;
+        this.submit();
+      });
+    });
+
+    document.getElementById('desocuparSeleccionadas').addEventListener('click', function() {
+      const selectedRows = [];
+      Array.from(rowCheckboxes).forEach(checkbox => {
+        if (checkbox.checked) {
+          const row = checkbox.closest('.audiencia-row');
+          const conciliador = row.querySelector('.conciliador').textContent.trim();
+          selectedRows.push(conciliador);
+        }
+      });
+
+      if (selectedRows.length === 0) {
+        alert('Por favor selecciona al menos una fila para desocupar');
+        return;
+      }
+
+      fetch('{% url "desocupar_sala" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+        },
+        body: JSON.stringify({
+          conciliadores: selectedRows
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          location.reload();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Ocurrió un error al desocupar las salas');
+      });
+    });
+
+    document.getElementById('asignarSeleccionadas').addEventListener('click', function() {
+      const selectedData = [];
+      Array.from(rowCheckboxes).forEach(checkbox => {
+        if (checkbox.checked) {
+          const row = checkbox.closest('.audiencia-row');
+          const conciliador = row.querySelector('.conciliador').textContent.trim();
+          const sala = row.querySelector('.salas-select').value;
+          selectedData.push({
+            conciliador: conciliador,
+            sala: sala
+          });
+        }
+      });
+
+      if (selectedData.length === 0) {
+        alert('Por favor selecciona al menos una fila para asignar');
+        return;
+      }
+
+      fetch('{% url "asignar_sala" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+        },
+        body: JSON.stringify({
+          asignaciones: selectedData
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === "success") {
+          location.reload();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Ocurrió un error al asignar las salas');
+      });
+    });
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    document.getElementById('search-input').addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll('.audiencia-row');
+
+      rows.forEach(function(row) {
+        const conciliador = row.querySelector('.conciliador').textContent.toLowerCase();
+        const sala = row.querySelector('.sala').textContent.toLowerCase();
+
+        if (conciliador.includes(filter) || sala.includes(filter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+{%endblock%}

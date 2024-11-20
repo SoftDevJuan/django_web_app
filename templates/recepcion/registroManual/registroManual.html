@@ -1,0 +1,541 @@
+{% include 'general/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %} 
+{% include 'general/barralateral.html' %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{% static 'js/municipios.js' %}"></script>
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'CSS/style.css' %}">
+{% endblock %}
+<script>
+    (function () {
+    "use strict";
+    window.addEventListener(
+        "load",
+        function () {
+            var forms = document.getElementsByClassName("needs-validation");
+            var validation = Array.prototype.filter.call(forms, function (form) {
+            form.addEventListener(
+                "submit",
+                function (event) {
+                if (form.checkValidity() === false) {
+                event.preventDefault();
+                event.stopPropagation();
+                }
+                form.classList.add("was-validated");
+            },
+            false
+            );
+        });
+        },
+        false
+    );
+    })();
+</script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: #004A99;
+        color: #fff;
+        padding: 1rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    header img {
+        width: 50px;
+        height: auto;
+        margin-right: 20px;
+    }
+    header h1 {
+        margin: 0;
+    }
+    .containerFormulario {
+        background-color: #fff;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+    h2 {
+        margin-bottom: 1rem;
+        color: #004A99;
+        border-bottom: 2px solid #004A99;
+        padding-bottom: 0.5rem;
+    }
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    .form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        text-align: left;
+    }
+    .btn {
+        background-color: #004A99;
+        color: #fff;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 1rem;
+        display: block;
+        width: 100%;
+    }
+    .btn:hover {
+        background-color: #005BB5;
+    }
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    .radio-group {
+        display: flex;
+        gap: 1rem;
+    }
+    .radio-group input {
+        margin-right: 0.5rem;
+    }
+    header img {
+        width: 100px;  
+        height: auto;  
+        margin-right: 20px;
+    }
+    .camera-container, .testigo-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    video, img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .hidden-field {
+    display: none;
+}
+
+.hidden-field + label {
+    display: none;
+}
+
+
+.nav_linkin {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #ffffff; 
+    border-radius: 8px;
+    text-decoration: none;
+    color: #007bff; 
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 5px;
+}
+
+.nav_linkin:hover {
+    background-color: #007bff;
+    color: #fff; 
+}
+
+.nav_linkin .nav_icon {
+    font-size: 20px;
+    margin-right: 8px; 
+    transition: transform 0.3s ease;
+}
+
+
+.nav_linkin:hover .nav_icon {
+    transform: scale(1.2); 
+}
+
+.nav_linkin.active {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+</style>
+
+<br>
+<br>
+<div class="containerFormulario">
+    <div class="container mt-3">
+        <h1>REGISTRO CIUDADANO</h1> 
+        <a href="{% url 'Registro Ratificaciones' %}" class="nav_linkin {% if active_view == 'Registro Manual' %}active{% endif %}">
+            <i class="bx bx-user-plus nav_icon"></i>
+            <span class="nav_name">Registro con folio</span>
+        </a>
+        <br></br>
+        {% if user.is_authenticated %}
+        Registro actual: {{registro}}
+        {%endif%}
+
+        <br></br>
+        <form method="post" action="{% url 'Registro Manual' %}" enctype="multipart/form-data" id="registroForm">
+            <div class="card mx-auto" style="width: 30rem;">
+                <div class="card-body">           
+                    {% csrf_token %}
+                    {% if mensaje %}
+                        <div class="alert alert-success" role="alert">
+                            Registrado Correctamente
+                        </div>
+                    {% endif %}
+                    
+                    {{ formset.management_form }}
+
+                    {% for form in formset %}
+                        <div class="formset-form" id="formset-form-{{ forloop.counter0 }}">
+                            <div class="form-group">
+                                <label>¿Tiene identificación?</label>
+                                <div>
+                                    <label><input type="radio" name="identificacion_{{ forloop.counter0 }}" value="si" class="identificacion_radio" required> Sí</label>
+                                </div>
+                                <div>
+                                    <label><input type="radio" name="identificacion_{{ forloop.counter0 }}" value="no" class="identificacion_radio" required> No</label>
+                                </div>
+                            </div>
+
+                            <div class="camera-container" id="camera-container-{{ forloop.counter0 }}" style="display:none;">
+                                                            
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="frente">Capturar Identificacion Frente</button>
+                                <video id="video-frente-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <canvas id="canvas-frente-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-frente-{{ forloop.counter0 }}" src="#" alt="Imagen frente" style="display:none;"/>
+                                
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="reverso">Capturar Identificacion Reverso</button>
+                                <video id="video-reverso-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <canvas id="canvas-reverso-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-reverso-{{ forloop.counter0 }}" src="#" alt="Imagen reverso" style="display:none;"/>
+                            </div>
+                            <br>
+                            
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+                            <div class="testigo-container" id="testigo-container-{{ forloop.counter0 }}" style="display:none;">
+                                <div class="alert alert-warning " role="alert">
+                                    <center>Datos de los Testigos</center>
+                                </div> 
+                                <br>
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="testigo_1_frente">Capturar Identificacion Frente Testigo 1</button>
+                                <video id="video-testigo_1_frente-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <canvas id="canvas-testigo_1_frente-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-testigo_1_frente-{{ forloop.counter0 }}" src="#" alt="Imagen frente" style="display:none;"/>
+
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="testigo_1_reverso">Capturar Identificacion Reverso Testigo 1</button>
+                                <video id="video-testigo_1_reverso-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <canvas id="canvas-testigo_1_reverso-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-testigo_1_reverso-{{ forloop.counter0 }}" src="#" alt="Imagen reverso" style="display:none;"/>
+                                <br>
+
+                                <!--<label>CURP o RFC del Testigo 1</label>
+                                <input type="text" name="curp_rfc_testigo_1" class="form-control" placeholder="CURP o RFC del Testigo 1" maxlength="18">
+                                <br>-->
+                                <label>Municipio del Testigo 1</label>
+                                <input type="text" name="municipio_testigo_1_{{ forloop.counter0 }}" id="id_municipio3" class="form-control" placeholder="Municipio del Testigo 1">
+                                <br>
+
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
+
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="testigo_2_frente">Capturar Identificacion Frente Testigo 2</button>
+                                <video id="video-testigo_2_frente-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <canvas id="canvas-testigo_2_frente-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-testigo_2_frente-{{ forloop.counter0 }}" src="#" alt="Imagen frente" style="display:none;"/> 
+                                <br><br> 
+                                
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="testigo_2_reverso">Capturar Identificacion Reverso Testigo 2</button>
+                                <video id="video-testigo_2_reverso-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <canvas id="canvas-testigo_2_reverso-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-testigo_2_reverso-{{ forloop.counter0 }}" src="#" alt="Imagen reverso" style="display:none;"/>
+                                <br><br>
+
+                            <!-- <label>CURP o RFC del Testigo 2</label>
+                                <input type="text" name="curp_rfc_testigo_2" class="form-control" placeholder="CURP o RFC del Testigo 2" maxlength="18">-->
+                                <br>
+                                <label>Municipio del Testigo 2</label>
+                                <input type="text" name="municipio_testigo_2_{{ forloop.counter0 }}" id="id_municipio2" class="form-control" placeholder="Municipio del Testigo 2">
+                                <br>
+
+                                <div class="alert alert-secondary" role="alert">
+                                    <center>Datos del Ciudadano</center>
+                                </div>    
+                                <br>                                 
+                            </div>
+
+                            <!-- Agregar campos ocultos para almacenar las imágenes capturadas -->
+                            <input type="hidden" name="documento_1_{{ forloop.counter0 }}" id="documento_1_{{ forloop.counter0 }}" style="display: none;">
+                            <input type="hidden" name="documento_2_{{ forloop.counter0 }}" id="documento_2_{{ forloop.counter0 }}" style="display: none;" >
+                            <input type="hidden" name="documento_3_{{ forloop.counter0 }}" id="documento_3_{{ forloop.counter0 }}" style="display: none;">
+                            <input type="hidden" name="documento_4_{{ forloop.counter0 }}" id="documento_4_{{ forloop.counter0 }}" style="display: none;">
+                            <input type="hidden" name="documento_5_{{ forloop.counter0 }}" id="documento_5_{{ forloop.counter0 }}" style="display: none;">
+                            <input type="hidden" name="documento_6_{{ forloop.counter0 }}" id="documento_6_{{ forloop.counter0 }}" style="display: none;">
+                            <input type="hidden" name="usuario" id="usuario" style="display: none;" value="{{user.id}}">
+
+                            {{ form|crispy }}
+                        </div>
+                    {% endfor %}
+
+                    <input type="hidden" name="num_personas" value="{{ formset.total_form_count }}">
+
+                    <button type="submit" class="btn btn-success">Guardar y continuar</button>
+                </div> 
+            </div>
+        </form>
+        <form method="post" action="{% url 'Registro Manual' %}">
+            {% csrf_token %}
+            <input type="hidden" name="terminar_registro" value="true">
+            <button type="submit" class="btn btn-success">Terminar</button>
+        </form>
+        <br></br>
+        <ul>
+            {% for ciudadano in ciudadanos%}
+            <li>{{ciudadano.nombre}} {{ciudadano.tipo_persona}}</li> 
+            {%endfor%}
+        </ul>
+        
+    </div>
+</div>
+
+
+<script>
+    jQuery(document).ready(function($) {
+    
+        //Funcion para deshabilitar el boton de registrar 1 minuto
+        document.addEventListener("DOMContentLoaded", function() {
+            const submitButton = document.querySelector('button[type="submit"]');
+            const form = document.getElementById("registroForm");
+
+            form.addEventListener("submit", function(event) {
+                  // Deshabilita el botón
+                submitButton.disabled = true;
+                submitButton.innerText = "Registrando";
+                  // Habilita nuevamente después de 1 minuto (60000 milisegundos)
+                setTimeout(function() {
+                    submitButton.disabled = false;
+                    submitButton.innerText = "Registrar";
+                }, 60000);
+            });
+        });
+
+        // Función para manejar el envío del formulario
+                // Función para manejar el envío del formulario
+                $('#registroForm').submit(function(event) {
+            var isValid = true;
+            var formCount = {{ formset.total_form_count }}; // Total de formularios en el formset
+
+            for (var i = 0; i < formCount; i++) {
+                // Obtener si tiene identificación
+                var identificacionValue = $('input[name="identificacion_' + i + '"]:checked').val();
+                
+                if (identificacionValue === 'si') {
+                    // Validar imágenes de frente y reverso
+                    var documentoFrente = $('#documento_1_' + i).val();
+                    var documentoReverso = $('#documento_2_' + i).val();
+                    
+                    if (!documentoFrente || !documentoReverso) {
+                        isValid = false;
+                        alert("Faltan las imágenes de frente o reverso de la identificación en el formulario " + (i+1));
+                        $('#photo-frente-' + i).addClass('error');
+                        $('#photo-reverso-' + i).addClass('error');
+                    } else {
+                        $('#photo-frente-' + i).removeClass('error');
+                        $('#photo-reverso-' + i).removeClass('error');
+                    }
+                } else if (identificacionValue === 'no') {
+                    // Validar imágenes de testigos
+                    var testigo1Frente = $('#documento_3_' + i).val();
+                    var testigo1Reverso = $('#documento_4_' + i).val();
+                    var testigo2Frente = $('#documento_5_' + i).val();
+                    var testigo2Reverso = $('#documento_6_' + i).val();
+                    
+                    if (!testigo1Frente || !testigo1Reverso || !testigo2Frente || !testigo2Reverso) {
+                        isValid = false;
+                        alert("Faltan las imágenes de los testigos en el formulario " + (i+1));
+                        $('#photo-testigo_1_frente-' + i).addClass('error');
+                        $('#photo-testigo_1_reverso-' + i).addClass('error');
+                        $('#photo-testigo_2_frente-' + i).addClass('error');
+                        $('#photo-testigo_2_reverso-' + i).addClass('error');
+                    } else {
+                        $('#photo-testigo_1_frente-' + i).removeClass('error');
+                        $('#photo-testigo_1_reverso-' + i).removeClass('error');
+                        $('#photo-testigo_2_frente-' + i).removeClass('error');
+                        $('#photo-testigo_2_reverso-' + i).removeClass('error');
+                    }
+                }
+
+                // Validar otros campos como sexo, tipo_persona y municipio
+                var sexoValue = $('input[name="form-' + i + '-sexo"]:checked').val();
+                var tipoPersonaValue = $('input[name="form-' + i + '-tipo_persona"]:checked').val();
+                var municipioValue = $('input[name="form-' + i + '-municipio"]').val();
+                
+                console.log('Valor del campo "sexo" en el formulario ' + i + ':', sexoValue);
+                console.log('Valor del campo "tipo_persona" en el formulario ' + i + ':', tipoPersonaValue);
+                console.log('Valor del campo "municipio" en el formulario ' + i + ':', municipioValue);
+
+                if (!sexoValue || !tipoPersonaValue || !municipioValue) {
+                    isValid = false;
+                    alert("Faltan llenar algunos campos como sexo, tipo de persona o municipio en el formulario " + (i+1));
+                    $('input[name="form-' + i + '-sexo"]').addClass('error');
+                    $('input[name="form-' + i + '-tipo_persona"]').addClass('error');
+                    $('input[name="form-' + i + '-municipio"]').addClass('error');
+                } else {
+                    $('input[name="form-' + i + '-sexo"]').removeClass('error');
+                    $('input[name="form-' + i + '-tipo_persona"]').removeClass('error');
+                    $('input[name="form-' + i + '-municipio"]').removeClass('error');
+                }
+            }
+
+            if (!isValid) {
+                $('#error-mensaje').show();
+                event.preventDefault(); // Evita el envío si no es válido
+            } else {
+                $('#error-mensaje').hide();
+                return true; // Permite el envío del formulario
+            }
+        });    
+
+        // Función para manejar el cambio en los radios
+        $('.identificacion_radio').change(function() {
+            var formIndex = $(this).attr('name').split('_')[1];
+            var identificacion = $(this).val();
+            
+            if (identificacion === 'si') {
+                // Mostrar la cámara para este formulario y ocultar los testigos
+                $('#camera-container-' + formIndex).show();
+                $('#testigo-container-' + formIndex).hide();
+                
+                // Ocultar todos los contenedores de testigos en otros formularios
+                $('.testigo-container').not('#testigo-container-' + formIndex).hide();
+            } else {
+                // Mostrar el contenedor de testigos para este formulario y ocultar la cámara
+                $('#camera-container-' + formIndex).hide();
+                $('#testigo-container-' + formIndex).show();
+                
+                // Desactivar opciones en otros formularios
+                $('.identificacion_radio').each(function() {
+                    var index = $(this).attr('name').split('_')[1];
+                    if (index != formIndex && $(this).val() === 'no') {
+                        $(this).prop('disabled', true);
+                    }
+                });
+            }
+            
+            // Activar opciones en el formulario actual
+            $('.identificacion_radio[name="identificacion_' + formIndex + '"]').prop('disabled', false);
+            
+            // Actualizar los campos de datos de los botones de cámara
+            $('#camera-container-' + formIndex + ' .open-camera[data-type="frente"]').data('campo', 'documento_1_' + formIndex);
+            $('#camera-container-' + formIndex + ' .open-camera[data-type="reverso"]').data('campo', 'documento_2_' + formIndex);
+            $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_1_frente"]').data('campo', 'documento_3_' + formIndex);
+            $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_1_reverso"]').data('campo', 'documento_4_' + formIndex);
+            $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_2_frente"]').data('campo', 'documento_5_' + formIndex);
+            $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_2_reverso"]').data('campo', 'documento_6_' + formIndex);
+        });
+        
+        // Función para abrir la cámara cuando se hace clic en el botón
+        $(document).on('click', '.open-camera', function() {
+            var index = $(this).data('index');
+            var type = $(this).data('type');
+            var campo = $(this).data('campo');
+            var videoId = 'video-' + type + '-' + index;
+            var canvasId = 'canvas-' + type + '-' + index;
+            var video = document.getElementById(videoId);
+            var canvas = document.getElementById(canvasId);
+
+            // Mostrar el video
+            video.style.display = 'block';
+
+            // Acceder a la cámara
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+
+                    // Capturar la imagen al hacer clic en el video
+                    video.addEventListener('click', function() {
+                        var context = canvas.getContext('2d');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        // Detener el video y ocultarlo
+                        var tracks = stream.getTracks();
+                        tracks.forEach(function(track) {
+                            track.stop();
+                        });
+                        video.style.display = 'none';
+
+                        // Mostrar la imagen capturada
+                        var dataURL = canvas.toDataURL('image/png');
+                        $('#photo-' + type + '-' + index).attr('src', dataURL).show();
+
+                        // Asignar la imagen capturada al campo oculto correspondiente
+                        $('#' + campo).val(dataURL);
+                    });
+                })
+                .catch(function(err) {
+                    console.log("Error: " + err);
+                });
+        });
+
+        // Autocompletar municipios
+        if (jQuery().autocomplete) {
+            var municipios = ["Acatic", "Acatlán de Juárez", "Ahualulco de Mercado", "Amacueca", "Amatitán", "Ameca",
+            "San Juanito de Escobedo", "Arandas", "El Arenal", "Atemajac de Brizuela", "Atengo", "Atenguillo",
+            "Atotonilco el Alto", "Atoyac", "Autlán de Navarro", "Ayotlán", "Ayutla", "La Barca", "Bolaños",
+            "Cabo Corrientes", "Casimiro Castillo", "Cihuatlán", "Zapotlán el Grande", "Cocula", "Colotlán",
+            "Concepción de Buenos Aires","Cuautitlán de García Barragán", "Cuautla", "Cuquío", "Chapala",
+            "Chimaltitán", "Chiquilistlán", "Degollado", "Ejutla", "Encarnación de Díaz", "Etzatlán", "El Grullo",
+            "Guachinango", "Guadalajara", "Hostotipaquillo", "Huejúcar", "Huejuquilla el Alto", "La Huerta",
+            "Ixtlahuacán de los Membrillos", "Ixtlahuacán del Río", "Jalostotitlán", "Jamay", "Jesús María",
+            "Jilotlán de los Dolores", "Jocotepec", "Juanacatlán", "Juchitlán", "Lagos de Moreno", "El Limón",
+            "Magdalena", "Santa María del Oro", "La Manzanilla de la Paz", "Mascota", "Mazamitla", "Mexticacán",
+            "Mezquitic", "Mixtlán", "Ocotlán", "Ojuelos de Jalisco", "Pihuamo", "Poncitlán", "Puerto Vallarta",
+            "Villa Purificación", "Quitupan", "El Salto", "San Cristóbal de la Barranca", "San Diego de Alejandría",
+            "San Juan de los Lagos", "San Julián", "San Marcos", "San Martín de Bolaños", "San Martín Hidalgo",	
+            "San Miguel el Alto", "Gómez Farías", "San Sebastián del Oeste", "Santa María de los Ángeles", "Sayula",	
+            "Tala", "Talpa de Allende", "Tamazula de Gordiano", "Tapalpa", "Tecalitlán", "Techaluta de Montenegro",
+            "Tecolotlán", "Tenamaxtlán", "Teocaltiche", "Teocuitatlán de Corona", "Tepatitlán de Morelos", "Tequila",
+            "Teuchitlán", "Tizapán el Alto", "Tlajomulco de Zúñiga", "San Pedro Tlaquepaque", "Tolimán", "Tomatlán",
+            "Tonalá", "Tonaya", "Tonila", "Totatiche", "Tototlán", "Tuxcacuesco", "Tuxcueca", "Tuxpan",
+            "Unión de San Antonio", "Unión de Tula", "Valle de Guadalupe", "Valle de Juárez", "San Gabriel",
+            "Villa Corona", "Villa Guerrero", "Villa Hidalgo", "Cañadas de Obregón", "Yahualica de González Gallo",
+            "Zacoalco de Torres", "Zapopan", "Zapotiltic", "Zapotitlán de Vadillo", "Zapotlán del Rey", "Zapotlanejo",
+            "San Ignacio Cerro Gordo"];
+
+            // Inicializa el autocompletado en todos los campos de municipio en los formularios
+            var formCount = {{ formset.total_form_count }}; // Total de formularios en el formset
+
+            for (var i = 0; i < formCount; i++) {
+                jQuery('input[name="form-' + i + '-municipio"]').autocomplete({
+                    source: municipios
+                });
+            }
+        } else{
+                console.error("jQuery UI Autocomplete no está disponible.");
+            }
+    });
+</script>
+
+
+{% endblock %}

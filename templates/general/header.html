@@ -1,0 +1,155 @@
+{% load static %}
+<header>
+    <script>
+        function opcionesRegistro() {
+            var modal = document.getElementById("registroModal");
+            modal.style.display = "block";
+        }
+    
+        function cerraropcionesRegistro() {
+            var modal = document.getElementById("registroModal");
+            modal.style.display = "none";
+        }
+    
+        function irARegistro(opcion) {
+            var tieneIdentificacion = confirm("¿Tiene identificación?");
+            var identificacionParam = tieneIdentificacion ? "si" : "no";
+    
+            if (opcion === 'registroSingular') {
+                window.location.href = "{% url 'Registro Testigo' %}?identificacion=" + identificacionParam;
+            } else if (opcion === 'registroGrupal') {
+                var numPersonas = prompt("Ingrese el número de personas a registrar:", "1");
+                if (numPersonas != null) {
+                    window.location.href = "{% url 'Registro Testigo' %}?num_personas=" + numPersonas + "&identificacion=" + identificacionParam;
+                }
+            }
+        }
+    </script>
+
+    <div class="px-3 py-2 text-bg-dark border-bottom">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a href="{% url 'Inicio' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                    <img src="{% static 'icon/engrane.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                    {% if usuario.is_authenticated %}
+                        <span class="text-white">{{ usuario.username|capfirst }}</span>
+                        <span class="text-white mx-2">|</span>
+                        <span class="text-white">{{ nombreGrupo }}</span>
+                    {% endif %}                
+                </a>
+
+                <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">                
+                {% include 'general/boton-inicio-header.html' %}    
+
+                
+                {% if usuario.is_authenticated and nombreGrupo == 'Recepcion' %}
+                    <li class="mx-3">
+                        <a href="{% url 'Recepcion' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                            <img src="{% static 'icon/recepcion.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                        </a>Recepción
+                    </li>
+                    <li class="mx-3">
+                        <a href="{% url 'Registro Manual' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                            <img src="{% static 'icon/registroCiudadano.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                        </a>Registro
+                    </li>
+                    <li class="mx-3">
+                        <a href="{% url 'auto_turno' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                            <img src="{% static 'icon/turnos.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                        </a>Turnos
+                    </li>
+                {% endif %}
+
+                {% if usuario.is_authenticated and nombreGrupo == 'Asesoria-Juridica' %}
+                    <li class="mx-3">
+                        <a href="{% url 'asesor' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                            <img src="{% static 'icon/balanza.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                        </a>Asesoría
+                    </li>
+                {% endif %}        
+                
+                {% if usuario.is_authenticated and nombreGrupo == 'Pantalla' %}
+                    <li class="mx-3">
+                        <a href="{% url 'asesorias_dashboard' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                            <img src="{% static 'icon/asesoria_juridica.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                        </a>Asesoría
+                    </li>
+                {% endif %} 
+
+                {% if usuario.is_authenticated and nombreGrupo == 'Comunicación' %}
+                    <li class="mx-3">
+                        <a href="{% url 'Comunicación' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                            <img src="{% static 'icon/comunicacion.png' %}" alt="Imagen completa" width="50" height="42" class="bi me-2">
+                        </a>Comunicación
+                    </li>
+                {% endif %} 
+
+                {% if usuario.is_authenticated and nombreGrupo == 'Administrador' %}
+                <li class="mx-3">
+                    <a href="{% url 'Recepcion' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                        <img src="{% static 'icon/recepcion.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                    </a>Recepción
+                </li>
+                <li class="mx-3">
+                    <a href="#" onclick="opcionesRegistro()" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                        <img src="{% static 'icon/registroCiudadano.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                    </a>Registro
+                </li>
+                <li class="mx-3">
+                    <a href="{% url 'auto_turno' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                        <img src="{% static 'icon/turnos.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                    </a>Turnos
+                </li>
+                <li class="mx-3">
+                    <a href="{% url 'asesor' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                        <img src="{% static 'icon/balanza.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                    </a>Asesoría
+                </li>
+                <li class="mx-3">
+                    <a href="{% url 'asesorias_dashboard' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                        <img src="{% static 'icon/asesoria_juridica.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                    </a>Pantalla AJ
+                </li>
+                <li class="mx-3">
+                    <a href="{% url 'Inicio Asesoria' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                        <img src="{% static 'icon/asesoria_juridica.png' %}" alt="Imagen completa" width="40" height="32" class="bi me-2">
+                    </a>ALex y Sebastian
+                </li>
+                {% endif %}
+
+                    <li>
+                        <a href="#" class="nav-link text-white">
+                            <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#speedometer2"/></svg>   
+                        </a>
+                    </li> 
+                  
+                {% include 'general/botones.html' %} 
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+<!--   <div class="px-3 py-2 border-bottom mb-3">
+      <div class="container d-flex flex-wrap justify-content-center">
+          <form class="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto" role="search">
+              <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+          </form>
+      </div>
+  </div> -->
+</header>
+
+<div id="registroModal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Opciones de Registro</h5>
+                <button type="button" class="btn-close" aria-label="Close" onclick="cerraropcionesRegistro()"></button>
+            </div>
+            <div class="modal-body">
+                <p>Seleccione una opción de registro:</p>
+                <button type="button" class="btn btn-primary" onclick="irARegistro('registroSingular')">Registro Singular</button>
+                <button type="button" class="btn btn-secondary" onclick="irARegistro('registroGrupal')">Registro Grupal</button>
+            </div>
+        </div>
+    </div>
+</div>

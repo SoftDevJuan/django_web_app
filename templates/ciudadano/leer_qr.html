@@ -1,0 +1,56 @@
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leer Código QR</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.3.1/jsQR.min.js"></script>
+    <style>
+        #preview {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+        }
+        #canvas {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+        }
+        #carga {
+            display: none;
+        }
+    </style>
+</head>
+<head>
+    <meta charset="utf-8">
+    <title>Welcome</title>
+    <script src="{% static 'js/lectorQR.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ </head>
+<body>
+    <h1>Leer Código QR con Cámara</h1>
+    <div id="lector">
+        <form id="lectorQR" name="confirmar">
+            <div style="font-size: 40px;">Escanea el código QR</div>
+            <br>
+            <div id="loadingMessage">🎥 <h2>Sin acceso a la cámara, favor de revisar los permisos.</h2></div>
+            <canvas id="canvas" hidden></canvas>
+            <div id="output" hidden>
+                <div id="outputMessage"></div>
+                <div hidden><b></b> 
+                    <input type="text" id="info" name="info">
+                    <span id="outputData"></span>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="carga">
+        <h1 id="texto_carga" class="mensaje de carga lector">Cargando, espere un momento por favor...</h1>
+    </div>
+
+    <video id="preview" hidden></video>
+    <div id="qr-reader-results"></div>
+    <script src="{% static 'js/lectorQR_extension.js' %}"></script>
+    
+</body>
+</html>

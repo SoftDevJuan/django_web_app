@@ -1,0 +1,497 @@
+{% extends 'audiencia/base_pantalla.html' %} {% load static %} {% block content %}
+
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  .container {
+    height: calc(100% - 40px); !important
+    width: calc(100% - 40px); !important
+  }
+  .tracking-container {
+    padding: 20px;
+    height: 100%;
+  }
+  .package-info {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: white;
+    height: 576px;
+  }
+  .map {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0;
+    height: 98%;
+    overflow: hidden;
+    background-color: black;
+  }
+  .map-img {
+    width: 100%;
+    height: 100%;
+    object-fit: scale-down;
+    object-position: center;
+  }
+  .package-info-overlay {
+    position: absolute;
+    margin-inline: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 90%;
+    border-radius: 8px 8px 8px 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+  }
+  .package-info-overlay p {
+    margin: 0;
+  }
+  .package-info-overlay h5 {
+    margin: 0;
+  }
+  .courier-info {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-right: 20px;
+  }
+  .pasadas-info {
+    color: #003366;
+    background-color: #a6c8ff;
+    border-radius: 8px;
+    padding: 10px;
+    display: none;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+  .pasadas-info.fade-in {
+    opacity: 1;
+    display: block;
+  }
+  .pasadas-info fade-out {
+    opacity: 0;
+    display: block;
+  }
+  .badge-outline-warning {
+    color: darkorange;
+    background-color: transparent;
+    border: 1px solid darkorange;
+    border-radius: 36px;
+    padding: 5px 10px;
+  }
+  .scroll-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+  }
+
+  .scroll-content {
+    display: inline-flex;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  @keyframes scroll-horizontal {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .fade-out {
+    animation: fadeOut 0.5s ease-in-out;
+  }
+  
+  #overlay {
+    transition: opacity 0.5s ease-in-out;
+  }
+
+</style>
+
+<div class="container pt-24 pb-0 pe-0 ps-0 mx-auto tracking-container">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="package-info">
+        <h5>Audiencias llamadas</h5>
+        <div class="package-list" id="package-list">
+          {% if audiencias_llamando %}
+          {% for audiencia in audiencias_llamando %}
+          <div class="pasadas-info w-100 align-items-center mt-2 pb-0">
+            <div class="row">
+              <div class="col-md-4 w-auto me-0 pe-0">
+                <i class="fa-solid fa-gavel"></i>
+              </div>
+              <div class="col-md-4 w-auto">
+                <strong>{{ audiencia.expediente }}</strong><br />
+              </div>
+              <hr class="my-1" />
+              <div class="d-flex align-items-center">
+                <div>
+                  Auxiliar asignado: <strong>{{ audiencia.auxiliar_audiencia.get_full_name|default:"Por asignar" }}</strong>
+                </div>
+              </div>
+              <hr class="my-1" />
+              <div class="row">
+                <div class="col-md-4">
+                  <h6>Fecha</h6>
+                  <p>{{ audiencia.fecha_audiencia|date:"d/m/Y" }}</p>
+                </div>
+                <div class="col-md-4">
+                  <h6>Hora</h6>
+                  <p>{{ audiencia.hora_audiencia|time:"H:i A" }}</p>
+                </div>
+                <div class="col-md-4">
+                  <h6>Sala</h6>
+                  <p>{{ audiencia.sala_audiencia }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="pasadas-info w-100 align-items-center mt-2 pb-0">
+            <div class="row">
+              <div class="col-md-4 w-auto me-0 pe-0">
+                <i class="fa-solid fa-xmark"></i>
+              </div>
+              <div class="col-md-4 w-auto">
+                <strong>No hay audiencias llamadas</strong><br />
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="map">
+        <video
+          id="video1"
+          src="{% static 'videos/cclvideo.mp4' %}"
+          class="img-fluid map-img"
+          autoplay
+          muted
+        ></video>
+        <video
+          id="video2"
+          src="{% static 'videos/cclvideonuevo.mp4' %}"
+          class="img-fluid map-img"
+          muted
+          style="display: none;"
+        ></video>
+        {% if audiencia_mostrada %}
+        <div class="package-info-overlay" id="overlay" style="display: none;">
+          <div class="col-md-12">
+            <div class="d-flex">
+              <h5 style="line-height: inherit; font-size: 1.2rem;">
+                Audiencia con expediente: <span class="expediente"></span>
+              </h5>
+              <div
+                class="badge-outline-warning align-middle ms-3"
+                style="font-size: 0.9rem"
+              >
+                <i class="fa-solid fa-circle fa-2xs me-2"></i>Auxiliar
+                guíandolos a sala
+              </div>
+            </div>
+            <div class="d-flex align-items-center">
+              <img
+                src="https://www.gob.mx/cms/uploads/structure/main_image/1599/Gob_Hgo_Julio_Menchaca.jpeg"
+                alt="Courier"
+                class="rounded me-2 auxiliar-image"
+                style="height: 60px; width: 60px; object-fit: cover;"
+              />
+              <div>
+                <strong class="auxiliar-nombre"></strong><br />
+                Auxiliar asignado<br />
+              </div>
+            </div>
+            <hr class="my-3" />
+            <div class="row">
+              <div class="col-md-4">
+                <h6>Fecha de la audiencia</h6>
+                <p class="fecha-audiencia"></p>
+              </div>
+              <div class="col-md-4">
+                <h6>Hora de la audiencia</h6>
+                <p class="hora-audiencia"></p>
+              </div>
+              <div class="col-md-4">
+                <h6>Sala de la audiencia</h6>
+                <p class="sala-audiencia"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="container mt-3">
+      <div class="row mt-3">
+        <div class="col-md-12">
+          <div class="card border">
+            <h5 class="mt-2 ms-3">Audiencias pendientes</h5>
+            <div class="scroll-container">
+              <div class="scroll-content d-flex flex-nowrap" id="scroll-content">
+                {% if audiencias_pendientes %}
+                  {% for audiencia in audiencias_pendientes %}
+                    <div class="courier-info d-flex align-items-center ms-2 me-2 mb-2">
+                      <i class="fa-regular fa-clock me-2"></i>
+                      <div>
+                        <strong>{{ audiencia.expediente }}</strong><br />
+                        {{ audiencia.hora_audiencia|time:"H:i A" }} → {{ audiencia.fecha_audiencia|date:"d/m/Y" }}
+                      </div>
+                    </div>
+                  {% endfor %}
+                  {% else %}
+                  <div>
+                    <div class="courier-info d-flex align-items-center ms-2 me-2 mb-2 w-100">
+                      <i class="fa-solid fa-xmark me-2"></i>
+                      <div class="w-100">
+                        <strong>No hay audiencias pendientes</strong><br />
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const scrollContainer = document.querySelector('.scroll-container');
+    const scrollContent = document.getElementById('scroll-content');
+    let scrollSpeed = 1;
+
+    function autoScroll() {
+      scrollContainer.scrollLeft += scrollSpeed; // Mueve el scroll hacia la izquierda
+
+      // Si el final del contenido se ha desplazado fuera del contenedor, reinicia
+      if (scrollContainer.scrollLeft >= scrollContent.scrollWidth - scrollContainer.clientWidth) {
+        scrollContainer.scrollLeft = 0; // Reinicia el scroll
+      }
+    }
+
+    setInterval(autoScroll, 15);
+
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let currentIndex = 0;
+    const maxVisibleItems = 3;
+    let audiencias = [];
+    let audienciaActualId = null;
+    let overlayTemporizador = null;
+    let audio = new Audio('{% static "audios/pantalla_audiencias.mp3" %}');
+    const video1 = document.getElementById('video1');
+    const video2 = document.getElementById('video2');
+
+    function toggleVideos(videoEnded, videoToPlay) {
+    // Oculta el video que terminó
+    videoEnded.style.display = "none";
+    
+    // Muestra y reproduce el siguiente video
+    videoToPlay.style.display = "block";
+    videoToPlay.play();
+    }
+
+    // Evento cuando video1 termina
+    video1.addEventListener('ended', function () {
+      toggleVideos(video1, video2);
+    });
+
+    // Evento cuando video2 termina
+    video2.addEventListener('ended', function () {
+      toggleVideos(video2, video1);
+    });
+
+    // Función para actualizar las audiencias desde el servidor
+    function actualizarAudiencias() {
+      console.log("Ejecutando fetch a la URL de audiencias...");
+
+      fetch("{% url 'audiencias_ajax' %}")
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error en la respuesta de red');
+          }
+          return response.text();
+        })
+        .then(data => {
+          console.log("Respuesta recibida de la URL de audiencias");
+          document.getElementById('package-list').innerHTML = data;
+          audiencias = document.querySelectorAll('.pasadas-info');
+          showCurrentItems();
+        })
+        .catch(error => console.log('Error:', error));
+    }
+
+    function actualizarPendientes() {
+      console.log("Iniciando actualizarPendientes()");
+    
+      fetch("{% url 'audiencias_pendientes_ajax' %}")
+        .then(response => {
+          console.log("Respuesta recibida:", response.status);
+          if (!response.ok) {
+            throw new Error('Error en la respuesta de red');
+          }
+          return response.text();
+        })
+        .then(data => {
+          document.getElementById('scroll-content').innerHTML = data;
+          console.log("Contenido actualizado en #scroll-content");
+          console.log("Número de elementos .courier-info después de la actualización:", 
+                      document.querySelectorAll('.courier-info').length);
+        })
+        .catch(error => console.error('Error en actualizarPendientes():', error));
+    }
+
+    function updateAudiencia() {
+      $.ajax({
+        url: '/audiencia_mostrada/',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          if (data.audiencia_mostrada && data.audiencia_mostrada.id !== audienciaActualId) {
+            if (audienciaActualId === null) {
+              updateOverlayContent(data.audiencia_mostrada);
+              showOverlay();
+            } else {
+              hideOverlayWithCallback(() => {
+                updateOverlayContent(data.audiencia_mostrada);
+                showOverlay();
+              });
+            }
+
+            audienciaActualId = data.audiencia_mostrada.id;
+            sonidoNotificacion();
+            
+            // Reiniciar el temporizador
+            if (overlayTemporizador) {
+              clearTimeout(overlayTemporizador);
+            }
+            overlayTemporizador = setTimeout(() => hideOverlayWithCallback(), 20000);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error("Error al obtener datos de audiencia:", error);
+        }
+      });
+    }
+
+    function updateOverlayContent(audiencia) {
+      $('#overlay .expediente').text(audiencia.expediente);
+      $('#overlay .auxiliar-nombre').text(audiencia.auxiliar_audiencia.get_full_name);
+      $('#overlay .fecha-audiencia').text(audiencia.fecha_audiencia);
+      $('#overlay .hora-audiencia').text(audiencia.hora_audiencia);
+      $('#overlay .sala-audiencia').text(audiencia.sala_audiencia);
+
+      if (audiencia.auxiliar_audiencia.image_url) {
+        $('#overlay .auxiliar-image').attr('src', audiencia.auxiliar_audiencia.image_url);
+      } else {
+        $('#overlay .auxiliar-image').attr('src', '/static/images/default_user.jpg');
+      }
+    }
+    
+    function showOverlay() {
+      $('#overlay').removeClass('fade-out').addClass('fade-in').show();
+    }
+    
+    function hideOverlayWithCallback(callback) {
+      $('#overlay').removeClass('fade-in').addClass('fade-out');
+      setTimeout(() => {
+        $('#overlay').hide().removeClass('fade-out');
+        if (callback) callback();
+      }, 500);  // Ajusta este valor según la duración de tu animación
+    }
+
+    function sonidoNotificacion() {
+      audio.play().catch(e => console.error("Error al reproducir el audio:", e));
+    }
+
+    function hideAllItems() {
+      audiencias.forEach(item => {
+        item.classList.remove('fade-in');
+        item.classList.add('fade-out');
+        setTimeout(() => {
+          item.style.display = 'none';
+        }, 1000);
+      });
+    }
+
+    function showCurrentItems() {
+      hideAllItems();
+      setTimeout(() => {
+        for (let i = currentIndex; i < currentIndex + maxVisibleItems && i < audiencias.length; i++) {
+          audiencias[i].style.display = 'block';
+          setTimeout(() => {
+            audiencias[i].classList.remove('fade-out');
+            audiencias[i].classList.add('fade-in');
+          }, 50); // Retraso para la animación de fade-in
+        }
+      }, 1000);
+    }
+
+    // Función para rotar los elementos
+    function rotateItems() {
+      currentIndex += maxVisibleItems;
+      if (currentIndex >= audiencias.length) {
+        currentIndex = 0;
+      }
+
+      hideAllItems();
+
+      setTimeout(function() {
+        actualizarAudiencias();
+        actualizarPendientes();
+        showCurrentItems();
+      }, 1000);
+    }
+
+    setInterval(rotateItems, 10000);
+
+    setInterval(actualizarPendientes, 60000);
+
+    setInterval(updateAudiencia, 5000);
+
+    actualizarAudiencias();
+
+    actualizarPendientes();
+
+    $(document).ready(function() {
+      updateAudiencia();
+    });
+  });
+</script>
+
+{% endblock %}

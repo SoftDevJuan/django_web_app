@@ -1,0 +1,123 @@
+{% extends 'audiencia/base.html' %} 
+{% load static%} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<h1 class="mt-3">Detalles de la Audiencia</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Expediente:</th>
+        <td>{{ audiencia.expediente }}</td>
+    </tr>
+    <tr>
+        <th>Fecha:</th>
+        <td>{{ audiencia.fecha_audiencia|date:"d/m/Y" }}</td>
+    </tr>
+    <tr>
+        <th>Hora:</th>
+        <td>{{ audiencia.hora_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Sala:</th>
+        <td>{{ audiencia.sala_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Conciliador:</th>
+        <td>{{ audiencia.conciliador_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Status:</th>
+          {% if audiencia.status_audiencia == 'Llamando' %}
+          <td><span class="badge rounded-pill text-bg-warning p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'En audiencia' %}
+          <td><span class="badge rounded-pill text-bg-success p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'Archivada' %}
+          <td><span class="badge rounded-pill text-bg-danger p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'Concluida' %}
+          <td><span class="badge rounded-pill text-bg-primary p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% else %}
+          <td><span class="badge rounded-pill text-bg-secondary p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% endif %}
+    </tr>
+</table>
+<h1 class="mt-5">Asistencia audiencia</h1>
+
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    <table class="table table-hover">
+        <thead>
+            <tr class="table-primary">
+                <th class="pb-3 pt-3">Nombre</th>
+                <th class="pb-3 pt-3">Tipo de persona</th>
+                <th class="pb-3 pt-3">Asistencia</th>
+                <th class="pb-3 pt-3">Hora de asistencia</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ciudadano in solicitantes_relacionados %}
+            <tr>
+                <td>{{ ciudadano.nombre }}</td>
+                <td>Solicitante</td>
+                <td class="text-center mx-auto">
+                    <div class="container">
+                        <input type="checkbox" id="cbx-solicitante-{{ forloop.counter }}" style="display: none;" name="asistencia_solicitante_{{ ciudadano.id }}" {% if ciudadano.asistencia %} checked {% endif %}>
+                        <label for="cbx-solicitante-{{ forloop.counter }}" class="check">
+                            <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                <path d="M1,9 L1,3.5 C1,2 2,1 3.5,1 L14.5,1 C16,1 17,2 17,3.5 L17,14.5 C17,16 16,17 14.5,17 L3.5,17 C2,17 1,16 1,14.5 L1,9 Z"></path>
+                                <polyline points="1 9 7 14 15 4"></polyline>
+                            </svg>
+                        </label>
+                    </div>
+                </td>
+                <td>{{ ciudadano.hora_asistencia|default:"Sin asistencia" }}</td>
+            </tr>
+            {% endfor %}
+            {% for ciudadano in citados_relacionados %}
+            <tr>
+                <td>{{ ciudadano.nombre }}</td>
+                <td>Citado</td>
+                <td class="text-center mx-auto">
+                    <div class="container">
+                        <input type="checkbox" id="cbx-citado-{{ forloop.counter }}" style="display: none;" name="asistencia_citado_{{ ciudadano.id }}" {% if ciudadano.asistencia %} checked {% endif %}>
+                        <label for="cbx-citado-{{ forloop.counter }}" class="check">
+                            <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                <path d="M1,9 L1,3.5 C1,2 2,1 3.5,1 L14.5,1 C16,1 17,2 17,3.5 L17,14.5 C17,16 16,17 14.5,17 L3.5,17 C2,17 1,16 1,14.5 L1,9 Z"></path>
+                                <polyline points="1 9 7 14 15 4"></polyline>
+                            </svg>
+                        </label>
+                    </div>
+                </td>
+                <td>{{ ciudadano.hora_asistencia|default:"Sin asistencia" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No hay ciudadanos registrados para esta audiencia.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="d-flex justify-content-between">
+        <button type="submit" name="asistencias" class="btn btn-primary mb-3">Guardar Asistencias</button>
+        <button type="submit" name="archivar" class="btn btn-danger mb-3">Archivar</button>
+    </div>
+</form>
+
+<a href="{% url 'audiencias_auxiliares_api' %}" class="btn btn-secondary mb-5">Volver a la lista</a>
+
+<div class="mb-5 mt-5"></div>
+<div class="mb-5 mt-5 pt-5 pb-5"></div>
+
+{%endblock%}

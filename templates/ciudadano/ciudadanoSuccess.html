@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Exitoso</title>
+    <link rel="stylesheet" href="{% static 'CSS/asesorStyles.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <header>
+        <img src="{% static 'icon/CCLLetras.png' %}" alt="ccl logo">
+        <h1>Registro Exitoso</h1>
+    </header>
+    <div class="container">
+        <h2>Registro Completo</h2>
+        <p>El registro del ciudadano ha sido completado exitosamente.</p>
+        <p>Escanea el siguiente código QR para ver los detalles:</p>
+        <img src="{{ ciudadano.qr_code.url }}" alt="Código QR">
+    </div>
+</body>
+</html>

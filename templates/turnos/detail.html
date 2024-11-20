@@ -1,0 +1,146 @@
+{% extends 'recepcion/base.html' %}
+{% block content %}
+    <h2>Detalle del Turno</h2>
+    <p>ID: {{ turno.id }}</p>
+    <p>Turno: {{ turno.turno }}</p>
+    <p>Área: {{ turno.get_area_display }}</p>
+    <!-- Botón para abrir el modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ciudadanoModal">
+        Agregar Ciudadano
+    </button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="ciudadanoModal" tabindex="-1" role="dialog" aria-labelledby="ciudadanoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="ciudadanoModalLabel">Registro de Ciudadano</h5>
+            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            {% include 'turnos/formCiudadano.html' %}
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" id="saveCiudadano">Guardar Ciudadano</button>
+            </div>
+        </div>
+        </div>
+    </div>
+  
+    <a href="{% url 'turnos list' %}">Volver a la lista</a>
+
+
+    <script>
+        jQuery(document).ready(function($) {
+        // Función para manejar el cambio en los radios
+        $('.identificacion_radio').change(function() {
+            var formIndex = $(this).attr('name').split('_')[1];
+            var identificacion = $(this).val();
+            
+            if (identificacion === 'si') {
+                // Mostrar la cámara para este formulario y ocultar los testigos
+                $('#camera-container-' + formIndex).show();
+                $('#testigo-container-' + formIndex).hide();
+                
+                // Ocultar todos los contenedores de testigos en otros formularios
+                $('.testigo-container').not('#testigo-container-' + formIndex).hide();
+            } else {
+                // Mostrar el contenedor de testigos para este formulario y ocultar la cámara
+                $('#camera-container-' + formIndex).hide();
+                $('#testigo-container-' + formIndex).show();
+                
+                // Desactivar opciones en otros formularios
+                $('.identificacion_radio').each(function() {
+                    var index = $(this).attr('name').split('_')[1];
+                    if (index != formIndex && $(this).val() === 'no') {
+                        $(this).prop('disabled', true);
+                    }
+                });
+            }
+            
+            // Activar opciones en el formulario actual
+            $('.identificacion_radio[name="identificacion_' + formIndex + '"]').prop('disabled', false);
+            
+            // Actualizar los campos de datos de los botones de cámara
+            $('#camera-container-' + formIndex + ' .open-camera[data-type="frente"]').data('campo', 'documento_1_' + formIndex);
+            $('#camera-container-' + formIndex + ' .open-camera[data-type="reverso"]').data('campo', 'documento_2_' + formIndex);
+            $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_1_frente"]').data('campo', 'documento_3_' + formIndex);
+            $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_1_reverso"]').data('campo', 'documento_4_' + formIndex);
+            $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_2_frente"]').data('campo', 'documento_5_' + formIndex);
+            $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_2_reverso"]').data('campo', 'documento_6_' + formIndex);
+        });
+        
+        // Función para abrir la cámara cuando se hace clic en el botón
+        $(document).on('click', '.open-camera', function() {
+            var index = $(this).data('index');
+            var type = $(this).data('type');
+            var campo = $(this).data('campo');
+            var videoId = 'video-' + type + '-' + index;
+            var canvasId = 'canvas-' + type + '-' + index;
+            var canvasId = 'canvas-' + type + '-' + index;
+            var video = document.getElementById(videoId);
+            var canvas = document.getElementById(canvasId);
+    
+            // Mostrar el video
+            video.style.display = 'block';
+    
+            // Acceder a la cámara
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+    
+                    // Capturar la imagen al hacer clic en el video
+                    video.addEventListener('click', function() {
+                        var context = canvas.getContext('2d');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+                        // Detener el video y ocultarlo
+                        var tracks = stream.getTracks();
+                        tracks.forEach(function(track) {
+                            track.stop();
+                        });
+                        video.style.display = 'none';
+    
+                        // Mostrar la imagen capturada
+                        var dataURL = canvas.toDataURL('image/png');
+                        $('#photo-' + type + '-' + index).attr('src', dataURL).show();
+    
+                        // Asignar la imagen capturada al campo oculto correspondiente
+                        $('#' + campo).val(dataURL);
+                    });
+                })
+                .catch(function(err) {
+                    console.log("Error: " + err);
+                });
+        });
+    });
+    </script>
+    
+    <script>
+        document.getElementById('saveCiudadano').addEventListener('click', function() {
+    var formData = new FormData(document.getElementById('registroForm'));
+    formData.append('turno_id', '{{ turno.id }}');  // Asegúrate de pasar el ID del turno adecuadamente
+
+    $.ajax({
+        url: '{% url "guardar_ciudadano" %}',  // Asegúrate de definir esta URL en tus urls.py
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            $('#ciudadanoModal').modal('hide');
+            // Aquí puedes agregar código para actualizar la interfaz con el nuevo ciudadano
+        },
+        error: function(error) {
+            console.error("Error al guardar el ciudadano: ", error);
+        }
+    });
+});
+
+    </script>
+
+{% endblock %}

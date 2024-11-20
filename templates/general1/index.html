@@ -1,0 +1,107 @@
+{% extends 'general1/base.html' %} 
+{% load static %}
+{% block content %} 
+      
+      {% include 'general1/barralateral.html' %}
+
+      <main role="main">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 pt-2 mb-3 border-bottom">
+          <h2 class="h2">Panel de {{nombreGrupo}}</h2>
+            <ul class="navbar-nav">
+              <li class="nav-item dropdown">
+                <button class="btn btn-outline dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ usuario.username|capfirst }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-outline">
+                  <li><a class="dropdown-item" href="#">Mi perfil</a></li>
+                  <li><a class="dropdown-item" href="#">Configuración</a></li>
+                  <li><form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline text-danger dropdown-item">Cerrar Sesión</button>
+                </form></li>
+                </ul>
+              </li>
+            </ul>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card shadow">
+              <div class="card-body">
+                <h5 class="card-title">Turnos atendidos</h5>
+                <span class="card-text fs-4">{{ turnos_atendidos }} </span><span><small class="text-muted"><span class="text-success fw-bold">+5.2% </span>del día de hoy</small></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                  <h5 class="card-title">Turnos cancelados</h5>
+                  <span class="card-text fs-4">2 </span><span><small class="text-muted"><span class="text-danger fw-bold">-2.7% </span>del día de hoy</small></span>
+                </div>
+              </div>
+          </div>
+          <div class="col-md-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                      <h5 class="card-title">Promedio de turnos</h5>
+                      <span class="card-text fs-4">78.2% </span><span><small class="text-muted"><span class="text-success fw-bold">+8.4% </span>desde el último mes</small></span>
+                    </div>
+                </div>
+          </div>
+        </div>
+
+        <div id="chart">
+          <div class="w-100" id="timeline-chart"></div>
+        </div>
+
+        <h2 class="mt-4">Noticias y avisos recientes</h2>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card border">
+              <img src="https://mfaisalkhatri.github.io/2020/07/11/testcases/Testing.jpg" class="card-img-top" alt="..." style="object-fit: cover; height: 12rem;">
+              <div class="card-body">
+                <h5 class="card-title">¡Nuevo panel de administración!</h5>
+                <p class="card-text">Descubre las nuevas y remasterizadas funciones y vistas para hacer tu trabajo más fácil y eficiente.</p>
+                <a href="#" class="btn btn-primary">Más información</a>
+              </div>
+              <div class="card-footer">
+                <small class="text-body-secondary">Publicada el 19/06/2024 a las 11:40 AM</small>
+              </div>
+            </div>
+            
+            
+          </div>
+          <div class="col-md-4">
+            <div class="card border">
+              <img src="https://t4.ftcdn.net/jpg/02/97/01/65/360_F_297016511_NWrJG1s3mpyjqD3hwdKidfYsvhEnrPm4.jpg" class="card-img-top size-adjust" alt="..." style="object-fit: cover; height: 12rem">
+              <div class="card-body">
+                <h5 class="card-title">¡Escuchamos tus quejas!</h5>
+                <p class="card-text">En caso de que detectes algun tipo de error o tengas sugerencias puedes enviar tus comentarios.</p>
+                <a href="#" class="btn btn-primary">Enviar quejas o sugerencias</a>
+              </div>
+              <div class="card-footer">
+                <small class="text-body-secondary">Publicada el 17/06/2024 a las 08:12 AM</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border">
+              <img src="https://www.health.qld.gov.au/__data/assets/image/0023/1160393/shift-work-1-2.png" class="card-img-top" alt="..." style="object-fit: cover; height: 12rem;">
+              <div class="card-body">
+                <h5 class="card-title">¡Nuevo modo oscuro!</h5>
+                <p class="card-text">Descubre las nuevas y remasterizadas funciones y vistas para hacer tu trabajo más fácil y eficiente.</p>
+                <a href="#" class="btn btn-primary">Más información</a>
+              </div>
+              <div class="card-footer">
+                <small class="text-body-secondary">Publicada el 16/06/2024 a las 10:23 AM</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-group">
+          
+        </div>
+      </main>
+
+{% endblock %}

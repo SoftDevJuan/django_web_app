@@ -1,0 +1,338 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expedientes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        .table-container {
+            margin-top: 20px;
+        }
+        .circle {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .red {
+            background-color: red;
+        }
+        .yellow {
+            background-color: yellow;
+        }
+        .green {
+            background-color: rgb(61, 255, 138);
+        }
+        .btn-call {
+            margin-top: 10px;
+        }
+        .switch-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .form-switch {
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* Align to the right */
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #44f321;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="switch-container">
+            <div class="form-switch">
+                <label for="conciliadorStatus" style="margin-right: 10px;">Cambiar estado del conciliador</label>
+                <label class="switch">
+                    <input type="checkbox" id="conciliadorStatus" onchange="cambiarEstadoConciliador()">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+        <h1 class="text-center">Expedientes</h1>
+        <div class="table-container">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Horario</th>
+                        <th>Solicitante</th>
+                        <th>Citado</th>
+                        <th>Expediente</th>
+                        <th>Conciliador</th>
+                        <th>Sala</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="expedientesTable">
+                    <tr>
+                        <td>9:00 am</td>
+                        <td>Juan Sebastian Aguirre Siordia</td>
+                        <td>Jose Rigoberto Aguirre Siordia</td>
+                        <td>TD/20021405/AJ</td>
+                        <td>Lic. Juan Ramon Ramirez</td>
+                        <td>Sala 22</td>
+                        <td class="text-center">
+                            <span class="circle red"></span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-call" onclick="llamarExpediente(this)" style="margin-bottom: 5px;">Llamar</button>
+                            <button class="btn btn-warning" data-toggle="modal" data-target="#formModal" onclick="llenarFormulario(this)">Formulario</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10:00 am</td>
+                        <td>Alvarezy</td>
+                        <td>Alejandro Magañan</td>
+                        <td>TD/20021405/AJ</td>
+                        <td>Lic. Manuel Velazco</td>
+                        <td>Sala 15</td>
+                        <td class="text-center">
+                            <span class="circle green"></span>
+                        </td>
+                        <td>
+                            <button id="llamarExpediente" class="btn btn-primary btn-call" onclick="llamarExpediente(this)" style="margin-bottom: 5px;">Llamar</button>
+                            <button class="btn btn-warning" data-toggle="modal" data-target="#formModal" onclick="llenarFormulario(this)">Formulario</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="formModalLabel">Formulario de Expediente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="horario">Horario</label>
+                            <input type="text" class="form-control" id="horario" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="solicitante">Solicitante</label>
+                            <input type="text" class="form-control" id="solicitante" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="citado">Citado</label>
+                            <input type="text" class="form-control" id="citado" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="expediente">Expediente</label>
+                            <input type="text" class="form-control" id="expediente" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="expediente">Conciliador</label>
+                            <input type="text" class="form-control" id="conciliador" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="sala">Sala</label>
+                            <input type="text" class="form-control" id="sala" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="estado">¿Se llegó a un acuerdo en la audiencia?</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="acuerdo" id="acuerdoSi" value="si" />
+                                <label class="form-check-label" for="acuerdoSi">Sí</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="acuerdo" id="acuerdoNo" value="no" />
+                                <label class="form-check-label" for="acuerdoNo">No</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="comentarios">Comentarios</label>
+                            <textarea class="form-control" id="comentarios" rows="3"></textarea>               
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="guardarCambiosBtn">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.js"></script>
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+        const ws = new WebSocket('ws://' + window.location.host + '/ws/turno/');
+
+        ws.onopen = function() {
+            console.log("WebSocket conectado");
+        };
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data).message;
+            console.log("Mensaje recibido: ", data);
+
+            document.getElementById('info-sala').textContent = data.sala;
+            document.getElementById('info-expediente').textContent = data.expediente;
+            document.getElementById('info-conciliador').textContent = data.conciliador;
+            document.getElementById('info-solicitante').textContent = data.solicitante;
+            document.getElementById('info-citado').textContent = data.citado;
+
+            new Audio(audioPath).play();
+        };
+
+        window.llamarExpediente = function(button) {
+            console.log("Llamar expediente ejecutado");
+
+            const row = button.closest('tr');
+            const expedienteData = {
+                horario: row.children[0].textContent,
+                solicitante: row.children[1].textContent,
+                citado: row.children[2].textContent,
+                expediente: row.children[3].textContent,
+                conciliador: row.children[4].textContent,
+                sala: row.children[5].textContent,
+                estado: row.children[6].querySelector('span').className.includes('red') ? 'Pendiente' : 'Completado'
+            };
+
+            console.log("Expediente data: ", expedienteData);
+
+            ws.send(JSON.stringify(expedienteData));
+        };
+    
+
+            window.llenarFormulario = function(button) {
+                var row = button.closest('tr');
+                document.getElementById('horario').value = row.cells[0].innerText;
+                document.getElementById('solicitante').value = row.cells[1].innerText;
+                document.getElementById('citado').value = row.cells[2].innerText;
+                document.getElementById('expediente').value = row.cells[3].innerText;
+                document.getElementById('sala').value = row.cells[4].innerText;
+                document.getElementById('conciliador').value = row.cells[5].innerText;
+                document.getElementById('estado').value = row.cells[6].innerText;
+            };
+
+            document.getElementById('guardarCambiosBtn').addEventListener('click', function() {
+                Swal.fire({
+                    title: '¿Deseas guardar los cambios?',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    denyButtonText: `No guardar`
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire('Saved!', '', 'success').then(() => {
+                            $('#formModal').modal('hide');
+                        });
+                        // Aquí puedes añadir el código para guardar los cambios
+                    } else if (result.isDenied) {
+                        Swal.fire('Los cambios no han sido guardados', '', 'info');
+                    }
+                });
+            });
+
+            window.cambiarEstadoConciliador = function() {
+                const isChecked = document.getElementById('conciliadorStatus').checked;
+                Swal.fire({
+                    title: '¿Deseas cambiar el estado del conciliador?',
+                    text: isChecked ? 'Estado: Desocupado' : 'Estado: Ocupado',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, cambiarlo!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(
+                            'Estado cambiado!',
+                            `El estado del conciliador ha sido ${isChecked ? 'activado' : 'desactivado'}.`,
+                            'success'
+                        );
+                    } else {
+                        // Revertir el cambio si se cancela
+                        document.getElementById('conciliadorStatus').checked = !isChecked;
+                    }
+                });
+            };
+
+            // Ordenar filas al cargar la página
+            ordenarFilas();
+
+            function ordenarFilas() {
+                var rows = $('#expedientesTable tr').get();
+                rows.sort(function(a, b) {
+                    var aState = $(a).find('.circle').attr('class').split(' ').pop();
+                    var bState = $(b).find('.circle').attr('class').split(' ').pop();
+                    var stateOrder = ['green', 'yellow', 'red'];
+                    return stateOrder.indexOf(aState) - stateOrder.indexOf(bState);
+                });
+                $.each(rows, function(index, row) {
+                    $('#expedientesTable').append(row);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+

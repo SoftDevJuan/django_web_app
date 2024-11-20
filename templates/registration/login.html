@@ -1,0 +1,32 @@
+{% extends 'registration/base.html' %} 
+{% load static %}
+
+{% block content %} 
+    {% load crispy_forms_tags %}
+    <div class="background-container">
+            <div class="row justify-content-center align-items-center" style="width: 30%;">
+                    <div class="card-login">
+                      <div class="card-body">
+                        <form method="post" action="">
+                            {% csrf_token %}
+                
+                            
+                                <div class="card-body font-login">
+                                    <h4 class="card-title m-3 text-center font-login">Iniciar sesión como empleado</h4>
+                                    
+                                    {{ form|crispy }}             
+                
+                                    <div class="d-grid mx-auto">
+                                      <button class="btn btn-primary mt-3 mb-3" type="submit">Acceder a mi panel</button>
+                                    </div>
+                                    
+                                </div>
+                            
+                
+                        </form>
+                      </div>
+                      <div class="text-center font-login mb-2">¿Aún no tiene un usuario? <a class="font-login" href="{% url 'Registro' %}">Registrarse</a></div>
+                    </div>
+            </div>
+    </div>
+{% endblock %}

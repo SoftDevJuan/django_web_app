@@ -1,0 +1,126 @@
+{% extends 'pagos/base_pagos.html' %}
+{% load static %}
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<div class="flex justify-end px-10 mt-3">
+    <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-bs-toggle="modal" data-bs-target="#modalForm">
+        Agregar Sala
+    </button>
+</div>
+
+<div class="container mx-auto mt-10 p-4 bg-white shadow-lg rounded-lg">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger" role="alert">
+        <strong>{{ message }}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr class="bg-gray-200 text-gray-900">
+                <th class="py-3 px-6 text-center">Foto</th>
+                <th class="py-3 px-6 text-center">Sala</th>
+                <th class="py-3 px-6 text-center">Conciliador</th>
+                <th class="py-3 px-6 text-center">Estatus</th>
+                <th class="py-3 px-6 text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-700">
+            {% for sala in salas %}
+            <tr class="border-b border-gray-300">
+                <td class="py-3 px-6 text-center">
+                    <img src="{{ sala.user.profile.image.url }}" alt="Imagen del Usuario" class="h-10 w-10 rounded-full mx-auto">
+                </td>
+                <td class="py-3 px-6 text-center">{{ sala.sala }}</td>
+                <td class="py-3 px-6 text-center">{{ sala.user }}</td>
+                <td class="py-3 px-6 text-center">
+                    <span class="bg-yellow-200 text-yellow-700 py-1 px-3 rounded-full text-xs">{{ sala.status }}</span>
+                </td>
+                <td class="py-3 px-6 text-center flex justify-center items-center space-x-2">
+                  <button type="button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded" data-bs-toggle="modal" data-bs-target="#modalFormEdit" data-sala-id="{{ sala.id }}" data-sala-name="{{ sala.sala }}" data-conciliador-id="{{ sala.user.id }}">
+                      Editar
+                  </button>
+              
+                  <form action="{% url 'delete_sala' sala.id %}" method="post" class="delete-form" onsubmit="return confirm('¿Estás seguro de querer eliminar esta sala?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="sala_id" value="{{ sala.id }}">
+                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Eliminar</button>
+                </form>
+                
+              </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para Agregar Sala -->
+<div class="modal fade" id="modalForm" tabindex="-1" aria-labelledby="modalFormLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFormLabel">Agregar Sala</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="room-name" class="form-label">Nombre de la Sala</label>
+                        {{ form.sala }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="conciliator-name" class="form-label">Conciliador</label>
+                        {{ form.user }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Sala -->
+<div class="modal fade" id="modalFormEdit" tabindex="-1" aria-labelledby="modalFormLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFormLabel">Editar Sala</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="put" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" id="sala-id" name="sala_id">
+                    <div class="mb-3">
+                        <label for="room-name" class="form-label">Nombre de la Sala</label>
+                        <input type="text" id="room-name" name="sala" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="conciliator-name" class="form-label">Conciliador</label>
+                        <select id="conciliator-name" name="user" class="form-control">
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

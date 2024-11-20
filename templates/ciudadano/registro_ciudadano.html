@@ -1,0 +1,166 @@
+{% extends 'ciudadano/base.html' %} 
+{% include 'general/header.html' %} 
+{% load static %} 
+{% block content %}
+
+<div class="containerFormulario">
+  <h2>Registro Ciudadano</h2>
+  <form action="{% url 'registro_ciudadano' %}" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-section">
+      <div class="form-group">
+        <label for="tipo_persona">Elige una opción*</label>
+        <div class="radio-group">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="tipo_persona"
+              id="tipoPersona1"
+              value="Soy Persona Trabajadora"
+              required
+            />
+            <label class="form-check-label" for="tipoPersona1">
+              Trabajo en una empresa
+            </label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="tipo_persona"
+              id="tipoPersona2"
+              value="Soy Persona Física Empleadora"
+              required
+            />
+            <label class="form-check-label" for="tipoPersona2">
+              Soy dueño de la empresa
+            </label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="tipo_persona"
+              id="tipoPersona3"
+              value="Soy Persona Jurídica Empleadora"
+              required
+            />
+            <label class="form-check-label" for="tipoPersona3">
+              Soy representante legal de la empresa
+            </label>
+          </div>
+          <div class="invalid-feedback">Por favor, selecciona una opción.</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-group">
+        <label for="nombre">Nombre Completo</label>
+        <input
+          type="text"
+          class="form-control"
+          id="nombre"
+          name="nombre"
+          placeholder="Nombre"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="sexo">Sexo*</label>
+        <div class="radio-group">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="sexo"
+              id="sexoHombre"
+              value="Hombre"
+              required
+            />
+            <label class="form-check-label" for="sexoHombre"> Hombre </label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="sexo"
+              id="sexoMujer"
+              value="Mujer"
+              required
+            />
+            <label class="form-check-label" for="sexoMujer"> Mujer </label>
+          </div>
+          <div class="invalid-feedback">Por favor, selecciona tu sexo.</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="correo">Correo electrónico del solicitante*</label>
+        <input
+          type="email"
+          class="form-control"
+          id="correo"
+          name="correo"
+          placeholder="Correo"
+          required
+        />
+        <div class="invalid-feedback">Por favor, ingresa un correo válido.</div>
+      </div>
+      <div class="form-group">
+        <label for="cita">Cita</label>
+        <input
+          type="text"
+          class="form-control"
+          id="cita"
+          name="cita"
+          placeholder="Cita"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="curp_rfc">CURP / RFC</label>
+        <input
+          type="text"
+          class="form-control"
+          id="curp_rfc"
+          name="curp_rfc"
+          placeholder="Ingresa tu CURP o RFC"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="municipio">Municipio</label>
+        <input
+          type="text"
+          class="form-control"
+          id="municipio"
+          name="municipio"
+          placeholder="Municipio"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="documento_1">Identificacion Frente</label>
+        <input
+          type="file"
+          class="form-control"
+          id="documento_1"
+          name="documento_1"
+          placeholder="Identificacion Frente"
+        />
+      </div>
+      <div class="form-group">
+        <label for="documento_2">Identificacion Reverso</label>
+        <input
+          type="file"
+          class="form-control"
+          id="documento_2"
+          name="documento_2"
+          placeholder="Identificacion Reverso"
+        />
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Enviar</button>
+  </form>
+</div>
+{% endblock %}

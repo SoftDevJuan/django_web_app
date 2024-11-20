@@ -1,0 +1,609 @@
+{% extends 'recepcion/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general1/barralateral.html' %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs/plugin/utc"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs/plugin/timezone"></script>
+
+<link href="{% static 'CSS/pantalla_ratis.css' %}" rel="stylesheet"/>
+<div class="height-100 bg-light">
+    <main role="main">
+        <div class="row text-center my-4">
+            <div class="col-md-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Turnos Hoy</h5>
+                        <h2 class="card-text">
+                            {{turnosTotal}} <i class="fa-regular fa-calendar blue-icon"></i>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Turnos Atendidos Hoy</h5>
+                        <h2 class="card-text">
+                            {{turnosFin}} <i class="fa-regular fa-calendar blue-icon"></i>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Turnos Cancelados</h5>
+                        <h2 class="card-text" style="color: red;">
+                            {{turnosCan}} <i class="fa-solid fa-xmark blue-icon"></i>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        
+
+        <!-- Contenedor para el gráfico de ApexCharts arriba del gráfico de Chart.js -->
+        <h2>Grafica de turnos por Conciliador</h2>
+        <div class="d-flex justify-content-center my-4">
+            <div id="chart" style="height: 400px; width: 100%;"></div>
+        </div>
+
+        <!-- Contenedor para el gráfico de Chart.js debajo del gráfico de ApexCharts -->
+        <h2>Grafica de tiempos de atención a casos</h2>
+        <div class="d-flex justify-content-center my-4">
+            
+            <div id="tiemposChart" style="height: auto; width: 100%;"></div>
+        </div>
+
+        <!-- Contenedor para el gráfico de Chart.js debajo del gráfico de ApexCharts -->
+        <h2>Grafica de Tiempos Total</h2>
+        <div class="d-flex justify-content-center my-4">
+            <div id="totalesChart2" style="height: auto; width: 100%;"></div>
+            <div id="totalesChart" style="height: auto; width: 100%;"></div>
+        </div>
+
+        <!-- Contenedor para el gráfico de Chart.js debajo del gráfico de ApexCharts -->
+       <!-- <h2>Grafica de Promedios</h2>
+        <div class="d-flex justify-content-center my-4">
+            <div id="promediosChart2" style="height: auto; width: 100%;"></div>
+            <div id="promediosChart" style="height: auto; width: 100%;"></div>
+        </div>-->
+
+        <div class="d-flex justify-content-center my-4">
+            <div id="reloj"></div>
+        </div>
+    </main>
+</div>
+
+
+
+<script>
+    ///////////////////////////////////////////////////////////////////////////////////// chart de suma de tiempos de atencion
+    var resultadoUsuarios = JSON.parse('{{ resultado_usuarios_json|escapejs }}');
+    var categories = Object.keys(resultadoUsuarios);  
+    var dataSumaAtencion = categories.map(function(usuario) {
+        return resultadoUsuarios[usuario].suma_atencion / 3600; 
+    });
+    
+    var options5 = {
+        series: [{
+        name: 'Total tiempo de Atención (hrs)',
+        data: dataSumaAtencion  
+        }],
+        chart: {
+        height: 350,
+        type: 'bar',
+        },
+        plotOptions: {
+        bar: {
+            borderRadius: 1,
+            dataLabels: {
+            position: 'top',
+            },
+        }
+        },
+        colors: ['#5CB85C'],
+        dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+            return val.toFixed(2) + " hrs";
+        },
+        offsetY: -20,
+        style: {
+            fontSize: '12px',
+            colors: ["#304758"]
+        }
+        },
+        xaxis: {
+        categories: categories,  
+        position: 'top',
+        axisBorder: {
+            show: false
+        },
+        axisTicks: {
+            show: false
+        },
+        crosshairs: {
+            fill: {
+            type: 'gradient',
+            gradient: {
+                colorFrom: '#D8E3F0',
+                colorTo: '#BED1E6',
+                stops: [0, 100],
+                opacityFrom: 0.4,
+                opacityTo: 0.5,
+            }
+            }
+        },
+        tooltip: {
+            enabled: true,
+        }
+        },
+        yaxis: {
+        labels: {
+            show: true,
+            formatter: function (val) {
+            return val + " hrs";  
+            }
+        }
+        },
+        title: {
+        text: 'Total tiempo de Atención por Conciliador (Horas)',
+        floating: true,
+        offsetY: 330,
+        align: 'center',
+        style: {
+            color: '#444'
+        }
+        }
+    };
+    
+    // Renderizar en el div con el ID promedioChart2
+    var chart5 = new ApexCharts(document.querySelector("#totalesChart"), options5);
+    chart5.render();
+</script>
+    
+    
+<script>
+        ///////////////////////////////////////////////////////////////////////////////////// chart suma de tiempos de NO atencion
+        var resultadoUsuarios = JSON.parse('{{ resultado_usuarios_json|escapejs }}');
+        var categories = Object.keys(resultadoUsuarios);  
+        var dataSumaSinAtencion = categories.map(function(usuario) {
+            return resultadoUsuarios[usuario].suma_sin_atencion / 3600; 
+        });
+        
+        var options6 = {
+            series: [{
+            name: 'Suma NO de Atención (hrs)',
+            data: dataSumaSinAtencion  
+            }],
+            chart: {
+            height: 350,
+            type: 'bar',
+            },
+            plotOptions: {
+            bar: {
+                borderRadius: 1,
+                dataLabels: {
+                position: 'top',
+                },
+                
+            }
+            },
+            colors: ['#D9534F'],
+            dataLabels: {
+            enabled: true,
+            formatter: function (val) {
+                return val.toFixed(2) + " hrs"; 
+            },
+            offsetY: -20,
+            style: {
+                fontSize: '12px',
+                colors: ["#af2f2f"]
+            }
+            },
+            xaxis: {
+            categories: categories, 
+            position: 'top',
+            axisBorder: {
+                show: false
+            },
+            axisTicks: {
+                show: false
+            },
+            crosshairs: {
+                fill: {
+                type: 'gradient',
+                gradient: {
+                    colorFrom: '#af2f2f',
+                    colorTo: '#af2f2f',
+                    stops: [0, 100],
+                    opacityFrom: 0.4,
+                    opacityTo: 0.5,
+                }
+                }
+            },
+            tooltip: {
+                enabled: true,
+            }
+            },
+            yaxis: {
+            labels: {
+                show: true,
+                formatter: function (val) {
+                return val + " hrs"; 
+                }
+            }
+            },
+            title: {
+            text: 'Total tiempo sin casos de ratificación por Conciliador (Horas)',
+            floating: true,
+            offsetY: 330,
+            align: 'center',
+            style: {
+                color: '#af2f2f'
+            }
+            }
+        };
+        var chart6 = new ApexCharts(document.querySelector("#totalesChart2"), options6);
+        chart6.render();
+</script>
+    
+
+
+
+
+
+<!--<script>
+///////////////////////////////////////////////////////////////////////////////////// chart de promedio de tiempos de atencion
+var resultadoUsuarios = JSON.parse('{{ resultado_usuarios_json|escapejs }}');
+var categories = Object.keys(resultadoUsuarios);  
+var dataPromedioAtencion = categories.map(function(usuario) {
+    return resultadoUsuarios[usuario].promedio_atencion / 3600;  
+});
+
+var options3 = {
+    series: [{
+    name: 'Promedio de Atención (hrs)',
+    data: dataPromedioAtencion  
+    }],
+    chart: {
+    height: 350,
+    type: 'bar',
+    },
+    plotOptions: {
+    bar: {
+        borderRadius: 1,
+        dataLabels: {
+        position: 'top',
+        },
+    }
+    },
+    colors: ['#5CB85C'],
+    dataLabels: {
+    enabled: true,
+    formatter: function (val) {
+        return val.toFixed(2) + " hrs";  
+    },
+    offsetY: -20,
+    style: {
+        fontSize: '12px',
+        colors: ["#5CB85C"]
+    }
+    },
+    xaxis: {
+    categories: categories,  
+    position: 'top',
+    axisBorder: {
+        show: false
+    },
+    axisTicks: {
+        show: false
+    },
+    crosshairs: {
+        fill: {
+        type: 'gradient',
+        gradient: {
+            colorFrom: '#D8E3F0',
+            colorTo: '#BED1E6',
+            stops: [0, 100],
+            opacityFrom: 0.4,
+            opacityTo: 0.5,
+        }
+        }
+    },
+    tooltip: {
+        enabled: true,
+    }
+    },
+    yaxis: {
+    labels: {
+        show: true,
+        formatter: function (val) {
+        return val + " hrs";  
+        }
+    }
+    },
+    title: {
+    text: 'Promedio de Atención por Conciliador (Horas)',
+    floating: true,
+    offsetY: 330,
+    align: 'center',
+    style: {
+        color: '#444'
+    }
+    }
+};
+var chart3 = new ApexCharts(document.querySelector("#promediosChart"), options3);
+chart3.render();
+</script>
+
+
+<script>
+    ///////////////////////////////////////////////////////////////////////////////////// chart de promedio de tiempos sin atencion
+    var resultadoUsuarios = JSON.parse('{{ resultado_usuarios_json|escapejs }}');
+    var categories = Object.keys(resultadoUsuarios);
+    var dataPromedioSinAtencion = categories.map(function(usuario) {
+        return resultadoUsuarios[usuario].promedio_sin_atencion / 3600;  
+    });
+    
+    var options4 = {
+        series: [{
+        name: 'Promedio NO de Atención (hrs)',
+        data: dataPromedioSinAtencion
+        }],
+        chart: {
+        height: 350,
+        type: 'bar',
+        },
+        plotOptions: {
+        bar: {
+            borderRadius: 1,
+            dataLabels: {
+            position: 'bottom',
+            },
+        }
+        },
+        colors:['#D9534F'],
+        dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+            return val.toFixed(2) + " hrs"; 
+        },
+        offsetY: -20,
+        style: {
+            fontSize: '12px',
+            colors: ["#D9534F"]
+        }
+        },
+        xaxis: {
+        categories: categories,  
+        position: 'top',
+        axisBorder: {
+            show: false
+        },
+        axisTicks: {
+            show: false
+        },
+        crosshairs: {
+            fill: {
+            type: 'gradient',
+            gradient: {
+                colorFrom: '#D8E3F0',
+                colorTo: '#BED1E6',
+                stops: [0, 100],
+                opacityFrom: 0.4,
+                opacityTo: 0.5,
+            }
+            }
+        },
+        tooltip: {
+            enabled: true,
+        }
+        },
+        yaxis: {
+        labels: {
+            show: true,
+            formatter: function (val) {
+            return val + " hrs";  
+            }
+        }
+        },
+        title: {
+        text: 'Promedio tiempo sin casos de ratificación por Conciliador (Horas)',
+        floating: true,
+        offsetY: 330,
+        align: 'center',
+        style: {
+            color: '#444'
+        }
+        }
+    };
+    var chart4 = new ApexCharts(document.querySelector("#promediosChart2"), options4);
+    chart4.render();
+    </script>-->
+    
+
+
+<script>
+////////////////////////////////////////////////////////////////// chart de tiempos por user
+const jsonData = JSON.parse('{{ resultado_usuarios_json|escapejs }}');
+function toTimestamp(dateStr) {
+    return new Date(dateStr).getTime();
+}
+function processChartData(data) {
+    console.log("la adata ", data);
+    const series = [];
+    
+    for (const [user, tiempos] of Object.entries(data)) {
+        series.push({
+            name: 'Tiempo de atencion',
+            data: tiempos.tiempos_atencion.map(item => ({
+                x: `${user}`,
+                y: [
+                    toTimestamp(item.inicio),
+                    toTimestamp(item.fin)
+                ]
+            }))
+        });
+
+        series.push({
+            name: 'Tiempo sin turno',
+            data: tiempos.tiempos_sin_atencion.map(item => ({
+                x: `${user}`,
+                y: [
+                    toTimestamp(item.inicio),
+                    toTimestamp(item.fin)
+                ]
+            }))
+        });
+
+
+        series.push({
+            name: 'Turno Actual',
+            data: tiempos.tiempos_atencion_actual.map(item => ({
+                x: `${user}`,
+                y: [
+                    toTimestamp(item.inicio),
+                    toTimestamp(item.fin)
+                ]
+            }))
+        });
+    
+    }
+    
+    return series;
+}
+
+const options2 = {
+    scales: {
+        x: {
+            type: 'time',
+            time: {
+                unit: 'hour',
+                tooltipFormat: 'll HH:mm',
+                displayFormats: {
+                    hour: 'HH:mm'
+                }
+            },
+            ticks: {
+                source: 'data'
+            },
+            adapters: {
+                date: {
+                    timezone: 'America/Mexico_City'  
+                }
+            }
+        }
+    },
+    series: processChartData(jsonData),
+    chart: {
+        height: 350,
+        type: 'rangeBar'
+    },
+    plotOptions: {
+        bar: {
+            horizontal: true,
+            barHeight: '50%',
+            rangeBarGroupRows: true
+        }
+    },
+    colors: ['#58B19F','#4A69BD', '#F6D55C', ],
+    fill: {
+        type: 'solid'
+    },
+    xaxis: {
+        type: 'datetime',
+        labels: {
+                formatter: function (value) {
+                    const localDate = new Date(value);
+                    const hours = localDate.getHours().toString().padStart(2, '0');
+                    const minutes = localDate.getMinutes().toString().padStart(2, '0');
+                    
+                    return `${hours}:${minutes}`;
+                }
+            }
+        
+    },
+    legend: {
+        position: 'right'
+    },
+    tooltip: {
+        custom: function (opts) {
+            const fromDate = new Date(opts.y1).toLocaleString();
+            const toDate = new Date(opts.y2).toLocaleString();
+            
+            const w = opts.ctx.w;
+            let ylabel = w.globals.labels[opts.dataPointIndex];
+            let seriesName = w.config.series[opts.seriesIndex].name
+                ? w.config.series[opts.seriesIndex].name
+                : '';
+            const color = w.globals.colors[opts.seriesIndex];
+            
+            return (
+                '<div class="apexcharts-tooltip-rangebar">' +
+                '<div> <span class="series-name" style="color: ' +
+                color +
+                '">' +
+                (seriesName ? seriesName : '') +
+                '</span></div>' +
+                '<div> <span class="category">' +
+                ylabel +
+                ' </span> <span class="value start-value">' +
+                fromDate +
+                '</span> <span class="separator">-</span> <span class="value end-value">' +
+                toDate +
+                '</span></div>' +
+                '</div>'
+            );
+        }
+    }
+};
+var chart2 = new ApexCharts(document.querySelector("#tiemposChart"), options2);
+chart2.render();
+</script>
+
+
+
+
+<script>
+///////////////////////////////////////////// chart de turnos por user
+
+document.addEventListener('DOMContentLoaded', function () {
+    fetch("/conteo_por_conciliador/")
+    .then(response => response.json())
+        .then(data => {
+            const usernames = data.map(item => item.user__username);
+            const turnos = data.map(item => item.total_turnos);
+
+        var options = {
+            chart: {
+            height: '100%',
+            type: 'bar'
+            },
+            colors: ['#2200e3','#16904b', '#e4bc2b'],
+            series: [
+            {
+                name: 'Turnos Atendidos',
+                data: turnos,
+            },
+            ],
+            xaxis: {
+            categories: usernames
+            }
+        }
+
+        var chart = new ApexCharts(document.querySelector('#chart'), options);
+        chart.render();
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/reloj.js'%}"></script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'general/base.html' %} 
+{% include 'general/header.html' %}
+{% load static %}
+
+{% block content %}
+<html lang="es">
+<div class="content ms-5 me-5">
+<h1 class="text-center mt-2">Turnos Activos Pagos</h1>
+<div class="row">
+    <div class="col">
+        <div class="list-group">
+            <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1"># Turno: 1900923</h5>
+                <small>hace 1 minuto</small>
+              </div>
+              <p class="mb-1">Asistir a mesa número 2.</p>
+              <small>Del solicitante Juan Sebastian.</small>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">List group item heading</h5>
+                <small class="text-body-secondary">3 days ago</small>
+              </div>
+              <p class="mb-1">Some placeholder content in a paragraph.</p>
+              <small class="text-body-secondary">And some muted small print.</small>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">List group item heading</h5>
+                <small class="text-body-secondary">3 days ago</small>
+              </div>
+              <p class="mb-1">Some placeholder content in a paragraph.</p>
+              <small class="text-body-secondary">And some muted small print.</small>
+            </a>
+          </div>
+    </div>
+    <div class="col">
+      <img></img>
+    </div>
+</div>
+</div>
+{% endblock %}

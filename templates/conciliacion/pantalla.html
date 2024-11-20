@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiencias</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/conciliacion.js' %}"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .header {
+            background-color: #003366;
+            width: 100%;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .clock {
+            font-size: 2rem;
+        }
+        .nav_logo-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+        .main {
+            display: flex;
+            flex-direction: row;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1200px;
+        }
+        .left, .right {
+            width: 45%;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 10px;
+            transition: transform 0.3s ease;
+        }
+        .left:hover, .right:hover {
+            transform: translateY(-5px);
+        }
+        .meeting-info h2, .upcoming-audiences h2 {
+            margin-top: 0;
+            color: #004080;
+            font-size: 2rem;
+        }
+        .upcoming-audiences {
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+            padding-top: 40px; /* Add padding to avoid covering the title */
+        }
+        .upcoming-audiences h2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            text-align: center;
+            margin: 0;
+            z-index: 2;
+        }
+        .upcoming-audiences ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            animation: scrollUp 15s linear infinite;
+        }
+        .upcoming-audiences li {
+            background-color: #f9f9f9;
+            border: 1px solid #dddddd;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 5px 0;
+            font-size: 1.5rem;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .info-item strong {
+            min-width: 120px;
+            color: #555;
+            font-size: 1.5rem;
+        }
+        .info-item p {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .icon {
+            margin-right: 10px;
+            color: #004080;
+            font-size: 1.5rem;
+        }
+        @keyframes scrollUp {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-50%);
+            }
+        }
+        .circle.red {
+            background-color: red;
+        }
+        .circle.green {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{% static 'icon/ccl-logo.svg' %}" class="nav_logo-icon" alt="CCL Logo">
+        <h1>Audiencias</h1>
+        <div class="clock" id="clock"></div>
+    </div>
+    <div class="main">
+        <div class="left">
+            <div class="meeting-info">
+                <div class="turno-board">
+                    <script>
+                        var audioPath = "{% static 'audios/alerta-turno5.mp3' %}";
+                    </script>
+                </div>
+                <h2>Expediente</h2>
+                <div class="info-item">
+                    <i class="fas fa-landmark icon"></i>
+                    <p><strong>Sala:</strong> <span id="info-sala">21</span></p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-calendar-alt icon"></i>
+                    <p><strong>Audiencia:</strong> <span id="info-expediente">27391/2024</span></p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-gavel icon"></i>
+                    <p><strong>Conciliador:</strong> <span id="info-conciliador">ROBERTO AGUILAR ELIZONDO</span></p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-user icon"></i>
+                    <p><strong>Solicitante:</strong> <span id="info-solicitante">No llegó</span></p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-user icon"></i>
+                    <p><strong>Citado:</strong> <span id="info-citado">No llegó</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="upcoming-audiences">
+                <h2>Siguientes Audiencias</h2>
+                <ul id="audienceList">
+                    <li>NLE/CI/2024/028291</li>
+                    <li>NLE/CI/2024/028296</li>
+                    <li>NLE/CI/2024/028297</li>
+                    <li>NLE/CI/2024/028305</li>
+                    <li>NLE/CI/2024/028669</li>
+                    <li>NLE/CI/2024/030138</li>
+                    <li>NLE/CI/2024/030179</li>
+                    <!-- Repeat the list for continuous scrolling -->
+                    <li>NLE/CI/2024/028291</li>
+                    <li>NLE/CI/2024/028296</li>
+                    <li>NLE/CI/2024/028297</li>
+                    <li>NLE/CI/2024/028305</li>
+                    <li>NLE/CI/2024/028669</li>
+                    <li>NLE/CI/2024/030138</li>
+                    <li>NLE/CI/2024/030179</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="switch-container">
+            <div class="form-switch">
+                <label for="conciliadorStatus" style="margin-right: 10px;">Cambiar estado del conciliador</label>
+                <label class="switch">
+                    <input type="checkbox" id="conciliadorStatus" onchange="cambiarEstadoConciliador()">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+        <h1 class="text-center">Expedientes</h1>
+        <div class="table-container">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Horario</th>
+                        <th>Solicitante</th>
+                        <th>Citado</th>
+                        <th>Expediente</th>
+                        <th>Conciliador</th>
+                        <th>Sala</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="expedientesTable">
+                    <tr>
+                        <td>9:00 am</td>
+                        <td>Juan Sebastian Aguirre Siordia</td>
+                        <td>Jose Rigoberto Aguirre Siordia</td>
+                        <td>TD/20021405/AJ</td>
+                        <td>Lic. Juan Ramon Ramirez</td>
+                        <td>Sala 22</td>
+                        <td class="text-center">
+                            <span class="circle red"></span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-call" onclick="llamarExpediente(this)" style="margin-bottom: 5px;">Llamar</button>
+                            <button class="btn btn-warning" data-toggle="modal" data-target="#formModal" onclick="llenarFormulario(this)">Formulario</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10:00 am</td>
+                        <td>Alvarezy</td>
+                        <td>Alejandro Magañan</td>
+                        <td>TD/20021405/AJ</td>
+                        <td>Lic. Manuel Velazco</td>
+                        <td>Sala 15</td>
+                        <td class="text-center">
+                            <span class="circle green"></span>
+                        </td>
+                        <td>
+                            <button id="llamarExpediente" class="btn btn-primary btn-call" onclick="llamarExpediente(this)" style="margin-bottom: 5px;">Llamar</button>
+                            <button class="btn btn-warning" data-toggle="modal" data-target="#formModal" onclick="llenarFormulario(this)">Formulario</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

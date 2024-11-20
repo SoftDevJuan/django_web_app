@@ -1,0 +1,135 @@
+<!-- templates/turnos/turno_entrega.html -->
+{% extends 'general/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general/barralateral.html' %}
+<body>
+    <style>
+        .nav_linkin {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #ffffff; 
+    border-radius: 8px;
+    text-decoration: none;
+    color: #007bff; 
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 5px;
+}
+
+.nav_linkin:hover {
+    background-color: #007bff;
+    color: #fff; 
+}
+
+.nav_linkin .nav_icon {
+    font-size: 20px;
+    margin-right: 8px; 
+    transition: transform 0.3s ease;
+}
+
+
+.nav_linkin:hover .nav_icon {
+    transform: scale(1.2); 
+}
+
+.nav_linkin.active {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    document.body.addEventListener('click', async function(event) {
+        if (event.target && event.target.matches('button[id^="eliminar-ciudadano"]')) {
+            event.preventDefault(); // Prevenir la recarga de página
+
+            const idCiudadano = event.target.id.replace('eliminar-ciudadano', '');
+            const row = document.getElementById(`ul${idCiudadano}`);
+            
+            if (confirm('¿Estás seguro de que deseas eliminar a este ciudadano?')) {
+                try {
+                    const response = await fetch(`/remover_ciudadano_ratis/${idCiudadano}/`, {
+                        method: 'PATCH',
+                        headers: {
+                            //'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    });
+
+                    if (response.ok) {
+                        if (row) {
+                            row.remove(); // Eliminar la fila de la tabla
+                        }
+                        alert('Ciudadano eliminado con éxito.');
+                    } else {
+                        alert('Hubo un error al intentar eliminar al ciudadano.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Hubo un error al intentar eliminar al ciudadano.');
+                }
+            }
+        }
+    });
+});
+</script>
+
+
+
+    <div class="container mt-5">
+        <div class="text-center mb-4">
+            <br>
+            <h1 class="display-4">Turnos Asignados</h1>
+            <a href="{% url 'Registro Ratificaciones' %}" class="nav_linkin {% if active_view == 'Registro Manual' %}active{% endif %}">
+                <i class="bx bx-user-plus nav_icon"></i>
+                <span class="nav_name">Registro con folio</span>
+            </a>
+            <br></br>
+        </div>
+
+        {% if turnos_asignados %}
+            {% for item in turnos_asignados %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="card-title">Turno: {{ item.turno.turno }}</h2>
+                        <p><strong>Área:</strong> {{ item.turno.get_area_display }}</p>
+                        <h3>Ciudadanos:</h3>
+                        
+                            {% for ciudadano in item.ciudadanos %}
+                            <ul id="ul{{ciudadano.id}}">
+                                <li>{{ ciudadano.nombre }} <button type="button" id="eliminar-ciudadano{{ciudadano.id}}" class="btn btn-warning">Remover</button></li> 
+                                <!-- Mostrar imágenes de documentos si existen -->
+                                {% if ciudadano.documento_1 or ciudadano.documento_2 %}
+                                    <div class="identificaciones-div">
+                                        {% if ciudadano.documento_1 %}
+                                            <img src="{{ ciudadano.documento_1.url }}" alt="Identificación Frente" class="img-id">
+                                            <br><br>
+                                        {% endif %}
+                                        {% if ciudadano.documento_2 %}
+                                            <img src="{{ ciudadano.documento_2.url }}" alt="Identificación Reverso" class="img-id">
+                                            <br><br>
+                                        {% endif %}
+                                        
+                                    </div>
+                                {% endif %}
+                            </ul>
+                            {% endfor %}
+                        
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="d-grid gap-2">
+                <a href="{% url 'auto_turno' %}" class="btn btn-lg bg-blue text-white mt-4">Solicitar otro turno</a>
+            </div>
+        {% else %}
+            <div class="alert alert-danger mt-4 text-center" role="alert">
+                No se asignaron turnos.
+            </div>
+        {% endif %}
+    </div>
+</body>
+{% endblock %}

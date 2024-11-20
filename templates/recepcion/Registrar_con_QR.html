@@ -1,0 +1,313 @@
+{% extends 'general/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general/barralateral.html' %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escaneo de QR</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="{% static 'js/lectorQR.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        #lector, #resultado_citas {
+            max-width: 680px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #loadingMessage {
+            font-size: 20px;
+            color: #333;
+        }
+
+        #carga {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        h1 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .botones_form_citas button {
+            padding: 10px 20px;
+            border: none;
+            background: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .botones_form_citas h1 {
+            color: #dc3545;
+        }
+        @media (max-width: 600px) {
+            #lector, #resultado_citas {
+                padding: 15px;
+                margin: 10px;
+            }
+            h1 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="lector">
+        <form id="lectorQR" name="confirmar">
+            {% csrf_token %}
+            <br><br>
+            <div style="font-size: 40px; text-align: center;">Escanea el código QR</div>
+            <br>
+            <div id="loadingMessage" style="text-align: center;">🎥 <h2>Sin Acceso a la cámara, Favor de revisar los permisos.</h2></div>
+            <canvas id="canvas" hidden></canvas>
+            <div id="output" hidden>
+                <div id="outputMessage"></div>
+                <div hidden><b></b> <input type="text" id="info" name="info"><span id="outputData"></span></div>
+            </div>
+        </form>
+    </div>
+    
+    <div id="resultado_citas" class="resultado_citas" hidden>
+        <form id="formulario_confirmar" method="POST" action="{% url 'registrar_ciudadano_QR' %}">
+            {% csrf_token %}
+            <div id="contenedor_cita" class="contenedor_cita">
+                <br><br>
+                <h1 class="titulo_cita">Información de la cita</h1>
+                <div id="cuerpo_cita" class="cuerpo_cita">
+                    <label for="dia_cita">Fecha de la cita (año/mes/día):</label>
+                    <input type="text" id="dia_cita" name="dia_cita" readonly>
+                    <br>
+                    <label for="hora_cita">Hora de la cita:</label>
+                    <input type="text" id="hora_cita" name="hora_cita" readonly>
+                </div>
+            </div>
+            <div id="contenedor_empleador" hidden>
+                <h1 class="titulo_empleador">Información de Empleador(es) / Fuente de trabajo</h1>
+                <div id="cuerpo_empleador" class="cuerpo_empleador">
+                    <label for="nombre_empleador">Nombre completo:</label>
+                    <input type="text" id="nombre_empleador" name="nombre_empleador" readonly>
+                    <br>
+                    <label for="sexo_empleador">Sexo:</label>
+                    <select id="sexo_empleador" name="sexo_empleador" disabled>
+                        <option value="Hombre">Hombre</option>
+                        <option value="Mujer">Mujer</option>
+                    </select>
+                    <br>
+                    <label for="correo_empleador">Correo:</label>
+                    <input type="text" id="correo_empleador" name="correo_empleador" readonly>
+                    <br>
+                    <label for="documentos_empleador">Documentos:</label>
+                    <div id="documentos_empleador"></div>
+                    <br>
+                    <label for="curp_rfc_empleador">CURP o RFC</label>
+                    <input type="text" id="curp_rfc_empleador" name="curp_rfc_empleador" class="form-control" placeholder="CURP o RFC del Empleador">
+                    <br>
+                    <label for="municipio_empleador">Municipio</label>
+                    <input type="text" id="municipio_empleador" name="municipio_empleador" id="id_municipio" class="form-control" placeholder="Municipio del Empleador">
+                    <br>
+                    <label for="tipo_persona_empleador">Tipo de Persona</label>
+                    <input type="radio" id="tipo_persona_empleador1" name="tipo_persona_empleador" value="Soy Persona Física Empleadora"> Soy dueño de la empresa
+                    <br>
+                    <input type="radio" id="tipo_persona_empleador2" name="tipo_persona_empleador" value="Soy Persona Jurisdicción Empleadora"> Soy representante legal de la empresa
+                    <br>
+                </div>
+            </div>
+            <div id="contenedor_trabajador" hidden>
+                <br>
+                <h1 class="titulo_trabajador">Información de Trabajador(a)</h1>
+                <div id="cuerpo_trabajador" class="cuerpo_trabajador">
+                    <label for="nombre_trabajador">Nombre completo:</label>
+                    <input type="text" id="nombre_trabajador" name="nombre_trabajador" readonly>
+                    <br>
+                    <label for="sexo_trabajador">Sexo:</label>
+                    <select id="sexo_trabajador" name="sexo_trabajador" disabled>
+                        <option value="Hombre">Hombre</option>
+                        <option value="Mujer">Mujer</option>
+                    </select>
+                    <br>
+                    <label for="correo_trabajador">Correo:</label>
+                    <input type="text" id="correo_trabajador" name="correo_trabajador" readonly>
+                    <br>
+                    <label for="documentos_trabajador">Documentos:</label>
+                    <div id="documentos_trabajador"></div>
+                    <br>
+                    <label for="curp_rfc_trabajador">CURP o RFC</label>
+                    <input type="text" id="curp_rfc_trabajador" name="curp_rfc_trabajador" class="form-control" placeholder="CURP o RFC del Trabajador">
+                    <br>
+                    <label for="municipio_trabajador">Municipio</label>
+                    <input type="text" id="municipio_trabajador" name="municipio_trabajador" id="id_municipio" class="form-control" placeholder="Municipio del Trabajador">
+                    <br>
+                    <label for="tipo_persona_trabajador">Tipo de Persona</label>
+                    <input type="radio" id="tipo_persona_trabajador1" name="tipo_persona_trabajador" value="Soy Persona Trabajadora" checked> Trabajo en una empresa
+                    <br>
+                </div>
+                <br>
+            </div>
+            <input type="hidden" id="nombre_empleador" name="nombre_empleador">
+            <input type="hidden" id="sexo_empleador" name="sexo_empleador">
+            <input type="hidden" id="correo_empleador" name="correo_empleador">
+            <input type="hidden" id="curp_rfc_empleador" name="curp_rfc_empleador">
+            <input type="hidden" id="municipio_empleador" name="municipio_empleador">
+            <input type="hidden" id="tipo_persona_empleador" name="tipo_persona_empleador">
+
+            <input type="hidden" id="nombre_trabajador" name="nombre_trabajador">
+            <input type="hidden" id="sexo_trabajador" name="sexo_trabajador">
+            <input type="hidden" id="correo_trabajador" name="correo_trabajador">
+            <input type="hidden" id="curp_rfc_trabajador" name="curp_rfc_trabajador">
+            <input type="hidden" id="municipio_trabajador" name="municipio_trabajador">
+            <input type="hidden" id="documentos_trabajador" name="documentos_trabajador">
+            <input type="hidden" id="tipo_persona_trabajador" name="tipo_persona_trabajador">
+
+            <div id="botones_form_citas" class="botones_form_citas"></div>
+        </form>
+    </div>
+
+    <div id="carga">
+        <h1 id="texto_carga" class="mensaje de carga lector"></h1>
+    </div>
+
+    <div id="contenedor_error" hidden></div>
+    <script src="{% static 'js/lectorQR_extension.js' %}"></script>
+    <script>
+      $(document).ready(function() {
+        function copiarValores() {
+            // Copiar los valores del formulario a los campos ocultos
+            $('#nombre_empleador').val($('#nombre_empleador').val());
+            $('#sexo_empleador').val($('#sexo_empleador').val());
+            $('#correo_empleador').val($('#correo_empleador').val());
+            $('#curp_rfc_empleador').val($('#curp_rfc_empleador').val());
+            $('#municipio_empleador').val($('#municipio_empleador').val());
+            $('#tipo_persona_empleador').val($('input[name="tipo_persona_empleador"]:checked').val());
+
+            $('#nombre_trabajador').val($('#nombre_trabajador').val());
+            $('#sexo_trabajador').val($('#sexo_trabajador').val());
+            $('#correo_trabajador').val($('#correo_trabajador').val());
+            $('#curp_rfc_trabajador').val($('#curp_rfc_trabajador').val());
+            $('#municipio_trabajador').val($('#municipio_trabajador').val());
+            $('#documentos_trabajador').val($('#documentos_trabajador').val());
+            $('#tipo_persona_trabajador').val($('input[name="tipo_persona_trabajador"]:checked').val());
+        }
+
+        function obtenerFechaActual() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // mes de 1 a 12
+        const day = String(today.getDate()).padStart(2, '0'); // día de 1 a 31
+        return `${year}-${month}-${day}`; // formato yyyy-mm-dd
+    }
+
+    $('#lectorQR').submit(function(event) {
+        event.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '{% url "pruebaauthcitas" %}',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                const cita = response.resultadoAPI.cita;
+                const documentacion = response.resultadoAPI.documentacion;
+                const empleador = response.resultadoAPI.empleador;
+                const trabajador = response.resultadoAPI.trabajador;
+
+                $("#resultado_citas").removeAttr("hidden");
+                $('#texto_carga').hide();
+
+                if (!response.resultadoAPI.Error) {
+                    $('#contenedor_cita').removeAttr("hidden");
+                    $('#dia_cita').val(cita.dia_cita);
+                    $('#hora_cita').val(cita.hora_cita);
+
+                    if (empleador.nombre) {
+                        let empleadorNombre = `${empleador.nombre} ${empleador.apellidopaterno || ''} ${empleador.apellidomaterno || ''}`.trim();
+                        $('#contenedor_empleador').removeAttr("hidden");
+                        $('#nombre_empleador').val(empleadorNombre);
+                        $('#sexo_empleador').val(empleador.sexo);
+                        $('#correo_empleador').val(empleador.correo);
+                        $('#curp_rfc_empleador').val(empleador.curp_rfc_empleador);
+                        $('#municipio_empleador').val(empleador.municipio_empleador);
+                        $(`input[name="tipo_persona_empleador"][value="${empleador.tipo_persona_empleador}"]`).prop('checked', true);
+
+                        let documentos = '';
+                        if (documentacion.empleador_id) documentos += `<a href="${documentacion.empleador_id}" target="_blank">Identificación</a><br>`;
+                        if (documentacion.empleador_actac) documentos += `<a href="${documentacion.empleador_actac}" target="_blank">Acta Constitutiva</a><br>`;
+                        if (documentacion.empleador_actar) documentos += `<a href="${documentacion.empleador_actar}" target="_blank">Acta representante legal</a><br>`;
+                        if (documentacion.empleador_csf) documentos += `<a href="${documentacion.empleador_csf}" target="_blank">Constancia de situación fiscal</a>`;
+                        $('#documentos_empleador').html(documentos || 'sin documentos');
+                    }
+
+                    if (trabajador.nombre) {
+                        let trabajadorNombre = `${trabajador.nombre} ${trabajador.apellidopaterno || ''} ${trabajador.apellidomaterno || ''}`.trim();
+                        $('#contenedor_trabajador').removeAttr("hidden");
+                        $('#nombre_trabajador').val(trabajadorNombre);
+                        $('#sexo_trabajador').val(trabajador.sexo);
+                        $('#correo_trabajador').val(trabajador.correo);
+                        $('#curp_rfc_trabajador').val(trabajador.curp_rfc_trabajador);
+                        $('#municipio_trabajador').val(trabajador.municipio_trabajador);
+                        $(`input[name="tipo_persona_trabajador"][value="${trabajador.tipo_persona_trabajador}"]`).prop('checked', true);
+
+                        let documentos = '';
+                        if (documentacion.trabajador_id) documentos += `<a href="${documentacion.trabajador_id}" target="_blank">Identificación</a><br>`;
+                        if (documentacion.trabajador_curp) documentos += `<a href="${documentacion.trabajador_curp}" target="_blank">CURP</a><br>`;
+                        if (documentacion.trabajador_comprobante) documentos += `<a href="${documentacion.trabajador_comprobante}" target="_blank">Comprobante de domicilio</a>`;
+                        $('#documentos_trabajador').html(documentos || 'sin documentos');
+                    }
+
+                    // Comparar la fecha de la cita con la fecha actual
+                    let fechaCita = cita.dia_cita; // formato yyyy-mm-dd
+                    console.log('Fecha Cita:', fechaCita); // Debugging
+                    console.log('Fecha Actual:', obtenerFechaActual()); // Debugging
+
+                    if (obtenerFechaActual() === fechaCita) {
+                        $('#botones_form_citas').html('<button type="submit">Confirmar</button>');
+                    } else {
+                        $('#botones_form_citas').html('<h1>La cita corresponde a otro día, no puedes confirmarla.</h1><br><h1>Disculpe las molestias</h1>');
+                    }
+                } else {
+                    $('#contenedor_error').html(response.resultadoAPI.Error).removeAttr("hidden");
+                }
+
+                copiarValores(); // Copiar los valores a los campos ocultos antes de enviar el formulario
+            },
+            error: function(xhr, status, error) {
+                $('#contenedor_error').html(`Error: ${xhr.responseText}`).removeAttr("hidden");
+            }
+        });
+    });
+
+        $('#formulario_confirmar').submit(function(event) {
+            // Habilitar los campos de selección antes de enviar el formulario
+            $('#sexo_empleador').prop('disabled', false);
+            $('#sexo_trabajador').prop('disabled', false);
+
+            copiarValores(); // Asegurarse de copiar los valores antes de enviar el formulario
+        });
+    });
+
+      
+  </script>
+</body>
+</html>
+{% endblock %}

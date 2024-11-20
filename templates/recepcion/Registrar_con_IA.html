@@ -1,0 +1,41 @@
+{% extends 'general/base.html' %} 
+{% include 'general/header.html' %}
+{% load static %}
+
+{% block content %} 
+<html lang="en">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="text-center">    
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">   
+                        <title>Registro IA</title>
+                    </head>
+                    <body>
+                        <h1>AREA QUE VISITA</h1>
+                        <div class="botonera_recepcion_IA">
+                            <div>
+                                <button onclick="window.location.href={% url 'Vista Mantenimiento' %}" value="AJ" class="boton">Asesoría Jurídica</button>
+                                <button onclick="window.location.href={% url 'Vista Mantenimiento' %}" value="P" class="boton">Pagos</button>
+                                <button onclick="window.location.href={% url 'Vista Mantenimiento' %}" value="AUD" class="boton">Audiencia</button>
+                            </div>
+                            <div>
+                                <button onclick="window.location.href={% url 'Vista Mantenimiento' %}" value="CN" class="boton">Ratificación</button>
+                                <button onclick="window.location.href={% url 'Vista Mantenimiento' %}" value="PROC" class="boton">Procuraduría</button>
+                                <button onclick="window.location.href={% url 'Vista Mantenimiento' %}" value="LYP" class="boton">Licitantes y Proveedores</button>
+                            </div>
+                            <div>
+                                <button onclick="window.location.href={% url 'Vista Mantenimiento' %}" value="Administrativo" class="boton">Administrativo</button>
+                            </div>
+                        </div>
+                        <script><>
+                    </body>
+                </div>
+            </div>
+        </div>
+    </div>                    
+</html>
+{% endblock %}

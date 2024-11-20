@@ -1,0 +1,14 @@
+<div class="text-center mt-3">
+    {% if request.user.is_authenticated %}
+    <div class="text-center mt-3">
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-danger">Cerrar Sesión</button>
+        </form>
+    </div>
+    
+    {% else %}
+    <a class="btn btn-primary btn-primary" href="{% url 'login' %}">Iniciar Sesion</a>
+    {% endif %}
+
+</div>

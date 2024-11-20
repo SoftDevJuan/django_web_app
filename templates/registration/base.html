@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCL</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="">
+    {% load static %}
+    {% if usuario.is_authenticated %}
+            <script type="text/javascript">
+                var csrf_token = "{{ csrf_token }}";
+                sessionStorage.setItem('csrf_token', csrf_token);
+                window.location.replace("http://127.0.0.1:8000/");
+            </script>
+    
+    {% endif %}
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+        .background-container {
+            background-image: url('/static/fotos/ciudad_laboral.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-login{
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .card-auth{
+            background: rgba(77, 82, 170, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 423px;
+        }
+        .text-blue{
+            color: #5B97FF;
+        }
+        .text-lesswhite{
+            color: rgba(192, 192, 192);
+        }
+        .a-white{
+            color: white;
+        }
+        @media screen and (min-width: 2500px) {
+            .card-login{
+            max-width: 800px;
+            font-size: x-large;
+            }
+            h4{
+                font-size: xx-large;
+            }
+            .textinput{
+                font-size: x-large;
+            }
+            .passwordinput{
+                font-size: x-large;
+            }
+            button{
+                font-size: x-large !important;
+                height: 5rem;
+            }
+        }
+        .form-control{
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            --bs-body-bg: rgba(255, 255, 255, 0.623);
+        }
+        .font-login{
+            color: whitesmoke;
+        }
+        ul{
+            font-size: smaller;
+            color: whitesmoke;
+        }
+        .form-text{
+            color: whitesmoke;
+            font-size: smaller;
+        }
+        .textinput{
+            font-size: small;
+        }
+        .alert ul li{
+            color: darkred;
+        }
+    </style>
+</head>
+<body>
+
+{% block content %}{% endblock %}   
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

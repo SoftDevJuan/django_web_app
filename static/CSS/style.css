@@ -1,0 +1,409 @@
+
+.wrapper{
+    position: relative;
+    background-image: url(../icon/bg.jpg);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    z-index: 40
+}
+
+
+.opacity {
+  background: rgba(79,70,62,0.5);
+  height: 100%;
+  position: absolute;
+  width: 100%;
+z-index: -1;
+}
+
+.identificaciones-div{
+  display: flex;
+  justify-content: start;
+}
+.img-id{
+  height:auto;
+  max-height: 200px;
+  margin: 10px;
+}
+.gravity {
+	width: 100%;
+	text-align: center;
+	padding: 70px 0;
+}
+.gravity .logo{
+  position: relative;
+  right: 45%;
+  height: auto;
+  width: 80%;
+}
+.gravity h1 {
+  color: #d0d0d0;
+  font-family: "Raleway",sans-serif;
+  font-size: 23px;
+  font-weight: 600;
+  text-align: center;
+    padding-top: 90px
+}
+
+
+.countdown .back-text h4{
+    color: red;
+    background: red
+}
+#countdown {
+  margin-top: 75px;
+}
+
+
+.Mensaje_Mantenimiento{
+    text-align: center;
+    padding-top: 120px;
+    z-index: 100;
+}
+.Mensaje_Mantenimiento h1 {
+  color: #fff;
+  font-family: "Raleway",sans-serif;
+  font-size: 21px;
+  font-weight: 600;
+  margin: 20px 0 50px;
+}
+
+
+.countDays{
+    position: relative;
+}
+.countDays::after{
+    position: absolute;
+    content: 'days';
+    color: #fff;
+    top: 0px;
+    left: 10px;
+    font-size: 20px;
+    letter-spacing: 1px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+}
+.countHours{
+    position: relative;
+}
+.countHours::after {
+  color: #fff;
+  content: "hours";
+  font-family: "Raleway",sans-serif;
+  font-size: 20px;
+  font-weight: 200;
+  left: 2px;
+  letter-spacing: 1px;
+  position: absolute;
+  top: 0;
+}
+.countMinutes{
+    position: relative;
+}
+.countMinutes::after{
+    position: absolute;
+    content: 'minutes';
+    color: #fff;
+    top: 0px;
+    left: -10px;
+    font-size: 20px;
+    letter-spacing: 1px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+}
+.countSeconds{
+    position: relative;
+}
+.countSeconds::after{
+    position: absolute;
+    content: 'seconds';
+    color: #fff;
+    top: 0px;
+    left: -10px;
+    font-size: 20px;
+    letter-spacing: 1px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+}
+
+/* Estilo del fondo del modal */
+.modal {
+  display: none; /* Oculta el modal por defecto */
+  position: fixed; /* Posiciona el modal respecto a la ventana del navegador */
+  z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Permite el desplazamiento si el contenido es demasiado grande */
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente para el modal */
+  padding-top: 60px; /* Espaciado en la parte superior */
+}
+
+/* Estilo del contenido del modal */
+.modal-content {
+  background-color: #7B868C;
+  margin: 10% auto; /* Centra el modal horizontalmente y ajusta la distancia desde la parte superior */
+  padding: 20px;
+  border: 1px solid #D9D9D9;
+  width: auto; /* Ajusta el ancho del modal al contenido */
+  max-width: 500px; /* Ancho máximo del modal */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0px 0px 15px #7B868C; /* Sombra sutil */
+  position: relative; /* Necesario para el posicionamiento del botón de cerrar */
+  text-align: center; /* Centra el contenido dentro del modal */
+}
+
+/* Estilo del botón de cerrar */
+.close {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+}
+
+/* Estilo de los botones dentro del modal */
+.modal-content .button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Espacio entre los botones */
+}
+
+.modal-content button {
+  padding: 10px 20px; /* Tamaño del padding */
+  font-size: 16px; /* Tamaño del texto */
+  border-radius: 20px; /* Bordes redondeados */
+  border: 1px solid transparent; /* Elimina el borde predeterminado */
+  cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+  background-color: #0a1f8f; /* Color de fondo */
+  color: white; /* Color del texto */
+}
+
+.modal-content button:hover {
+  background-color: #7B868C; /* Color de fondo al pasar el mouse */
+}
+
+
+/* botones modal cita  */
+.modal-content .button-cita {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Espacio entre los botones */
+}
+
+.modal-content button {
+  padding: 10px 20px; /* Tamaño del padding */
+  font-size: 16px; /* Tamaño del texto */
+  border-radius: 20px; /* Bordes redondeados */
+  border: 1px solid transparent; /* Elimina el borde predeterminado */
+  cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+  background-color: #0a1f8f; /* Color de fondo */
+  color: white; /* Color del texto */
+}
+
+.modal-content button:hover {
+  background-color: #7B868C; /* Color de fondo al pasar el mouse */
+}
+
+
+  /* Estilo del modal barra lateral */
+  .modalBarra {
+    display: none; /* Oculta el modal por defecto */
+    position: fixed; /* Posiciona el modal respecto a la ventana del navegador */
+    top: 100px; /* Ajusta la distancia desde la parte superior */
+    left: 73px; /* Ajusta la distancia desde el borde izquierdo */
+    background-color: #f9f7f7; /* Fondo blanco */
+    border: 1px solid #f9f7f7; /* Borde delgado gris */
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1); /* Sombra sutil */
+    z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+    width: auto; /* Ajusta el ancho al contenido */
+    max-width: 300px; /* Ancho máximo */
+    max-height: 300px; /* Altura máxima para el modal */
+    padding: 5px; /* Espaciado interno */
+    border-radius: 20px; /* Bordes redondeados */
+  }
+
+  .modalBarra-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #0a1f8f;
+    padding-bottom: 10px;
+  }
+
+  .modalBarra-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .modalBarra-header .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+  }
+
+
+/*Estilo fondo inicio*/
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.background-container {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  display: flex;
+  align-items: flex-start; /* Alinea el contenido al inicio del eje vertical */
+  justify-content: flex-start; /* Alinea el contenido al inicio del eje horizontal */
+  color: white;
+  padding-top: 20px;
+}
+
+.background-container .text {
+  margin-left: 0; /* Asegura que no haya margen izquierdo en el div interno */
+  align-self: flex-start; /* Asegura que el div interno esté alineado al inicio en el eje vertical */
+}
+.containerTitulo {
+  background: rgba(255, 255, 255, 0.5); /* Añade un fondo semi-transparente al contenedor */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/*Estilo fondo inicio*/
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.background-container {
+    background-size: cover; /* Hace que la imagen cubra todo el contenedor */
+    background-position: center; /* Centra la imagen en el contenedor */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    height: 100vh; /* Hace que el contenedor tenga la altura de la ventana */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;;
+    text-align:center;
+    color: white; /* Cambia el color del texto si es necesario */
+    padding-top: 20px;
+}
+
+.containerTitulo {
+    background: rgba(255, 255, 255, 0.5); /* Añade un fondo semi-transparente al contenedor */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+
+
+/* Estilos para html buscar datos ciudadano */
+.buscar-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Estilos para el formulario */
+.buscar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.buscar-form input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.buscar-form button {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buscar-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Estilos para la lista de resultados */
+.resultados-lista {
+  list-style: none;
+  padding: 0;
+}
+
+.resultado-item {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.resultado-item:last-child {
+  border-bottom: none;
+}
+
+.resultado-item p {
+  margin: 5px 0;
+}
+
+/* Estilos para la imagen QR */
+.resultado-item img {
+  max-width: 100px;
+  height: auto;
+  margin-top: 10px;
+}
+
+/* Estilos responsivos */
+@media (min-width: 768px) {
+  .buscar-form {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .buscar-form input[type="text"] {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .buscar-container {
+    padding: 15px;
+  }
+
+  .buscar-form input[type="text"],
+  .buscar-form button {
+    font-size: 14px;
+  }
+}
+
+
+

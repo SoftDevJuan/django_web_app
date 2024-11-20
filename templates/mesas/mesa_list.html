@@ -1,0 +1,36 @@
+{% extends 'recepcion/base.html' %} 
+{% load static %} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Lista de Mesas</h1>
+    <a href="{% url 'mesa_create' %}" class="btn btn-primary mb-3">Crear Nueva Mesa</a>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Área</th>
+                <th>Usuario</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mesa in mesas %}
+                <tr>
+                    <td>Mesa {{ mesa.mesa }}</td>
+                    <td>{{ mesa.get_area_display }}</td>
+                    <td>{{ mesa.user }}</td>
+                    <td>
+                        <a href="{% url 'mesa_update' mesa.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{% url 'mesa_delete' mesa.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+

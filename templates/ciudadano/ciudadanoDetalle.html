@@ -1,0 +1,48 @@
+{% extends 'ciudadano/base.html' %}
+{% load static %}
+{% block content %}
+
+<body>
+    <div class="containerFormulario">
+        <!-- Formulario para buscar al ciudadano -->
+        <form action="{% url 'buscar_ciudadano' %}" method="GET" class="form-inline my-4">
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="codigo_ciudadano" class="sr-only">Código del Ciudadano</label>
+                <input type="text" class="form-control" id="codigo_ciudadano" name="codigo_ciudadano" placeholder="Código del Ciudadano">
+                <br>
+                <label for="registro" class="sr-only">Número de Registro del Ciudadano</label>
+                <input type="text" class="form-control" id="registro" name="registro" placeholder="Número de Registro">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Buscar</button>
+        </form>
+
+        <!-- Mostrar detalles del ciudadano si existen -->
+        {% if ciudadanos %}
+            {% for ciudadano in ciudadanos %}
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Detalle del Ciudadano</h2>
+                        <p><strong>Nombre:</strong> {{ ciudadano.nombre }}</p>
+                        <p><strong>Sexo:</strong> {{ ciudadano.sexo }}</p>
+                        <p><strong>CURP / RFC:</strong> {{ ciudadano.curp_rfc }}</p>
+                        <p><strong>Correo:</strong> {{ ciudadano.correo }}</p>
+                        <p><strong>Municipio:</strong> {{ ciudadano.municipio }}</p>
+                        <p><strong>Código Ciudadano:</strong> {{ ciudadano.codigo_ciudadano }}</p>
+                        <p><strong>Número de Registro:</strong> {{ ciudadano.registro }}</p>
+                        <p><strong>Código QR:</strong></p>
+                        <img src="{{ ciudadano.qr_code.url }}" alt="Código QR" class="img-fluid">
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-danger mt-4" role="alert">
+                No se encontró el ciudadano.
+            </div>
+        {% endif %}
+        <div class="text-center">
+            <a href="{% url 'auto_turno' %}" class="btn btn-primary mb-2">Sacar turno</a>
+        </div>        
+    </div>
+</body>
+</html>
+{% endblock %}

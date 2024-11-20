@@ -1,0 +1,240 @@
+{% load static %}
+<head> 
+  <link rel="stylesheet" href="{% static 'CSS/style.css' %}">
+</head>
+
+<body>
+  <div class="l-navbar" id="nav-bar">
+    <nav class="nav" id="nav-contenedor">
+      <div>
+        <!-- icono principal-->
+        <a href="{% url 'Inicio' %}" class="nav_logo">
+          <img src="{% static 'icon/ccl-logo.svg' %}" class="nav_logo-icon" alt="...">
+          {% if usuario.is_authenticated %}
+            <span class="nav_logo-name">{{ usuario.username|capfirst }}</span>
+          {% endif %}
+        </a>
+      
+
+
+        <!--empieza la barra de navegacion-->
+        <div class="nav_list">
+                <!-- Se muestra el nombre del usuario -->
+                <a href="{% url 'perfil' %}" class="nav_link {% if active_view == 'Inicio' %}active{% endif %}">
+                  <i class="bx bx-user nav_icon"></i>
+                  <span class="nav_name">Ver Perfil</span>
+                </a>
+              
+
+                <!-- Recepción -->
+                {% if usuario.is_authenticated and nombreGrupo == 'Recepcion' %}
+                  <a href="{% url 'Recepcion' %}" class="nav_link {% if active_view == 'Recepcion' %}active{% endif %}">
+                    <i class="bx bx-group nav_icon"></i>
+                    <span class="nav_name">Recepción</span>
+                  </a>
+                  <a href="{% url 'Registrar con QR' %}" class="nav_link {% if active_view == 'QR' %}active{% endif %}">
+                    <i class="bx bx-qr-scan nav_icon"></i>
+                    <span class="nav_name">Lectura QR</span>
+                  </a>
+                  <a href="{% url 'Registro Manual' %}"  class="nav_link {% if active_view == 'Registro Manual' %}active{% endif %}">
+                    <i class="bx bx-user-plus nav_icon"></i>
+                    <span class="nav_name">Registro Manual</span>
+                  </a>
+                  <a href="{% url 'Registro Ratificaciones' %}" class="nav_link {% if active_view == 'Registro Ratificaciones' %}active{% endif %}">
+                    <i class='bx bxl-foursquare'></i>
+                    <span class="nav_name">Registro Folio</span>
+                  </a>
+                  <a href="{% url 'Buscar Datos Ciudadano' %}" class="nav_link {% if active_view == 'Recepcion' %}active{% endif %}">
+                    <i class="bx bx-search nav_icon"></i>
+                    <span class="nav_name">Buscar Ciudadano</span>
+                  </a>
+                  <a href="{% url 'auto_turno' %}" class="nav_link {% if active_view == 'Turnos' %}active{% endif %}">
+                    <i class="bx bx-user-check nav_icon"></i>
+                    <span class="nav_name">Turnos</span>
+                  </a>
+                  <a href="{% url 'turnos_dia_actual' %}" class="nav_link {% if active_view == 'turnos_dia_actual' %}active{% endif %}">
+                    <i class="bx bx-edit nav_icon"></i>
+                    <span class="nav_name">Editar Turnos</span>
+                </a>
+                {% endif %}
+
+
+                {% if usuario.is_authenticated and nombreGrupo == 'Coordinador' %}
+                <a href="{% url 'conciliadores disponibles' %}" class="nav_link {% if active_view == 'Asesoría' %}active{% endif %}">
+                  <i class="bx bx-user-voice nav_icon"></i>
+                  <span class="nav_name">Conciliadores</span>
+                </a>
+              {% endif %}
+
+
+                <!-- Asesoria Juridica -->
+                {% if usuario.is_authenticated and nombreGrupo == 'Asesoria-Juridica' %}
+                  <a href="{% url 'asesor' %}" class="nav_link {% if active_view == 'Asesoría' %}active{% endif %}">
+                    <i class="bx bx-user-voice nav_icon"></i>
+                    <span class="nav_name">Asesoría</span>
+                  </a>
+                {% endif %}
+
+                {% if usuario.is_authenticated and nombreGrupo == 'Auxiliar-Asesoria' %}
+                  <a href="{% url 'auxiliares asesoria' %}" class="nav_link {% if active_view == 'Auxiliares Ratificacion' %}active{% endif %}">
+                    <i class="bx bx-list-check nav_icon"></i>
+                    <span class="nav_name">Auxiliar Asesoria</span>
+                  </a>
+                {% endif %}
+
+                <!-- Ratificacion -->
+                {% if usuario.is_authenticated and nombreGrupo == 'Ratificacion' %}
+                  <a href="{% url 'auxiliares_ratificacion' %}" class="nav_link {% if active_view == 'Auxiliares Ratificacion' %}active{% endif %}">
+                    <i class="bx bx-list-check nav_icon"></i>
+                    <span class="nav_name">Ratificacion Aux</span>
+                  </a>
+                {% endif %}
+
+
+                {% if usuario.is_authenticated and nombreGrupo == 'Conciliacion' %}
+                  <a href="{% url 'conciliador' %}" class="nav_link {% if active_view == 'Auxiliares Ratificacion' %}active{% endif %}">
+                    <i class="bx bx-user-circle nav_icon"></i>
+                    <span class="nav_name">Ratificaciones</span>
+                  </a>
+                  <a href="{% url 'Ratificacion Metricas dashboard'%}" class="nav_link">
+                    <i class="bx bx-bar-chart-alt-2 nav_icon"></i>
+                    <span class="nav_name">Estadisiticas</span>
+                  </a>
+                {% endif %}
+
+                <!-- Pantalla asesoría -->
+                {% if usuario.is_authenticated and nombreGrupo == 'Pantalla' %}
+                  <a href="{% url 'asesorias_dashboard' %}" class="nav_link {% if active_view == 'Pantalla AJ' %}active{% endif %}">
+                    <i class="bx bx-tv nav_icon"></i>
+                    <span class="nav_name">Pantalla AJ</span>
+                  </a>
+                  <a href="{% url 'pantalla_ratificacion' %}" class="nav_link {% if active_view == 'Pantalla Ratificacion' %}active{% endif %}">
+                    <i class="bx bx-tv nav_icon"></i>
+                    <span class="nav_name">Ratificación</span>
+                  </a>
+                {% endif %}
+
+                <!-- Pantalla de audiencias -->
+                {% if usuario.is_authenticated and nombreGrupo == 'Pantalla' %}
+                  <a href="{% url 'pantalla_audiencia' %}" class="nav_link" {% if active_view == 'Pantalla Audiencias' %}active{% endif %}>
+                    <i class="bx bx-tv nav_icon"></i>
+                    <span class="nav_name">Pantalla Audiencias</span>
+                  </a>
+                {% endif %}
+
+                {% if usuario.is_authenticated and nombreGrupo == 'Conciliacion' or nombreGrupo == 'Auxiliar-Asistencias' %}
+                <div class="nav_dropdown">
+                  <a href="#" class="nav_link">
+                    <i class="bx bx-user-circle nav_icon"></i>
+                    <span class="nav_name">Conciliación</span>
+                  </a>
+                  <div class="nav_dropdown-content">
+                    <a href="{% url 'audiencias_auxiliares_api'%}">Audiencias</a>
+                    <a href="{% url 'asignar_sala' %}">Asignar salas</a>
+                    <a href="{% url 'conciliador' %}">Ratificaciones</a>
+                    <a href="{% url 'Ratificacion Metricas dashboard' %}">Estadísticas</a>
+                  </div>
+                </div>
+                {% elif usuario.is_authenticated and nombreGrupo == 'Recepcion' %}
+                  <a href="{% url 'audiencias_auxiliares_api'%}" class="nav_link">
+                    <i class="bx bx-user-circle nav_icon"></i>
+                    <span class="nav_name">Audiencias</span>
+                  </a>
+                {% endif %}
+
+
+                {% if usuario.is_authenticated and nombreGrupo == 'Administrador' %}
+                <a href="{% url 'admin:index' %}" class="nav_link">
+                  <i class="bx bx-hard-hat nav_icon"></i>
+                  <span class="nav_name">Administrador</span>
+                </a>
+              
+              <div class="nav_dropdown">
+                <a href="#" class="nav_link">
+                  <i class="bx bx-group nav_icon"></i>
+                  <span class="nav_name">Recepción</span>
+                </a>
+                <div class="nav_dropdown-content">
+                  <a href="{% url 'Recepcion' %}">Recepción</a>
+                  <a href="{% url 'Registrar con QR' %}">Lectura QR</a>
+                  <a href="{% url 'Registro Manual' %}">Registro Manual</a>
+                  <a href="{% url 'Registro Ratificaciones' %}">Registro Folio</a>
+                  <a href="{% url 'Buscar Datos Ciudadano' %}">Buscar Ciudadano</a>
+                  <a href="{% url 'auto_turno' %}">Turnos</a>
+                  <a href="{% url 'turnos_dia_actual' %}">Editar Turnos</a>
+                </div>
+              </div>
+              
+              <div class="nav_dropdown">
+                <a href="#" class="nav_link">
+                  <i class="bx bx-user-voice nav_icon"></i>
+                  <span class="nav_name">Asesoría Jurídica</span>
+                </a>
+                <div class="nav_dropdown-content">
+                  <a href="{% url 'asesor' %}">Asesoría</a>
+                  <a href="{% url 'auxiliares asesoria' %}">Auxiliares Asesoría</a>
+                </div>
+              </div>
+              
+              <div class="nav_dropdown">
+                <a href="#" class="nav_link">
+                  <i class="bx bx-list-check nav_icon"></i>
+                  <span class="nav_name">Ratificación</span>
+                </a>
+                <div class="nav_dropdown-content">
+                  <a href="{% url 'auxiliares_ratificacion' %}">Ratificación Aux</a>
+                  <a href="{% url 'Ratificacion Metricas dashboard' %}">Estadísticas</a>
+                </div>
+              </div>
+            
+              <div class="nav_dropdown">
+                <a href="#" class="nav_link">
+                  <i class="bx bx-user-circle nav_icon"></i>
+                  <span class="nav_name">Conciliación</span>
+                </a>
+                <div class="nav_dropdown-content">
+                  <a href="{% url 'audiencias_auxiliares_api'%}">Audiencias</a>
+                  <a href="{% url 'asignar_sala' %}">Asignar salas</a>
+                  <a href="{% url 'conciliador' %}">Ratificaciones</a>
+                  <a href="{% url 'Ratificacion Metricas dashboard' %}">Estadísticas</a>
+                  <a href="{% url 'conciliadores disponibles'%}">Conciliadores</a>
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- Pantallas -->
+              {% if usuario.is_authenticated and nombreGrupo == 'Administrador' %}
+              <div class="nav_dropdown">
+                <a href="#" class="nav_link">
+                  <i class="bx bx-tv nav_icon"></i>
+                  <span class="nav_name">Pantallas</span>
+                </a>
+                <div class="nav_dropdown-content">
+                  <a href="{% url 'asesorias_dashboard' %}">Pantalla AJ</a>
+                  <a href="{% url 'pantalla_ratificacion' %}">Ratificación</a>
+                  <a href="{% url 'pantalla_audiencia' %}">Pantalla Audiencias</a>
+                </div>
+              </div>
+              {% endif %}
+              </div>
+            </div>
+
+              <!-- Botón de salir -->
+            {% if request.user.is_authenticated %}
+            <form id="logout-form" action="{% url 'logout' %}" method="post">
+              {% csrf_token %}
+              <a class="nav_link" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+                <i class="bx bx-log-out nav_icon"></i>
+                <span class="nav_name">Salir</span>
+              </a>
+            </form>
+          {% else %}
+            <a class="btn btn-primary btn-primary" href="{% url 'login' %}">Iniciar Sesion</a>
+          {% endif %}
+
+        </div>
+      </div>
+    </nav>
+  </div>
+
+</body>

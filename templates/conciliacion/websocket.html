@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Expediente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .info-item strong {
+            min-width: 120px;
+            color: #555;
+            font-size: 1.5rem;
+        }
+        .info-item p {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .icon {
+            margin-right: 10px;
+            color: #004080;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Detalle de Expediente</h1>
+        <div class="meeting-info">
+            <h2>Expediente: <span id="expediente-id"></span></h2>
+            <div class="info-item">
+                <i class="fas fa-landmark icon"></i>
+                <p><strong>Sala:</strong> <span id="expediente-sala"></span></p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-alt icon"></i>
+                <p><strong>Audiencia:</strong> <span id="expediente-audiencia"></span></p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-gavel icon"></i>
+                <p><strong>Conciliador:</strong> <span id="expediente-conciliador"></span></p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-user icon"></i>
+                <p><strong>Solicitante:</strong> <span id="expediente-solicitante"></span></p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-user icon"></i>
+                <p><strong>Citado:</strong> <span id="expediente-citado"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = new WebSocket('ws://127.0.0.1:8000/ws/expediente/');
+        console.log("WebSocket is connecting...");
+
+        socket.onopen = function(e) {
+            console.log("WebSocket is open now.");
+        };
+
+        socket.onmessage = function(e) {
+            console.log("Message received from server:", e.data);
+            const data = JSON.parse(e.data);
+            if (data.type === 'expediente_details') {
+                const expediente = data.expediente;
+                document.getElementById('expediente-id').textContent = expediente.id;
+                document.getElementById('expediente-sala').textContent = expediente.sala;
+                document.getElementById('expediente-audiencia').textContent = expediente.audiencia;
+                document.getElementById('expediente-conciliador').textContent = expediente.conciliador;
+                document.getElementById('expediente-solicitante').textContent = expediente.solicitante;
+                document.getElementById('expediente-citado').textContent = expediente.citado;
+            }
+        };
+
+        socket.onerror = function(error) {
+            console.error("WebSocket Error: ", error);
+        };
+
+        socket.onclose = function(event) {
+            console.log("WebSocket closed: ", event);
+        };
+    </script>
+</body>
+</html>

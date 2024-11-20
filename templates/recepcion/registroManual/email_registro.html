@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Registro Exitoso</title>
+</head>
+<body>
+    <p>Estimado {{ ciudadano.nombre }},</p>
+    <p>Tu registro se ha realizado con éxito. Deberás presentar tu número de registro, el cual es <strong>{{ ciudadano.registro }}</strong>, cuando te presentes en el Centro de Conciliación Laboral CCL. De igual forma, guarda este código QR:</p>
+    <p><img src="{{ ciudadano.qr_code.url }}" alt="Código QR"></p>
+    <p>Saludos Cordiales.</p>
+</body>
+</html>

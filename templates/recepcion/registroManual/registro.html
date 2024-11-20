@@ -1,0 +1,196 @@
+
+
+{% include 'general/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %} 
+{% include 'general/barralateral.html' %} 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{% static 'js/municipios.js' %}"></script>
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'CSS/style.css' %}">
+{% endblock %}
+
+<br>
+<br>
+<div class="containerFormulario">
+    <div class="container mt-3">
+        <h2>REGISTRO CIUDADANO</h2>
+        <form method="post" action="{% url 'Registro Manual' %}" enctype="multipart/form-data" id="registroForm">
+            <div class="card mx-auto" style="width: 30rem;">
+                <div class="card-body">           
+                    {% csrf_token %}
+                    {% if mensaje %}
+                        <div class="alert alert-success" role="alert">
+                            Registrado Correctamente
+                        </div>
+                    {% endif %}
+                    
+                    {{ formset.management_form }}
+
+                    {% for form in formset %}
+                        <div class="formset-form" id="formset-form-{{ forloop.counter0 }}">
+                            <div class="form-group">
+                                <label>¿Tiene identificación?</label>
+                                <div>
+                                    <label><input type="radio" name="identificacion_{{ forloop.counter0 }}" value="si" class="identificacion_radio" required> Sí</label>
+                                </div>
+                                <div>
+                                    <label><input type="radio" name="identificacion_{{ forloop.counter0 }}" value="no" class="identificacion_radio" required> No</label>
+                                </div>
+                            </div>
+                            <br>
+
+                            <div class="camera-container" id="camera-container-{{ forloop.counter0 }}" style="display:none;">
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="frente">Capturar Identificacion Frente</button>
+                                <br>
+                                <video id="video-frente-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <br>
+                                <canvas id="canvas-frente-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-frente-{{ forloop.counter0 }}" src="#" alt="Imagen frente" style="display:none;"/>
+                                <br><br>
+
+                                
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="reverso">Capturar Identificacion Reverso</button>
+                                <br>
+                                <video id="video-reverso-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <br>
+                                <canvas id="canvas-reverso-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-reverso-{{ forloop.counter0 }}" src="#" alt="Imagen reverso" style="display:none;"/>
+                                <br><br>
+                            </div>
+                            
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+                            <div class="testigo-container" id="testigo-container-{{ forloop.counter0 }}" style="display:none;">
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="testigo_1_frente">Capturar Identificacion Frente Testigo 1</button>
+                                <br>
+                                <video id="video-testigo_1_frente-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <br>
+                                <canvas id="canvas-testigo_1_frente-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-testigo_1_frente-{{ forloop.counter0 }}" src="#" alt="Imagen frente" style="display:none;"/>
+                                <br><br>
+
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="testigo_1_reverso">Capturar Identificacion Reverso Testigo 1</button>
+                                <br>
+                                <video id="video-testigo_1_reverso-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <br>
+                                <canvas id="canvas-testigo_1_reverso-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-testigo_1_reverso-{{ forloop.counter0 }}" src="#" alt="Imagen reverso" style="display:none;"/>
+                                <br><br>
+
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
+
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="testigo_2_frente">Capturar Identificacion Frente Testigo 2</button>
+                                <br>
+                                <video id="video-testigo_2_frente-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <br>
+                                <canvas id="canvas-testigo_2_frente-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-testigo_2_frente-{{ forloop.counter0 }}" src="#" alt="Imagen frente" style="display:none;"/> 
+                                <br><br> 
+                                
+                                <button type="button" class="btn btn-primary open-camera" data-index="{{ forloop.counter0 }}" data-type="testigo_2_reverso">Capturar Identificacion Reverso Testigo 2</button>
+                                <br>
+                                <video id="video-testigo_2_reverso-{{ forloop.counter0 }}" width="320" height="240" autoplay style="display:none;"></video>
+                                <br>
+                                <canvas id="canvas-testigo_2_reverso-{{ forloop.counter0 }}" style="display:none;"></canvas>
+                                <img id="photo-testigo_2_reverso-{{ forloop.counter0 }}" src="#" alt="Imagen reverso" style="display:none;"/>
+                                <br><br>
+                            </div>
+                            <br>
+                            <br>    
+
+                            <!-- Agregar campos ocultos para almacenar las imágenes capturadas -->
+                            <input type="hidden" name="documento_1_{{ forloop.counter0 }}" id="documento_1_{{ forloop.counter0 }}">
+                            <input type="hidden" name="documento_2_{{ forloop.counter0 }}" id="documento_2_{{ forloop.counter0 }}">
+                            <input type="hidden" name="documento_3_{{ forloop.counter0 }}" id="documento_3_{{ forloop.counter0 }}">
+                            <input type="hidden" name="documento_4_{{ forloop.counter0 }}" id="documento_4_{{ forloop.counter0 }}">
+                            <input type="hidden" name="documento_5_{{ forloop.counter0 }}" id="documento_5_{{ forloop.counter0 }}">
+                            <input type="hidden" name="documento_6_{{ forloop.counter0 }}" id="documento_6_{{ forloop.counter0 }}">
+
+                            {{ form|crispy }}
+                        </div>
+                    {% endfor %}
+
+                    <input type="hidden" name="num_personas" value="{{ formset.total_form_count }}">
+
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                </div> 
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    jQuery(document).ready(function($) {
+        // Función para manejar el cambio
+        $('.identificacion_radio').change(function() {
+            var formIndex = $(this).attr('name').split('_')[1];
+            var identificacion = $(this).val();
+            if (identificacion === 'si') {
+                $('#camera-container-' + formIndex).show();
+                $('#testigo-container-' + formIndex).hide();
+                $('#camera-container-' + formIndex + ' .open-camera[data-type="frente"]').data('campo', 'documento_1_' + formIndex);
+                $('#camera-container-' + formIndex + ' .open-camera[data-type="reverso"]').data('campo', 'documento_2_' + formIndex);
+            } else {
+                $('#camera-container-' + formIndex).hide();
+                $('#testigo-container-' + formIndex).show();
+                $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_1_frente"]').data('campo', 'documento_3_' + formIndex);
+                $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_1_reverso"]').data('campo', 'documento_4_' + formIndex);
+                $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_2_frente"]').data('campo', 'documento_5_' + formIndex);
+                $('#testigo-container-' + formIndex + ' .open-camera[data-type="testigo_2_reverso"]').data('campo', 'documento_6_' + formIndex);
+            }
+        });
+    
+        // Función para abrir la cámara cuando se hace clic en el botón de testigos
+        $(document).on('click', '.open-camera', function() {
+            var index = $(this).data('index');
+            var type = $(this).data('type');
+            var campo = $(this).data('campo');
+            var videoId = 'video-' + type + '-' + index;
+            var canvasId = 'canvas-' + type + '-' + index;
+            var video = document.getElementById(videoId);
+            var canvas = document.getElementById(canvasId);
+    
+            // Mostrar el video
+            video.style.display = 'block';
+    
+            // Acceder a la cámara
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+    
+                    // Capturar la imagen al hacer clic en el video
+                    video.addEventListener('click', function() {
+                        var context = canvas.getContext('2d');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+                        // Detener el video y ocultarlo
+                        var tracks = stream.getTracks();
+                        tracks.forEach(function(track) {
+                            track.stop();
+                        });
+                        video.style.display = 'none';
+    
+                        // Mostrar la imagen capturada
+                        var dataURL = canvas.toDataURL('image/png');
+                        $('#photo-' + type + '-' + index).attr('src', dataURL).show();
+    
+                        // Asignar la imagen capturada al campo oculto correspondiente
+                        $('#' + campo).val(dataURL);
+                    });
+                })
+                .catch(function(err) {
+                    console.log("Error: " + err);
+                });
+        });
+    });
+</script>
+
+
+{% endblock %}

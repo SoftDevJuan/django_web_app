@@ -1,0 +1,82 @@
+{% extends 'recepcion/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general/barralateral.html' %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnos con Ciudadanos</title>
+    <link rel="stylesheet" href="{% static 'CSS/turnos_dia_actual.css' %}">
+    <script src="{% static 'js/buscar_ciudadanos.js' %}" defer></script>
+</head>
+<body>
+    <h1>Turnos</h1>
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary">Nuevo turno</button>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Turno</th>
+                    <th>Área</th>
+                    <th>Fecha del Turno</th>
+                    <th>Código de Ciudadano</th>
+                    <th>Nombres de los Ciudadanos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for turno in informacion_turnos %}
+                    <tr>
+                        <td>{{ turno.turno }}</td>
+                        <td>{{ turno.area }}</td>
+                        <td>{{ turno.fecha }}</td>
+                        <td>{{ turno.codigo_ciudadano }}</td>
+                        <td>{{ turno.nombres_ciudadanos }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="openModal('{{ turno.turno }}', '{{ turno.area }}')">Editar</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>Gestionar Ciudadano en el Turno</h2>
+    
+            <!-- Formulario para añadir ciudadano -->
+            <form id="add-ciudadano-form" action="{% url 'agregar_ciudadano_turno' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" id="turno-id-add" name="turno_id">
+                <input type="hidden" name="area" value="area">
+                <div>
+                    <label for="search-add">Busca el Ciudadano para Añadir o Quitar:</label>
+                    <input type="text" id="search-add" name="search" onkeyup="searchCiudadanoAdd()" placeholder="Nombre Completo del Ciudadano">
+                </div>
+                <div id="results-add"></div>
+                <button type="submit" class="btn btn-primary">Añadir</button>
+            </form>
+    
+            <!-- Formulario para quitar ciudadano -->
+            <form id="remove-ciudadano-form" action="{% url 'quitar_ciudadano_turno' %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="nombre_seleccionado" placeholder="Nombre del Ciudadano" hidden>
+                <input type="hidden" id="turno-id-remove" name="turno_id">
+                <input type="hidden" name="area-remove" value="area-remove">
+                <input type="hidden" name="ciudadano_id" value="{{ ciudadano.id }}">
+                <button type="submit" class="btn btn-danger">Quitar</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'general/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general1/barralateral.html' %}
+<body style="background-color: #f0f2f5;">
+    <div class="container mt-5">
+        <div class="text-center mb-5">
+            <h1 class="display-4 font-weight-bold text-dark">Solicita tu Turno</h1>
+            <p class="text-muted">Proporciona tu información para obtener un turno de manera eficiente.</p>
+        </div>
+
+        <!-- Formulario elegante -->
+        <div class="d-flex justify-content-center">
+            <div class="card border-0 shadow" style="width: 400px; border-radius: 20px; background-color: #ffffff;">
+                <div class="card-body p-5">
+                    <form action="{% url 'generar_nuevo_turno' %}" method="POST" class="form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="area" class="font-weight-bold text-dark">Área Asignada</label>
+                            <select class="form-control form-control-lg custom-select" id="area" name="area" required style="border-radius: 10px;">
+                                <option value="" disabled selected>Selecciona el área</option>
+                                {% for choice in form.fields.area.choices %}
+                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label for="prefijo" class="font-weight-bold text-dark">¿Con qué viene el ciudadano?</label>
+                            <select class="form-control form-control-lg custom-select" id="prefijo" name="prefijo" required style="border-radius: 10px;">
+                                <option value="" disabled selected>Selecciona una opción</option>
+                                <option value="CF" class="area-3">Con solicitud</option>
+                                <option value="CC" class="area-3">Con cita</option>
+                                <option value="PR" class="area-3">Preferente</option>
+                                <option value="AJ" class="area-3">Sin nada</option>
+
+                                <option value="RCC" class="area-1">Con cita</option>
+                                <option value="RPR" class="area-1">Preferente</option>
+                                <option value="CN" class="area-1">Sin nada</option>
+                            </select>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                document.getElementById('area').addEventListener('change', function() {
+                                    var selectedArea = this.value;
+                                    var prefijos = document.querySelectorAll('#prefijo option');
+                                    prefijos.forEach(function(option) {
+                                        if (option.classList.contains('area-' + selectedArea)) {
+                                            option.style.display = 'block';
+                                        } else {
+                                            option.style.display = 'none';
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+
+                        <div class="text-center mt-5">
+                            <button type="submit" class="btn btn-lg btn-primary btn-block shadow-sm" style="border-radius: 10px;">Crear Turno</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+   
+    </div>
+</body>
+{% endblock %}

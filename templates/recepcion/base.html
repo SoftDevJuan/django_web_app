@@ -1,0 +1,499 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="{% static 'icon/engrane-azul2.png' %}" type="image/png">
+    <title>turnero CCL</title>
+
+    {% load static %}
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script> var username = "{{ username }}"; 
+      var user_id = "{{user.id}}";
+    </script>
+    <script src="{% static 'js/notificaciones.js' %}"></script>
+    <link
+    href="{% static 'CSS/pantalla_ratis.css'%}"
+    rel="stylesheet"
+    />
+
+    <link rel="icon" type="image/png" href="" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+      :root {
+        --header-height: 3rem;
+        --nav-width: 68px;
+        --first-color: #0a1f8f;
+        --first-color-light: #afa5d9;
+        --white-color: #f7f6fb;
+        --body-font: "Nunito", sans-serif;
+        --normal-font-size: 1rem;
+        --z-fixed: 100;
+      }
+      *,
+      ::before,
+      ::after {
+        box-sizing: border-box;
+      }
+      body {
+        position: relative;
+        margin: var(--header-height) 0 0 0;
+        padding: 0 1rem;
+        font-family: var(--body-font);
+        font-size: var(--normal-font-size);
+        transition: 0.5s;
+      }
+      a {
+        text-decoration: none;
+      }
+      .header {
+        width: 100%;
+        height: var(--header-height);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1rem;
+        background-color: var(--white-color);
+        z-index: var(--z-fixed);
+        transition: 0.5s;
+      }
+      .header_toggle {
+        color: var(--first-color);
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+      .header_img {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        justify-content: center;
+        border-radius: 50%;
+        overflow: hidden;
+      }
+      .header_img img {
+        width: 40px;
+      }
+      .l-navbar {
+        position: fixed;
+        top: 0;
+        left: -30%;
+        width: var(--nav-width);
+        height: 100vh;
+        background-color: var(--first-color);
+        padding: 0.5rem 1rem 0 0;
+        transition: 0.5s;
+        z-index: var(--z-fixed);
+      }
+      .nav {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+      }
+      .nav_logo,
+      .nav_link {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        align-items: center;
+        column-gap: 1rem;
+        padding: 0.5rem 0 0.5rem 1.5rem;
+      }
+      .nav_logo {
+        margin-bottom: 2rem;
+      }
+      .nav_logo-icon {
+        width: 1.50rem;
+        color: var(--white-color);
+      }
+      .nav_logo-name {
+        color: var(--white-color);
+        font-weight: 700;
+      }
+      .nav_link {
+        position: relative;
+        color: var(--first-color-light);
+        margin-bottom: 1.5rem;
+        transition: 0.3s;
+      }
+      .nav_link:hover {
+        color: var(--white-color);
+      }
+      .nav_icon {
+        font-size: 1.25rem;
+      }
+      .l-navbar.show {
+        left: 0;
+      }
+      .body-pd {
+        padding-left: calc(var(--nav-width) + 1rem);
+      }
+      .active {
+        color: var(--white-color);
+      }
+      .active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 2px;
+        height: 32px;
+        background-color: var(--white-color);
+      }
+      .height-100 {
+        height: 100vh;
+      }
+      @media screen and (min-width: 768px) {
+        body {
+          margin: calc(var(--header-height) + 1rem) 0 0 0;
+          padding-left: calc(var(--nav-width) + 2rem);
+        }
+        .header {
+          height: calc(var(--header-height) + 1rem);
+          padding: 0 2rem 0 calc(var(--nav-width) + 2rem);
+        }
+        .header_img {
+          width: 40px;
+          height: 40px;
+        }
+        .header_img img {
+          width: 45px;
+        }
+        .l-navbar {
+          left: 0;
+          padding: 1rem 1rem 0 0;
+        }
+        .l-navbar.show {
+          width: calc(var(--nav-width) + 156px);
+        }
+        .body-pd {
+          padding-left: calc(var(--nav-width) + 188px);
+        }
+      }
+
+      .card {
+        border-radius: 10px;
+      }
+
+      .card-body h2 {
+        font-size: 2.5rem;
+      }
+
+      table {
+        margin-top: 20px;
+      }
+
+      thead th {
+        text-transform: uppercase;
+      }
+
+      .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      .table-active {
+        background-color: #d1e7dd !important;
+      }
+
+      .btn-primary {
+        background-color: #d8defb;
+        border-color: #d8defb;
+        color: #555a7c;
+      }
+
+      .btn-warning {
+        background-color: #f5e3d1;
+        border-color: #f5e3d1;
+        color: #816b4d;
+      }
+
+      .btn-danger {
+        background-color: #f5b7b1;
+        border-color: #f5b7b1;
+        color: #783f3f;
+      }
+
+      .btn-success {
+        background-color: #e6f9f7;
+        border-color: #e6f9f7;
+        color: #5a7d77;
+      }
+
+      .btn-dark {
+        background-color: #5d6d7e;
+        border-color: #5d6d7e;
+        color: #fff;
+      }
+
+      .btn-secondary {
+        background-color: #d5d8dc;
+        border-color: #d5d8dc;
+        color: #000;
+      }
+
+      .btn-sm {
+        margin: 0 2px;
+      }
+
+      .group {
+        display: flex;
+        line-height: 28px;
+        align-items: center;
+        position: relative;
+        width: 100%;
+      }
+
+      .input {
+        width: 100%;
+        height: 40px;
+        line-height: 28px;
+        padding: 0 1rem;
+        padding-left: 2.5rem;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        outline: none;
+        border-color: rgba(0, 21, 247, 0.084);
+        background-color: #f3f3f4;
+        color: #0d0c22;
+        transition: 0.3s ease;
+      }
+
+      .input::placeholder {
+        color: #9e9ea7;
+      }
+
+      .input:focus,
+      input:hover {
+        outline: none;
+        border-color: rgba(0, 21, 247, 0.4);
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(8, 0, 247, 0.1);
+      }
+
+      .icon {
+        position: absolute;
+        left: 1rem;
+        fill: #9e9ea7;
+        width: 1rem;
+        height: 1rem;
+      }
+
+      .blue-icon {
+        color: #004a99;
+      }
+
+      .bg-blue {
+        background-color: var(--first-color);
+      }
+
+      .bg-blue:hover {
+        background-color: var(--first-color);
+      }
+
+      .table {
+        --bs-table-hover-bg: #004a9929;
+      }
+
+      .close {
+        display: none;
+      }
+
+      .d-flex-center {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .d-flex-center p {
+        margin-bottom: 0;
+      }
+    </style>
+    {% load static %}
+  </head>
+  <body id="body-pd" onload="updateTime()">
+   
+   
+
+   
+
+    <header class="header" id="header" style="padding-right: 1em;">
+      <div class="header_toggle"><i class="bx bx-menu" id="header-toggle"></i></div>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      </div>
+    </header>
+    {% block content %}{% endblock %}
+
+
+
+
+
+    <script>
+      function updateTime() {
+        const now = new Date();
+        const options = { 
+          year: 'numeric', month: 'long', day: 'numeric', 
+          hour: '2-digit', minute: '2-digit', second: '2-digit', 
+          hour12: false 
+        };
+        const formattedTime = now.toLocaleDateString('es-ES', options);
+        var currentTime = document.getElementById('current-time');
+        if(currentTime){
+          currentTime.innerText = 'Última actualización: ' + formattedTime + ' hrs.';
+        }
+        
+      }
+      document.addEventListener("DOMContentLoaded", function (event) {
+        const showNavbar = (toggleId, navId, bodyId, headerId) => {
+          const toggle = document.getElementById(toggleId),
+            nav = document.getElementById(navId),
+            bodypd = document.getElementById(bodyId),
+            headerpd = document.getElementById(headerId);
+
+          // Validate that all variables exist
+          if (toggle && nav && bodypd && headerpd) {
+            toggle.addEventListener("click", () => {
+              // show navbar
+              nav.classList.toggle("show");
+              // change icon
+              toggle.classList.toggle("bx-x");
+              // add padding to body
+              bodypd.classList.toggle("body-pd");
+              // add padding to header
+              headerpd.classList.toggle("body-pd");
+            });
+          }
+        };
+
+        showNavbar("header-toggle", "nav-bar", "body-pd", "header");
+
+        /*===== LINK ACTIVE =====*/
+        const linkColor = document.querySelectorAll(".nav_link");
+
+        function colorLink() {
+          if (linkColor) {
+            linkColor.forEach((l) => l.classList.remove("active"));
+            this.classList.add("active");
+          }
+        }
+        linkColor.forEach((l) => l.addEventListener("click", colorLink));
+
+        const llamarBtn = document.getElementById("llamar-btn");
+        const cancelarBtn = document.getElementById("cancelar-btn");
+        const llamarCountSpan = document.getElementById("llamar-count");
+        let llamarCount = 3;
+        let isCooldown = false;
+        const cancelButton = document.getElementById("cancelButton");
+        const modal = document.getElementById("cancelModal");
+
+        if(llamarBtn){
+          llamarBtn.addEventListener("click", function () {
+          if (isCooldown) return;
+
+          llamarCount--;
+          llamarCountSpan.textContent = llamarCount;
+
+          if (llamarCount <= 0) {
+            llamarBtn.classList.add("disabled");
+            cancelarBtn.classList.remove("disabled");
+          } else {
+            isCooldown = true;
+            llamarBtn.classList.add("disabled");
+            setTimeout(() => {
+              isCooldown = false;
+              llamarBtn.classList.remove("disabled");
+            }, 5000); // 5 segundos de cooldown
+          }
+        });
+
+        }
+
+        
+
+        //Función para que filtre la barra de busqueda
+        const searchInput = document.getElementById("search-input");
+        const tableBody = document.getElementById("table-body");
+        const noResultsMessage = document.getElementById("no-results");
+
+        searchInput.addEventListener("keyup", function () {
+          const filter = searchInput.value.toLowerCase();
+          const rows = tableBody.getElementsByTagName("tr");
+          let hasVisibleRows = false;
+
+          Array.from(rows).forEach(function (row) {
+            const turno = row
+              .getElementsByTagName("td")[0]
+              .textContent.toLowerCase();
+            const hora = row
+              .getElementsByTagName("td")[1]
+              .textContent.toLowerCase();
+            const expediente = row
+              .getElementsByTagName("td")[2]
+              .textContent.toLowerCase();
+
+            if (
+              turno.includes(filter) ||
+              hora.includes(filter) ||
+              expediente.includes(filter)
+            ) {
+              row.style.display = "";
+              hasVisibleRows = true;
+            } else {
+              row.style.display = "none";
+            }
+          });
+
+          if (hasVisibleRows) {
+            noResultsMessage.style.display = "none";
+          } else {
+            noResultsMessage.style.display = "block";
+          }
+        });
+
+        //Función para temporizador en modal de cancelar turno
+
+        if(modal){
+          modal.addEventListener("shown.bs.modal", () => {
+          cancelButton.classList.add("disabled");
+          cancelButton.textContent = "Sí, cancelar turno (3s)";
+
+          let countdown = 3;
+          const interval = setInterval(() => {
+            countdown--;
+            cancelButton.textContent = `Sí, cancelar turno (${countdown}s)`;
+
+            if (countdown === 0) {
+              clearInterval(interval);
+              cancelButton.classList.remove("disabled");
+              cancelButton.textContent = "Sí, cancelar turno";
+            }
+          }, 1000);
+        });
+
+        }
+        
+        
+      });
+    </script>
+
+    
+    <script
+      src="https://kit.fontawesome.com/8ea13d36c9.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>

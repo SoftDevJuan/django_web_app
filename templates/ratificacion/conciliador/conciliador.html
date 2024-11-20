@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conciliador</title>
+    <link rel="icon" href="{% static 'icon/engrane-azul2.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'CSS/conciliadorStyles.css' %}">
+    <script src="{% static 'js/conciliador.js' %}"></script>
+    <script src="{% static 'js/notificaciones.js' %}"></script>
+    <script>var audioPathNotificacion = "{% static 'audios/alerta-notificacion.mp3' %}";</script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script> var username = "{{ username }}"; 
+            var user_id = "{{user.id}}";
+    </script>
+</head>
+<body>
+    <header>
+        <img src="{% static 'headers/cclimage.jpg' %}" alt="ccl logo" id="logo-image">
+        
+        <h1>Conciliador</h1>
+        <script>
+            document.getElementById('logo-image').addEventListener('click', function() {
+                window.location.href = "{% url 'Inicio' %}";
+            });
+        
+            document.getElementById('logo-image').addEventListener('mouseover', function() {
+                this.style.cursor = 'pointer';
+                this.style.opacity = '0.7';
+            });
+        
+            document.getElementById('logo-image').addEventListener('mouseout', function() {
+                this.style.opacity = '1';
+            });
+        </script>
+        {% if user.is_authenticated %}
+            <p>Bienvenido, {{ user.username }}</p>
+        {% endif %}
+    </header>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="verturnos" id="verturnos">Turnos</div>
+            <!--<button id="ver-dashboard"> <a href="{% url 'ratificacion_dashboard'%}" style="text-decoration: none; color: inherit;">Ver Dashboard</a></button>-->
+            <button id="mesa">Mi Mesa</button>
+            <button id="iniciar-ratificacion">Iniciar Turno</button>
+            <button id="retroceder">Retroceder Turno</button>
+
+        
+            {% if request.user.is_authenticated %}
+            <form id="cerrar-sesion-form"  action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+            <button type="submit" id="cerrar-sesion">Cerrar Sesión</button>
+            </form>  
+            {% endif %}
+        </nav>
+
+        <div id="mesaModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Selecciona tu Mesa</h2>
+                <select name="mesaselect" id="mesaSelect">
+                    <option value="0">Desocupar Mesa</option>
+                        {% for i in numeros_mesa %}
+                        <option value="{{ i.mesa }}"> {{ i.mesa }}</option>
+                        {% endfor %}      
+                </select>
+                <button id="usarMesa">Usar Mesa</button> 
+            </div>
+        </div>
+
+        <main class="content" id="contenido-principal">
+
+
+            
+            <div class="turno-actual" style="display: none;">
+                
+                <h2 id="turno-id">Turno &ensp; <span id="turno-numero"></span></h2>
+                <div id="personas-lista">
+                    
+                </div>
+
+                <!--<label for="razonSocial" id="label-razon">Fuente de Trabajo:</label>
+                <input list="razonSocialList" id="razonSocial" placeholder="Ingrese o seleccione una razón social">
+                    <datalist id="razonSocialList">
+                    </datalist>-->
+
+            </div>
+            <div class="observaciones" id="observacionesdiv" style="display: none;">
+
+                <!--<label for="folio-sinacol-solicitud">Folio Sinacol Solicitud:</label>
+                <input type="text" id="folio-sinacol-solicitud" name="folio-sinacol-solicitud" placeholder=" Ingrese el folio de Sinacol de la solicitud">
+                <br>-->
+
+                <label for="observaciones" id="observaciones-titulo">Observaciones:</label>
+                <textarea id="observaciones-text" rows="4"></textarea>
+            </div>
+            <div class="acciones">
+                <button id="terminar-btn" style="display: none;">Terminar</button>
+            </div>
+            <div class="acciones"></div>
+            <span id="tiempo" style="display: none;">Tiempo de atencion: </span>
+            </div>
+            <div id="myModal" class="modal">
+                <img class="modal-content" id="modalImg">
+            </div>
+            <div id="cancelarModal" class="modal">
+                <div class="modal-content">
+                    <h2>Estas por cancelar el turno, esta accion no se puede revertir.</h2>
+                    <button id="confirmar-cancelacion">Confirmar</button> 
+                </div>
+            </div>
+            
+        </main>
+    </div>
+    
+</body>
+</html>

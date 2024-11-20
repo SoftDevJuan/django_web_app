@@ -1,0 +1,166 @@
+*{
+    margin: 0;
+    padding: 0
+}
+
+.wrapper{
+    position: relative;
+    background-image: url(../icon/bg.jpg);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    z-index: 40
+}
+
+
+.opacity {
+  background: rgba(79,70,62,0.5);
+  height: 100%;
+  position: absolute;
+  width: 100%;
+z-index: -1;
+}
+
+
+.gravity {
+	width: 100%;
+	text-align: center;
+	padding: 70px 0;
+}
+.gravity .logo{
+  position: relative;
+  right: 45%;
+  height: auto;
+  width: 80%;
+}
+.gravity h1 {
+  color: #d0d0d0;
+  font-family: "Raleway",sans-serif;
+  font-size: 23px;
+  font-weight: 600;
+  text-align: center;
+    padding-top: 90px
+}
+
+
+.countdown .back-text h4{
+    color: red;
+    background: red
+}
+#countdown {
+  margin-top: 75px;
+}
+
+
+.Mensaje_Mantenimiento{
+    text-align: center;
+    padding-top: 120px;
+    z-index: 100;
+}
+.Mensaje_Mantenimiento h1 {
+  color: #fff;
+  font-family: "Raleway",sans-serif;
+  font-size: 21px;
+  font-weight: 600;
+  margin: 20px 0 50px;
+}
+
+
+.countDays{
+    position: relative;
+}
+.countDays::after{
+    position: absolute;
+    content: 'days';
+    color: #fff;
+    top: 0px;
+    left: 10px;
+    font-size: 20px;
+    letter-spacing: 1px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+}
+.countHours{
+    position: relative;
+}
+.countHours::after {
+  color: #fff;
+  content: "hours";
+  font-family: "Raleway",sans-serif;
+  font-size: 20px;
+  font-weight: 200;
+  left: 2px;
+  letter-spacing: 1px;
+  position: absolute;
+  top: 0;
+}
+.countMinutes{
+    position: relative;
+}
+.countMinutes::after{
+    position: absolute;
+    content: 'minutes';
+    color: #fff;
+    top: 0px;
+    left: -10px;
+    font-size: 20px;
+    letter-spacing: 1px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+}
+.countSeconds{
+    position: relative;
+}
+.countSeconds::after{
+    position: absolute;
+    content: 'seconds';
+    color: #fff;
+    top: 0px;
+    left: -10px;
+    font-size: 20px;
+    letter-spacing: 1px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+}
+
+/* estilo pregunta si tiene cita o pre-registro */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #111111bd;
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s .9s;
+  --transform: translateY(-100vh);
+  --transition: transform .8s;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+}
+
+.modal-pequeno {
+  max-width: 400px; /* Ajusta este valor según lo que desees */
+  margin: auto;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}

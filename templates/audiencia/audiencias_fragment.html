@@ -1,0 +1,33 @@
+{% for audiencia in audiencias_llamando %}
+  <div class="pasadas-info w-100 align-items-center mt-2 pb-0">
+    <div class="row">
+      <div class="col-md-4 w-auto me-0 pe-0">
+        <i class="fa-solid fa-gavel"></i>
+      </div>
+      <div class="col-md-4 w-auto">
+        <strong>{{ audiencia.expediente }}</strong><br />
+      </div>
+      <hr class="my-1" />
+      <div class="d-flex align-items-center">
+        <div>
+          Auxiliar asignado: <strong>{{ audiencia.auxiliar_audiencia.get_full_name|default:"Por asignar" }}</strong>
+        </div>
+      </div>
+      <hr class="my-1" />
+      <div class="row">
+        <div class="col-md-4">
+          <h6>Fecha</h6>
+          <p>{{ audiencia.fecha_audiencia|date:"d/m/Y" }}</p>
+        </div>
+        <div class="col-md-4">
+          <h6>Hora</h6>
+          <p>{{ audiencia.hora_audiencia|time:"H:i A" }}</p>
+        </div>
+        <div class="col-md-4">
+          <h6>Sala</h6>
+          <p>{{ audiencia.sala_audiencia }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}

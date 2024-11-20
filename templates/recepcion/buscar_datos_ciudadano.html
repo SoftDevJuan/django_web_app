@@ -1,0 +1,40 @@
+{% extends 'general/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general/barralateral.html' %}
+
+<head>
+  <link rel="stylesheet" href="{% static 'CSS/style.css' %}">
+</head>
+
+<div class="buscar-container">
+    <br><br>
+    <h1>Buscar Ciudadano</h1>
+    <form class="buscar-form" method="GET" action="">
+        <input type="text" name="q" placeholder="Ingresa el nombre del ciudadano">
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if resultados %}
+        <h2>Resultados de la búsqueda:</h2>
+        <ul class="resultados-lista">
+            {% for ciudadano in resultados %}
+                <li class="resultado-item">
+                    <p><strong>Nombre:</strong> {{ ciudadano.nombre }}</p>
+                    <p><strong>Sexo:</strong> {{ ciudadano.sexo }}</p>
+                    <!--<p><strong>Correo:</strong> {{ ciudadano.correo }}</p>-->
+                    <p><strong>Municipio:</strong> {{ ciudadano.municipio }}</p>
+                    <!--<p><strong>CURP o RFC:</strong> {{ ciudadano.curp_rfc }}</p>-->
+                    <p><strong>Tipo de Persona:</strong> {{ ciudadano.tipo_persona }}</p>
+                    <p><strong>Número de Registro:</strong> {{ ciudadano.registro }}</p>
+                    <p><strong>Codigo Ciudadano:</strong> {{ ciudadano.codigo_ciudadano }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {% if query %}
+            <p>No se encontraron resultados para "{{ query }}"</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

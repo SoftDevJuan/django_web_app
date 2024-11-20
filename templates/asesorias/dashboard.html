@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesorias Dashboard</title>
+    <link rel="stylesheet" href="{% static 'CSS/asesorias.css' %}">
+    <script src="{% static 'js/reloj.js' %}" defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/actualizarTurnos.js' %}" defer></script>
+</head>
+<body>
+    <div class="header">
+            <img src="{% static  'headers/cclimage.jpg' %}" alt="logo CCL">
+        <h1>Asesorías</h1>
+    </div>
+    <div class="container">
+        <div class="dashboard">
+                <div class="turno-inner-p-last"></div>
+                <div class="inner-scroll">
+                    <div class="turno-inner-p"></div>
+                </div>
+                <script>
+                    var audioPath = "{% static 'audios/alerta-turno5.mp3' %}";
+                </script>
+        </div>
+        <div class="pasarela">
+            <div class="turno-board">
+                    <div class="turno-inner"></div>
+            </div>
+        </div>
+
+        <div class="reloj" id="reloj"></div>
+        <div class="video-section">
+            <video id="videoccl" controls autoplay loop>
+                <source src="{% static 'videos/cclvideo.mp4' %}" type="video/mp4">
+            </video>
+
+            
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,325 @@
+{% extends 'audiencia/base.html' %} 
+{% load static%} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<h1 class="mt-3">Detalles de la audiencia</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Expediente:</th>
+        <td id="expediente">{{ audiencia.expediente }}</td>
+    </tr>
+    <tr>
+        <th>Fecha:</th>
+        <td>{{ audiencia.fecha_audiencia|date:"d/m/Y" }}</td>
+    </tr>
+    <tr>
+        <th>Hora:</th>
+        <td id="hora-audiencia">{{ audiencia.hora_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Sala:</th>
+        <td>{{ audiencia.sala_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Conciliador:</th>
+        <td>{{ audiencia.conciliador_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Folio de audiencia:</th>
+        <td>{{ audiencia.folio_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Status:</th>
+            {% if audiencia.status_audiencia == 'Llamando' %}
+            <td><span class="badge rounded-pill text-bg-warning p-2">{{ audiencia.status_audiencia }}</span></td>
+            {% elif audiencia.status_audiencia == 'En audiencia' %}
+            <td><span class="badge rounded-pill text-bg-success p-2">{{ audiencia.status_audiencia }}</span></td>
+            {% elif audiencia.status_audiencia == 'Archivada' %}
+            <td><span class="badge rounded-pill text-bg-danger p-2">{{ audiencia.status_audiencia }}</span></td>
+            {% elif audiencia.status_audiencia == 'Concluida' %}
+            <td><span class="badge rounded-pill text-bg-primary p-2">{{ audiencia.status_audiencia }}</span></td>
+            {% else %}
+            <td><span class="badge rounded-pill text-bg-secondary p-2">{{ audiencia.status_audiencia }}</span></td>
+            {% endif %}
+    </tr>
+</table>
+
+<div id="span-space" style="height: 20px;"></div>
+
+<h1 class="mt-5">Asistencia audiencia</h1>
+
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    <table class="table table-hover">
+        <thead>
+            <tr class="table-primary">
+                <th class="pb-3 pt-3">Nombre</th>
+                <th class="pb-3 pt-3">Tipo de persona</th>
+
+                <th class="pb-3 pt-3">Hora de asistencia</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ciudadano in solicitantes_relacionados %}
+            <tr>
+                <td>{{ ciudadano.nombre }}</td>
+                <td>Solicitante</td>
+
+                <td>{{ ciudadano.hora_asistencia|default:"Sin asistencia" }}</td>
+            </tr>
+            {% endfor %}
+            {% for ciudadano in citados_relacionados %}
+            <tr>
+                <td>{{ ciudadano.nombre }}</td>
+                <td>Citado</td>
+
+                <td>{{ ciudadano.hora_asistencia|default:"Sin asistencia" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No hay ciudadanos registrados para esta audiencia.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+
+    <!-- Botones para cambiar el estado de la audiencia -->
+    {% if audiencia.status_audiencia != 'En audiencia' %}
+        {% if nombreGrupo == 'Conciliacion' or nombreGrupo == 'Administrador' %}
+            <button type="submit" name="iniciar" class="btn btn-warning mb-3">Iniciar audiencia</button>
+        {% endif %}
+    {% endif %}
+    
+    {% if audiencia.status_audiencia == 'En audiencia' %}
+        <button type="submit" name="concluir" class="btn btn-success mb-3">Concluir</button>
+        <button type="submit" name="archivar" class="btn btn-danger mb-3" id="archivarButton" disabled>Archivar</button>
+    {% endif %}
+
+</form>
+
+<a href="{% url 'audiencias_auxiliares_api' %}" class="btn btn-secondary mb-5">Volver a la lista</a>
+<div>
+    <button type="submit" name="mesa-ayuda" class="btn btn-warning mb-3" id="mesaButton" data-bs-toggle="modal" data-bs-target="#mesa-ayuda">Levantar Mesa de Ayuda</button>
+    <button type="submit" class="btn btn-success mb-3" id="asistenciabtn" data-bs-toggle="modal" data-bs-target="#asistencia">Solicitar Ayuda de Auxiliares</button>
+</div>
+
+
+<div class="text-center mt-3 mb-3 fw-light counter-text mt-5">
+    {% if audiencia.status_audiencia == 'En audiencia' %}
+    <span><i class="fa-solid fa-business-time"></i></span>
+    <span id="tiempo-audiencia" data-audiencia-id="{{ audiencia.id }}">Tiempo de la audiencia transcurrido: Cargando...</span>
+    {% elif audiencia.status_audiencia == 'Concluida' or 'Archivada' %}
+    
+    {% else %}
+    <span><i class="fa-solid fa-business-time"></i></span>
+    <span>La audiencia no ha iniciado. Inicie la audiencia para poder consultar el tiempo de está.</span>
+    {% endif %}
+</div>
+
+
+
+<!--modal para mesa de ayuda-->
+
+<div class="modal fade" id="mesa-ayuda" tabindex="-1" aria-labelledby="addCitizenModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCitizenModalLabel">Mesa de Ayuda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <form id="mesaAyudaForm" action="{% url 'mesa ayuda' pk=audiencia.pk %}" method="POST">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Expediente</label>
+                        <input type="text" class="form-control" id="expediente" name="expediente" value="{{audiencia.expediente}}" readonly required>
+                        <input type="hidden" class="form-control" id="user_id" name="user_id" value="{{user.id}}" readonly required>
+                        {% for ciudadano in solicitantes_relacionados %}
+                            <input type="hidden" name="nombres_solicitantes" value="{{ ciudadano.nombre }}">
+                        {% endfor %}
+                    
+                        <!-- Enviar los nombres de los citados relacionados -->
+                        {% for ciudadano in citados_relacionados %}
+                            <input type="hidden" name="nombres_citados" value="{{ ciudadano.nombre }}">
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Audiencia</label>
+                        <input type="text" class="form-control" id="audiencia" name="audiencia" value="{{audiencia.folio_audiencia}}" readonly required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Solicitud</label>
+                        <input type="text" class="form-control" id="solicitud" name="solicitud" value="{{audiencia.folio_soli}}" readonly required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="peticion" class="form-label">Petición</label>
+                        <select class="form-select" id="peticion" name="peticion" required>
+                            <option value="" disabled selected>Selecciona una opción</option>
+                            <option value="Reagenda">Reagenda</option>
+                            <option value="Retroceso (Quitar terminación de audiencia)">Retroceso (Quitar terminación de audiencia)</option>
+                            <option value="Retroceso (Reiniciar audiencia)">Retroceso (Reiniciar audiencia)</option>
+                            <option value="Retroceso (Quitar Confirmación)">Retroceso (Quitar Confirmación)</option>
+                            <option value="SINACOL lento">SINACOL lento</option>
+                            <option value="Regenerar documentos">Regenerar documentos</option>
+                            <option value="No se generaron los documentos">No se generaron los documentos</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="mensaje" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required></textarea>
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary" form="mesaAyudaForm" data-bs-dismiss="modal">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--modal de asistencia-->
+
+<div class="modal fade" id="asistencia" tabindex="-1" aria-labelledby="addCitizenModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCitizenModalLabel">Solicitar Asistencia Auxiliares</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <form id="asistenciaForm" action="{% url 'asistencia auxiliares' pk=audiencia.pk %}" method="POST">
+                    <div class="mb-3">
+                
+                    <div class="mb-3">
+                        <input type="hidden" name="conciliador" value="{{user.id}}">
+                        <input type="hidden" name="audiencia_id" value="{{audiencia.id}}">
+
+                        <label for="mensaje" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required></textarea>
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary" form="asistenciaForm" data-bs-dismiss="modal">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    const audiencias_id = document.getElementById('tiempo-audiencia').getAttribute('data-audiencia-id');
+
+    function actualizarTiempoAudiencia() {
+        fetch(`/celebrar/${audiencias_id}/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('tiempo-audiencia').textContent = `Tiempo de la audiencia transcurrido: ${data.tiempo}`;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    // Actualizar cada segundo
+    setInterval(actualizarTiempoAudiencia, 1000);
+  </script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    console.log("carga mi bloque de código");
+
+    function verificarLlamados() {
+        const existingSpan = document.getElementById('span-mensaje');
+                    if (existingSpan) {
+                        existingSpan.remove();
+                    }
+        console.log("carga el fetch");
+        fetch('/ver_asistencias', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Datos obtenidos:", data);
+
+            data.audiencias.forEach(audiencia => {
+                const expediente = audiencia.expediente;
+                const tdElement = document.getElementById("expediente");
+                const spanSpace = document.getElementById('span-space');
+
+                // Verificar si el contenido de tdElement coincide con expediente
+                if (tdElement && tdElement.textContent.trim() === expediente) {
+                    // Remover span anterior si existe
+                    const existingSpan = document.getElementById('span-mensaje');
+                    if (existingSpan) {
+                        existingSpan.remove();
+                    }
+
+                    // Crear un nuevo span actualizado
+                    const spanElement = document.createElement('span');
+                    spanElement.id = "span-mensaje";
+
+                    if (audiencia.atendiendo) {
+                        console.log("la audiencia se está atendiendo");
+                        spanElement.className = 'badge rounded-pill text-bg-success p-2 span-ayuda';
+                        spanElement.textContent = `Atendiendo la solicitud de ayuda:  ${audiencia.auxiliar}`;
+                    } else {
+                        console.log("no lo están atendiendo");
+                        spanElement.className = 'badge rounded-pill text-bg-warning p-2 span-ayuda';
+                        spanElement.textContent = "Se envió mensaje de ayuda a los auxiliares";
+                    }
+
+                    // Añadir el span al tdElement
+                    spanSpace.appendChild(spanElement);
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error en el fetch:", error);
+        });
+    }
+
+    // Ejecuta la función cada 2 segundos
+    setInterval(verificarLlamados, 5000);
+});
+
+
+
+</script>
+
+{%endblock%}

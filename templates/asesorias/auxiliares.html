@@ -1,0 +1,330 @@
+{% extends 'asesorias/base.html' %} 
+{% load static%} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+
+<div class="height-100 bg-light">
+<main role="main">
+  
+  <h1 class="text-white bg-blue p-3 rounded text-center">
+    Mensajes del día
+  </h1>
+
+  <div class="row text-center my-4">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Solicitudes Pendientes</h5>
+          <h2 class="card-text">
+            {{pendientes}} <i class="fa-regular fa-clock blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Solicitudes en Proceso</h5>
+          <h2 class="card-text">
+            {{proceso}} <i class="fa-regular fa-handshake blue-icon"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+    
+
+  <div class="group d-flex align-middle">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+      <g>
+        <path
+          d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
+        ></path>
+      </g>
+    </svg>
+    <input
+      class="input"
+      type="text"
+      id="search-input"
+      placeholder="Buscar por número de expediente, por citados, por fecha y hora, etc..."
+    />
+  </div>
+
+  <!--<div class="accordion mt-2 mb-3" id="accordionFiltro">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Mostrar filtros adicionales <i class="fa-solid fa-arrow-down-wide-short ms-2"></i>
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFiltro">
+        <div class="accordion-body">
+          <div class="group d-flex align-middle">
+            <select id="status-select" class="form-select me-3 w-auto">
+              <option selected value="">Cualquier estatus</option>
+              {% for status in estatus%}
+                <option value="{{ status }}">{{ status }}</option>
+              {% endfor %}
+            </select>
+            <select id="conciliador-select" class="form-select me-3">
+              <option selected value="">Todos los conciliadores</option>
+              {% for conciliador in conciliadores %}
+                <option value="{{ conciliador }}">{{ conciliador|cut:"."|title }}</option>
+              {% endfor %}
+            </select>
+        
+            <select id="fecha-select" class="form-select ms-3 w-auto">
+              <option selected value="">Cualquier fecha</option>
+              {% for fecha in fechas %}
+                <option value="{{ fecha|date:"d/m/Y" }}">{{ fecha|date:"d/m/Y" }}</option>
+              {% endfor %}
+            </select>
+            <select id="hora-select" class="form-select ms-3 w-auto">
+              <option selected value="">Cualquier hora</option>
+              {% for hora in horas %}
+                  <option value="{{ hora }}">{{ hora|time:"H:i" }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+-->
+  <div class="w-100">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} mt-4 text-center" role="alert"> 
+      <p  {% if message.tags %} class="mb-0 mt-0 {{ message.tags }} " {% endif %}> {{ message|safe }} </p>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <table class="table table-hover border text-center align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Acciones</th>
+        <th>Mesa</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Asesor</th>
+        <th>Mensaje</th>
+        <th>Status</th>
+        <th>Atiende</th>
+      </tr>
+    </thead>
+    <tbody id="table-body">
+      {% for solicitud in solicitudes %}
+        <tr>
+          <td class="acciones" id="acciones-{{solicitud.id}}"></td>
+          <td id="mesa-{{solicitud.id}}">{{solicitud.mesa}}</td>
+          <td>{{solicitud.fecha}}</td>
+          <td>{{solicitud.hora}}</td>
+          <td>{{solicitud.nombre}}</td>
+          <td>{{solicitud.mensaje}}</td>          
+          <td>{% if solicitud.activo and solicitud.atendiendo%} En proseso{%elif solicitud.activo%} Por atender {%else%} Finalizado {%endif%}</td>
+          <td>{{solicitud.auxiliar}}</td>
+      </tr>
+      {% endfor %}
+      
+    </tbody>
+  </table>
+</main>
+</div>
+
+
+
+<!-- Modal -->
+<div id="miModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+  <div style="position: relative; margin: auto; padding: 20px; background: white; width: 50%; top: 20%;">
+    <span id="cerrarModal" style="cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+    <h2 id="modalTitulo">Título del Modal</h2>
+    <p id="modalContenido">Este es el contenido del modal.</p>
+    <div>
+      <form action="/asistir_asesor/" method="POST">
+        <input type="hidden" name="user_id" value="{{user.id}}">
+        <input type="hidden" name="mesa" id="mesa2" value="">
+        <button type="submit" class="btn btn-success">Entendido!</button>
+      </form>
+      <br>
+      <form action="/terminar_asistencia_asesor/" method="POST">
+        <input type="hidden" name="user_id" value="{{user.id}}">
+        <input type="hidden" name="mesa" id="mesa1" value="">
+        <button type="submit" class="btn btn-danger">Terminar</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function formatDate(dateString) {
+  const months = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+  ];
+  
+  const dateParts = dateString.split('-');
+  const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); 
+
+
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  
+  return `${day} de ${month} de ${year}`;
+}
+
+function formatTime(timeString) {
+  const timeParts = timeString.split(':');
+  const hours = timeParts[0];
+  const minutes = timeParts[1];
+  return `${hours}:${minutes}`;
+}
+
+</script>
+
+
+<script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  function verificarLlamados() {
+    fetch('/ver_solicitudes_asesor', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
+      return response.json();
+    })
+    .then(data => {
+      const tbody = document.getElementById('table-body');
+      
+      
+      // Limpiar el contenido actual del tbody antes de agregar nuevos datos
+      tbody.innerHTML = '';
+
+      data.forEach(asesor => {
+        // Crear una nueva fila para cada solicitud de asesor
+        const tr = document.createElement('tr');
+
+        const fecha_formateada = formatDate(asesor.fecha);
+        const hora_formateada = formatTime(asesor.hora)
+
+        
+        // Crear celdas (td) para cada columna y añadir el contenido dinámico
+        const tdAcciones = document.createElement('td');
+        tdAcciones.className = 'acciones';
+        tdAcciones.id = `acciones-${asesor.id}`;
+        tdAcciones.style.display = 'flex';
+        tdAcciones.style.flexDirection = 'column';
+        tdAcciones.style.alignItems = 'center';
+        
+        const imgElement = document.createElement('img');
+        imgElement.src = '/static/icon/abogado.gif';
+        imgElement.alt = 'gif';
+        imgElement.height = 150;
+
+        const spanElement = document.createElement('span');
+        spanElement.className = asesor.atendiendo 
+          ? 'badge rounded-pill text-bg-success p-2 span-ayuda' 
+          : 'badge rounded-pill text-bg-warning p-2 span-ayuda';
+        spanElement.textContent = asesor.atendiendo 
+          ? `Atiende: ${asesor.auxiliar}` 
+          : "Necesito Ayuda!";
+        
+        // Añadir elementos a tdAcciones
+        tdAcciones.appendChild(imgElement);
+        tdAcciones.appendChild(spanElement);
+
+        // Añadir el evento de clic para el modal
+        spanElement.addEventListener('click', function() {
+          document.getElementById('modalTitulo').innerText = `Mesa: ${asesor.mesa}`;
+          document.getElementById('modalContenido').innerText = `Mensaje del asesor ${asesor.nombre}: ${asesor.mensaje}`;
+          document.getElementById('mesa1').value = asesor.mesa;
+          document.getElementById('mesa2').value = asesor.mesa;
+          document.getElementById('miModal').style.display = 'block';
+        });
+
+        // Crear y añadir el resto de las celdas de la fila
+        const tdMesa = document.createElement('td');
+        tdMesa.textContent = asesor.mesa;
+
+        const tdFecha = document.createElement('td');
+        tdFecha.textContent = fecha_formateada;
+
+        const tdHora = document.createElement('td');
+        tdHora.textContent = hora_formateada;
+
+        const tdAsesor = document.createElement('td');
+        tdAsesor.textContent = asesor.nombre;
+
+        const tdMensaje = document.createElement('td');
+        tdMensaje.textContent = asesor.mensaje;
+
+        const tdStatus = document.createElement('td');
+        tdStatus.textContent = asesor.activo && asesor.atendiendo ? "En proceso" 
+                          : asesor.activo ? "Por atender" 
+                          : "Finalizado";
+
+        const tdAtiende = document.createElement('td');
+        tdAtiende.textContent = asesor.auxiliar;
+
+        // Añadir todas las celdas a la fila
+        tr.appendChild(tdAcciones);
+        tr.appendChild(tdMesa);
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdHora);
+        tr.appendChild(tdAsesor);
+        tr.appendChild(tdMensaje);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdAtiende);
+
+        // Añadir la fila completa al tbody
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(error => {
+      console.error("Error en el fetch:", error);
+    });
+  }
+
+  // Cerrar el modal cuando se hace clic en el botón de cerrar
+  const cerrarModal = document.getElementById('cerrarModal');
+  cerrarModal.addEventListener('click', function() {
+    document.getElementById('miModal').style.display = 'none';
+  });
+
+  // Cerrar el modal al hacer clic fuera del mismo
+  window.addEventListener('click', function(event) {
+    const miModal = document.getElementById('miModal');
+    if (event.target === miModal) {
+      miModal.style.display = 'none';
+    }
+});
+
+// Llamar a la función cada 2 segundos para actualizar la tabla
+setInterval(verificarLlamados, 2000);
+});
+
+
+</script>
+
+
+
+
+<style>
+.span-ayuda:hover{
+  cursor: pointer;
+}
+
+
+</style>
+
+
+{% endblock %}

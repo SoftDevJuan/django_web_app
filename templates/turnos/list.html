@@ -1,0 +1,15 @@
+{% extends 'recepcion/base.html' %}
+{% block content %}
+    <h2>Lista de Turnos</h2>
+    <a href="{% url 'turnos new' %}">Crear nuevo turno</a>
+    <ul>
+        {% for turno in turnos %}
+            <li>
+                {{ turno.turno }} - 
+                <a href="{% url 'turnos detail' turno.id %}">Detalle</a> |
+                <a href="{% url 'turnos edit' turno.id %}">Editar</a> |
+                <a href="{% url 'turnos delete' turno.id %}">Borrar</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

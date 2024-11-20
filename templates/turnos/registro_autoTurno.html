@@ -1,0 +1,178 @@
+{% extends 'general/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'general/barralateral.html' %}
+<body>
+    <div class="container mt-5">
+        <div class="text-center mb-4">
+            <br>
+            <h1 class="display-4">Asignación de turno</h1>
+            <p class="lead">Busca tu código de ciudadano o de registro para obtener un turno</p>
+        </div>
+
+        <!-- Formulario para buscar al ciudadano -->
+        <div class="card shadow-sm p-4 mb-4">
+            <form action="{% url 'auto_turno' %}" method="GET" class="form-inline justify-content-center">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="codigo_ciudadano" class="sr-only">Código del Ciudadano</label>
+                    <div class="d-grid gap-1">
+                        <input
+                        type="number"
+                        class="form-control"
+                        id="codigo_ciudadano"
+                        name="codigo_ciudadano"
+                        placeholder="Código del ciudadano"
+                        value="{{ request.GET.codigo_ciudadano }}"
+                        />
+                    </div>
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="registro" class="sr-only">Registro del Ciudadano</label>
+                    <div class="d-grid gap-1">
+                        <input
+                        type="text"
+                        class="form-control"
+                        id="registro"
+                        name="registro"
+                        placeholder="Número de Registro"
+                        value="{{ request.GET.registro }}"
+                        />
+                    </div>
+                </div>
+                <div class="d-grid gap-1 mx-sm-3 mb-2">
+                    <button class="btn bg-blue text-white" type="submit">Buscar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Mostrar detalles del ciudadano si existen -->
+        {% if ciudadanos %}
+            <!-- Formulario para sacar un turno -->
+            <div class="card shadow-sm p-4 mb-4">
+                <form action="{% url 'asignar_turno' %}" method="POST" class="form">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="area">Área</label>
+                            <select class="form-control" id="area" name="area" required>
+                                <option value="">Selecciona el área</option>
+                                {% for choice in form.fields.area.choices %}
+                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <input type="hidden" name="registro" value="{{ ciudadanos.0.registro }}">
+                    <input type="hidden" name="codigo_ciudadano" value="{{ request.GET.codigo_ciudadano }}">
+                    {% for ciudadano in ciudadanos %}
+                    <input type="hidden" name="ciudadanos[]" value="{{ ciudadano.codigo_ciudadano }}">
+                    {% endfor %}
+                
+                    <div class="form-group col-md-6">
+                        <label for="prefijo">Indica si el ciudadano viene con:</label>
+                        <select class="form-control" id="prefijo" name="prefijo" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="CF" class="area-3" style="display:none;">Con solicitud</option>
+                            <option value="CC" class="area-3" style="display:none;">Con cita</option>
+                            <option value="PR" class="area-3" style="display:none;">Preferente</option>
+                            <option value="AJ" class="area-3" style="display:none;">Sin nada</option>
+
+                            <option value="CR" class="area-1" style="display:none;">Con cita</option>
+                            <option value="RPR" class="area-1" style="display:none;">Preferente</option>
+                            <option value="CN" class="area-1" style="display:none;">Sin nada</option>
+                        </select>
+                    </div>
+                
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            document.getElementById('area').addEventListener('change', function() {
+                                var selectedArea = this.value;
+                                var prefijos = document.querySelectorAll('#prefijo option');
+                                prefijos.forEach(function(option) {
+                                    if (option.classList.contains('area-' + selectedArea)) {
+                                        option.style.display = 'block';
+                                    } else if (option.value) {
+                                        option.style.display = 'none';
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+                
+                    <button type="submit" class="btn btn-success btn-block mt-4">Sacar Turno</button>
+                </form>
+            </div>
+
+
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">Detalles de los Ciudadanos</h1>
+                    {% for ciudadano in ciudadanos %}
+                        <p><strong>Nombre:</strong> {{ ciudadano.nombre }}</p>
+                        <p><strong>Sexo:</strong> {{ ciudadano.sexo }}</p>
+                        <!--<p><strong>CURP / RFC:</strong> {{ ciudadano.curp_rfc }}</p>-->
+                        <!--<p><strong>Correo:</strong> {{ ciudadano.correo }}</p>-->
+                        <p><strong>Municipiop:</strong> {{ ciudadano.municipio }}</p>
+                        <p><strong>Código Ciudadano:</strong> {{ ciudadano.codigo_ciudadano }}</p>
+                        <p><strong>Número de Registro:</strong> {{ ciudadano.registro }}</p>
+                        
+                        {% if ciudadano.documento_1 or ciudadano.documento_2 %}
+                            <div class="identificaciones-div">
+                                <img src="{{ ciudadano.documento_1.url }}" alt="Identificación Frente" class="img-id">
+                            <br><br>
+                            <img src="{{ ciudadano.documento_2.url }}" alt="Identificación Frente" class="img-id">
+                            </div>
+                            
+                        {% endif %}
+
+                        <!-- Mostrar imágenes de los testigos si existen -->
+                        {% for testigo in testigos %}
+                            {% if testigo.codigo_ciudadano == ciudadano.codigo_ciudadano %}
+                            <div class="identificaciones-div">
+
+                            
+                                {% if testigo.documento_3 %}
+                                    <img src="{{ testigo.documento_3.url }}" alt="Documento 3 del Testigo" class="img-id">
+                                    <br><br>
+                                {% endif %}
+                                {% if testigo.documento_4 %}
+                                    <img src="{{ testigo.documento_4.url }}" alt="Documento 4 del Testigo" class="img-id">
+                                    <br><br>
+                                </div>
+                                {% endif %}
+                                {% if testigo.documento_5 %}
+                                <div class="identificaciones-div"> 
+                                    <img src="{{ testigo.documento_5.url }}" alt="Documento 5 del Testigo" class="img-id">
+                                    <br><br>
+                                {% endif %}
+                                {% if testigo.documento_6 %}
+                                    <img src="{{ testigo.documento_6.url }}" alt="Documento 6 del Testigo" class="img-id">
+                                    <br><br>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <br><br>
+                        <!--<p><strong>Código QR:</strong></p>
+                        <img src="{{ ciudadano.qr_code.url }}" alt="Código QR" class="img-fluid"> -->
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+
+            
+        {% else %}
+            <div class="alert alert-danger mt-4 text-center" role="alert">
+                No se encontró el ciudadano.
+            </div>
+            <div class="alert alert-warning mt-4 text-center" role="alert">
+                Necesitas estar registrado para tomar un turno.
+            </div>
+            <div class="d-grid gap-1 mx-sm-3 mb-2 text-center">
+                <a href="{% url 'Registro Manual' %}" class="btn btn-info btn-lg btn-block">Registro Manual</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+{% endblock %}

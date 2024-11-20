@@ -1,0 +1,108 @@
+{% extends 'recepcion/base_pantalla.html' %} 
+{% load static %} 
+{% block content %}
+<link
+  href="{% static 'CSS/pantalla_ratis.css' %}"
+  rel="stylesheet"
+/>
+
+<div class="height-100 bg-light">
+  <main role="main">
+    <h1 class="text-white bg-blue p-3 rounded text-center">
+      Mostrando turnos para ratificación
+    </h1>
+
+    <div class="row text-center my-4">
+      <div class="col-md-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title">Turnos atendidos</h5>
+            <h2 class="card-text">
+              {{ turnosFin }} <i class="fa-solid fa-check blue-icon"></i>
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title">Turnos pendientes</h5>
+            <h2 class="card-text">
+              {{ turnosPen }}  <i class="fa-regular fa-clock blue-icon"></i>
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title">Turnos cancelados</h5>
+            <h2 class="card-text">
+              {{ turnosCan }} <i class="fa-solid fa-xmark blue-icon"></i>
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="group"></div>
+
+    <table class="table table-hover border text-center">
+      <thead class="table-light">
+        <tr>
+          <th>Turno / Folio</th>
+          <th>Estatus</th>
+          <th>Mesa / sala</th>
+          <th>Conciliador</th>
+          <th>Personas</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        {% for turno in turnos %}
+        {% if turno.status != 'FIN' and turno.status != 'CAN' and turno.status != 'PRO'%}
+        <tr data-turno-id="{{ turno.id }}">
+          <td>{{ turno.turno}}</td>
+          <td class="{% if turno.status == 'NOT' %}td-llamando{% endif %}">
+            {% if turno.status == 'PEN' %}
+              Por atender
+            {% elif turno.status == 'NOT' %}
+              Llamando
+            {% endif %}
+          </td>
+          <td>
+            {% if turno.mesa %}
+              {{ turno.mesa }}
+            {% else %}
+              Por asignar
+            {% endif %}
+          </td>
+          <td>
+            {% if turno.mesa_obj.user %}
+              {{ turno.mesa_obj.user.first_name }} {{ turno.mesa_obj.user.last_name }}
+            {% else %}
+              Por asignar
+            {% endif %}
+          </td>
+          <td style="display: none;">{{ turno.notificacion}}</td>
+          <td>{{ turno.personas_count }}</td>
+        </tr>
+        {%endif%}
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center my-4">
+      <div id="reloj"></div>
+    </div
+  </main>
+</div>
+
+{% block scripts %}
+<script src="{% static 'js/pantalla_ratis.js' %}"></script>
+<script>
+  var audioPath = "{% static 'audios/alerta-turno8.mp3' %}";
+</script>
+<script src="{% static 'js/reloj.js'%}"></script>
+{% endblock %}
+
+{% endblock %}

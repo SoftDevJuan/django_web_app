@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiencias</title>
+    <link rel="stylesheet" href="{% static 'CSS/asesorStyles.css' %}">
+    <script src="{% static 'js/asesor.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script> var username = "{{ username }}"; 
+            var user_id = "{{user.id}}";
+    </script>
+</head>
+<body>
+    <header>
+        <img src="{% static 'headers/cclimage.jpg' %}" alt="ccl logo">
+        <h1>Audiencias</h1>
+        {% if user.is_authenticated %}
+            <p>Bienvenido, {{ user.username }}</p>
+        {% endif %}
+    </header>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="verturnos" id="verturnos">Turnos</div>
+            <button id="mesa">Mi Mesa</button>
+            <button id="llamar-turno">Llamar turno</button>
+            <button id="re-llamar" style="display: none;">Volver a llamar</button>
+            {% if request.user.is_authenticated %}
+            <form id="cerrar-sesion-form"  action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+            <button type="submit" id="cerrar-sesion">Cerrar Sesión</button>
+            </form>  
+            {% endif %}
+        </nav>
+
+        <div id="mesaModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Selecciona tu Mesa</h2>
+                <select name="mesaselect" id="mesaSelect">
+                    <option value="0">Desocupar Mesa</option>
+                        {% for i in numeros_mesa %}
+                        <option value="{{ i }}"> Mesa {{ i }}</option>
+                        {% endfor %}      
+                </select>
+                <button id="usarMesa">Usar Mesa</button> 
+            </div>
+        </div>
+
+        <main class="content" id="contenido-principal">
+            
+            <div class="turno-actual" style="display: none;">
+                
+                <h2 id="turno-id">Turno Actual: <span id="turno-numero"></span></h2>
+                <div id="personas-lista">
+                    
+                </div>
+                <select class="razonSocial" id="razonSocial"></select>
+
+            </div>
+            <div class="observaciones" id="observacionesdiv" style="display: none;">
+                <label for="observaciones" id="observaciones-titulo">observaciones:</label>
+                <textarea id="observaciones-text" rows="4"></textarea>
+            </div>
+            <div class="acciones">
+                <button id="terminar-btn" style="display: none;">Terminar</button>
+            </div>
+            <div id="myModal" class="modal">
+                <img class="modal-content" id="modalImg">
+            </div>
+        </main>
+    </div>
+</body>
+</html>

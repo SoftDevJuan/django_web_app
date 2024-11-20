@@ -1,0 +1,8 @@
+<!-- mesa_confirm_delete.html -->
+<h1>Eliminar Mesa</h1>
+<p>¿Estás seguro que deseas eliminar la mesa "{{ mesa }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Eliminar</button>
+</form>
+<a href="{% url 'mesa_list' %}">Volver a la Lista</a>

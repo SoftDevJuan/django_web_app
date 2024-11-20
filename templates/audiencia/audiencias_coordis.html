@@ -1,0 +1,90 @@
+{% extends 'audiencia/base.html' %} 
+{% load static %} 
+{% block content %}
+{% include 'general1/barralateral.html' %}
+<h1 class="mt-3">Detalles de la Audiencia</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Expediente:</th>
+        <td>{{ audiencia.expediente }}</td>
+    </tr>
+    <tr>
+        <th>Fecha:</th>
+        <td>{{ audiencia.fecha_audiencia|date:"d/m/Y" }}</td>
+    </tr>
+    <tr>
+        <th>Hora:</th>
+        <td>{{ audiencia.hora_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Sala:</th>
+        <td>{{ audiencia.sala_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Conciliador:</th>
+        <td>{{ audiencia.conciliador_audiencia }}</td>
+    </tr>
+    <tr>
+        <th>Status:</th>
+          {% if audiencia.status_audiencia == 'Llamando' %}
+          <td><span class="badge rounded-pill text-bg-warning p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'En audiencia' %}
+          <td><span class="badge rounded-pill text-bg-success p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'Archivada' %}
+          <td><span class="badge rounded-pill text-bg-danger p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% elif audiencia.status_audiencia == 'Concluida' %}
+          <td><span class="badge rounded-pill text-bg-primary p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% else %}
+          <td><span class="badge rounded-pill text-bg-secondary p-2">{{ audiencia.status_audiencia }}</span></td>
+          {% endif %}
+    </tr>
+</table>
+
+<table class="table table-hover">
+  <thead>
+      <tr class="table-primary">
+          <th class="pb-3 pt-3">Nombre</th>
+          <th class="pb-3 pt-3">Tipo de persona</th>
+          <th class="pb-3 pt-3">Hora de asistencia</th>
+      </tr>
+  </thead>
+  <tbody>
+      {% for ciudadano in ciudadanos_relacionados %}
+      <tr>
+          <td>{{ ciudadano.nombre }}</td>
+          <td>{{ ciudadano.tipo_persona }}</td>
+          <td>{{ciudadano.hora_asistencia|default:"Sin asistencia"}}</td>
+      </tr>
+      {% empty %}
+      <tr>
+          <td colspan="6">No hay ciudadanos registrados para esta audiencia.</td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
+
+<h1 class="mt-3">Editar Audiencia</h1>
+
+<!-- Mostrar mensajes -->
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- Formulario de edición de la audiencia -->
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>
+
+<a href="{% url 'audiencias_auxiliares_api' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
+
+{% endblock %}
